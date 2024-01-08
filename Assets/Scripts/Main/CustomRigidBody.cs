@@ -52,6 +52,8 @@ public class CustomRigidBody
         int chunkX = (int)MathF.Floor(pos.x / Chunk.ChunkSize);
         int chunkZ = (int)MathF.Floor(pos.z / Chunk.ChunkSize);
 
+        if(MapHandler.Chunks == null) return;
+
         // check collisions with chunks around
         for (int i = chunkX - 1; i < chunkX + 2; i++)
         for (int j = chunkZ - 1; j < chunkZ + 2; j++)

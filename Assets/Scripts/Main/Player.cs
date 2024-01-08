@@ -34,6 +34,7 @@ public class Player : NetworkBehaviour
     {
         Spawn = new Vector3(x + 0.5f, Chunk.ChunkSize - 1, z + 0.5f);
         int chunkX = x / Chunk.ChunkSize, chunkZ = z / Chunk.ChunkSize;
+        if(MapHandler.Chunks == null) return;
         if (MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
         {
             int i = ((x - chunkX * Chunk.ChunkSize) * Chunk.ChunkSize - chunkZ) * Chunk.ChunkSize + z;

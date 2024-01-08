@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -11,22 +11,27 @@ public class NetworkManagement : MonoBehaviour
 
     public string MainMenuScenename = "MainMenu";
 
-    private bool IsPaused = false;
+    [NonSerialized] public bool IsPaused = false;
+
     public GameObject PauseMenu;
+
+    [NonSerialized] public bool IsChunksReady = false;
+    private Dictionary<string, Chunk> Chunks;
 
 
     void Start()
     {
         PauseMenu.SetActive(false);
         manager = GetComponent<NetworkManager>();
-        bool IsOnline = NetworkInfos.IsMultiplayerGame;
-        IsHost = NetworkInfos.IsHost;
 
         if (!NetworkInfos.StartedFromMainMenu)
         {
-            IsHost = true;
-            IsOnline = true;
+            NetworkInfos.IsHost = true;
+            NetworkInfos.IsMultiplayerGame = true;
         }
+
+        bool IsOnline = NetworkInfos.IsMultiplayerGame;
+        IsHost = NetworkInfos.IsHost;
 
         manager.maxConnections = IsOnline ? 2 : 1;
 
@@ -35,6 +40,8 @@ public class NetworkManagement : MonoBehaviour
         else
             manager.StartClient();
     }
+
+
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -59,4 +66,11 @@ public class NetworkManagement : MonoBehaviour
 
         SceneManager.LoadScene(MainMenuScenename);
     }
+
+    public void ReadyToSendChunks(Dictionary<string, Chunk> chunks)
+    {
+        IsChunksReady = true;
+        Chunks = chunks;
+    }
+
 }

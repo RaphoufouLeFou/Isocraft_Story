@@ -15,10 +15,11 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject MainParent;
     [SerializeField] private GameObject NewGameParent;
     [SerializeField] private GameObject LoadGameParent;
+    [SerializeField] private GameObject BackButton;
 
-    // Start is called before the first frame update
     void Start()
     {
+        BackButton.SetActive(false);
         MainParent.SetActive(true);
         NewGameParent.SetActive(false);
         LoadGameParent.SetActive(false);
@@ -27,11 +28,22 @@ public class MainMenu : MonoBehaviour
 
     public void NewGameButtonClick()
     {
+        BackButton.SetActive(true);
         MainParent.SetActive(false);
         NewGameParent.SetActive(true);
     }
+
+    public void BackButtonClick()
+    {
+        MainParent.SetActive(true);
+        NewGameParent.SetActive(false);
+        LoadGameParent.SetActive(false);
+        BackButton.SetActive(false);
+    }
+
     public void LoadGameButtonClick()
     {
+        BackButton.SetActive(true);
         MainParent.SetActive(false);
         LoadGameParent.SetActive(true);
     }
