@@ -4,7 +4,7 @@ this is a good game
 
 # Installation :
 
-* clone the repo somwhere in your machine
+* clone the repo somwere in your machine
 * download the entire prodject "IsoCraft Story (1).zip" from [here](https://drive.google.com/drive/u/0/folders/1eLwcwYeZIpldG1B9WUpeLuSKw6Ah3_26)
 * extract the project from the .zip to the cloned repo on your machine
 * If windows tells you if you want to replace some files, say NO. github is the newest
