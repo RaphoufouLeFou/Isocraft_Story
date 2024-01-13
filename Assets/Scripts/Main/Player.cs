@@ -8,6 +8,8 @@ public class Player : NetworkBehaviour
     public new Camera camera;
     public PlayerCamera playerCamera;
 
+    public NetworkManagement NetManager;
+
     [NonSerialized] public CustomRigidBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     [NonSerialized] public Vector3 Spawn;
@@ -22,7 +24,9 @@ public class Player : NetworkBehaviour
             return;
         }
         camera.enabled = true;
-        
+
+        NetManager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
+
         Debug.Log("Transform Tag is: " + camera.gameObject.tag);
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
@@ -119,10 +123,12 @@ public class Player : NetworkBehaviour
     
     void Update()
     {
-        if (!isLocalPlayer) { return; }
-        Body.Update();
+        if (!isLocalPlayer) return; 
+        Body.Update(NetManager.IsPaused);
+
         if (Body.OnFloor) GroundedHeight = transform.position.y;
 
+        if (NetManager.IsPaused) return;
         // rotate camera about the Y axis
         Vector3 rotation = transform.rotation.eulerAngles;
         bool change = false;

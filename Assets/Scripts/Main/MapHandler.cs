@@ -15,7 +15,7 @@ public class MapHandler : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void RequestChunks()
     {
-        Debug.LogError($"Spawning chunks");
+        Debug.Log($"Spawning chunks");
         foreach (var chunk in Chunks)
         {
 
@@ -27,7 +27,7 @@ public class MapHandler : NetworkBehaviour
             NetworkClient.RegisterPrefab(chunk.Value.gameObject, 69);
            
 
-            Debug.LogError($"Spawning chunk ({chunk.Key})");
+            Debug.Log($"Spawning chunk ({chunk.Key})");
             NetworkServer.Spawn(chunk.Value.gameObject);
         }
 
@@ -53,16 +53,10 @@ public class MapHandler : NetworkBehaviour
 
                     NetworkIdentity Ni = chunkObject.GetComponent<NetworkIdentity>();
 
-                    Debug.LogWarning($"{ Ni.assetId}");
                     Chunk chunk = chunkObject.GetComponent<Chunk>();
                     MeshRenderer meshRenderer = chunkObject.GetComponent<MeshRenderer>();
                     meshRenderer.material = material;
-                    chunk.Init(pos);
-
-
-
-                    
-                    
+                    chunk.Init(pos);              
 
                     Chunks.Add(chunkObject.name, chunk);
                 } 
@@ -72,9 +66,9 @@ public class MapHandler : NetworkBehaviour
         {
             //while (!manager.IsChunksReady) ;
 
-            Debug.LogError("Requesting chunks");
+            Debug.Log("Requesting chunks");
             RequestChunks();
-            Debug.LogError("Requested chunks");
+            Debug.Log("Requested chunks");
             /*
             foreach (var chunk in Chunks)
             {

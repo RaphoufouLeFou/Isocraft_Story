@@ -137,19 +137,22 @@ public class CustomRigidBody
         _transform.position = pos;
     }
     
-    public void Update()
+    public void Update(bool paused)
     {
         // capped movement speed
         float delta = Time.deltaTime;
         if (delta > 0.1f) delta = 0.1f;
 
-        // keys movement
-        MoveRelative = new Vector3(Input.GetAxisRaw("Horizontal") * 0.8f, 0, Input.GetAxisRaw("Vertical")).normalized;
-        Vector3 move = _transform.rotation * MoveRelative;
-        float speed = Input.GetKey(KeyCode.LeftControl) ? 1.7f * _speed : _speed;
-        Movement += move * (speed * delta);
-        if (Input.GetKey("space") && OnFloor) Movement.y = _jumpForce;
-        
+        if (!paused)
+        {
+            // keys movement
+            MoveRelative = new Vector3(Input.GetAxisRaw("Horizontal") * 0.8f, 0, Input.GetAxisRaw("Vertical")).normalized;
+            Vector3 move = _transform.rotation * MoveRelative;
+            float speed = Input.GetKey(KeyCode.LeftControl) ? 1.7f * _speed : _speed;
+            Movement += move * (speed * delta);
+            if (Input.GetKey("space") && OnFloor) Movement.y = _jumpForce;
+        }
+
         // move according to movement
         float drag = MathF.Pow(_drag, 100 * delta);
         Movement.x *= drag;
