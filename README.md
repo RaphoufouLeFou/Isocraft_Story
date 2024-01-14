@@ -18,4 +18,4 @@ this is a good game
 
 # Tips 
 
-* Use Github Desktop, it is way simpler tha the command line
+* Use Github Desktop, it is way simpler than the command line
