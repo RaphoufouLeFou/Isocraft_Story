@@ -5,7 +5,7 @@ this is a good game
 # Installation :
 
 * clone the repo somwere in your machine
-* download the entire prodject "IsoCraft Story (1).zip" from [here](https://drive.google.com/drive/u/0/folders/1eLwcwYeZIpldG1B9WUpeLuSKw6Ah3_26)
+* download the entire prodject "IsoCraft Story (1).zip" from [here](https://drive.google.com/drive/u/0/folders/1eLwcwYeZIpldG1B9WUpeLuSKw6Ah3_26) (Make sure to get the version from Raphoulefou, aka the bleur circle)
 * extract the project from the .zip to the cloned repo on your machine
 * If windows tells you if you want to replace some files, say NO. github is the newest
 * finally, you can go to the Unity hub and add the prodject, and then work on it
