@@ -12,7 +12,7 @@ this is a good game
 
 # Commits :
 
-* Before opening the project to make modification, check if you have the latest version !!
+* Before opening the project to make modification, **check if you have the latest version !!**
 * Once you have done your modification, commit your changes WITH A CLEAR NAME AND A SHORT DESCRIPTION
 * then push
 
