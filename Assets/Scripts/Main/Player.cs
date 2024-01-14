@@ -2,6 +2,8 @@ using Mirror;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class Player : NetworkBehaviour
 {
@@ -13,11 +15,20 @@ public class Player : NetworkBehaviour
     [NonSerialized] public CustomRigidBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     [NonSerialized] public Vector3 Spawn;
+    
+    public Inventory inventory = new Inventory();
+
+    
+    public Sprite[] Sprites;
 
     void Start()
     {
         //camera = GameObject.Find("Main Camera").GetComponent<Camera>();
-
+        GameObject Items = GameObject.Find("HotBarBackground");
+        for (int i = 0; i < 9; i++)
+        {
+            Hotbar.ItemImages[i] = Items.transform.GetChild(i).gameObject;
+        }
         camera = GetComponentInChildren<Camera>();
         if (!isLocalPlayer) { 
             camera.enabled = false;
@@ -75,9 +86,8 @@ public class Player : NetworkBehaviour
         PlaceBreak(pos, type, IsPlacing);
     }
 
-    void PlaceBreak(Vector3 pos, int type, bool IsPlacing)
+    int PlaceBreak(Vector3 pos, int type, bool IsPlacing)
     {
-
         int chunkX = Floor(pos.x / Chunk.ChunkSize),
             chunkZ = Floor(pos.z / Chunk.ChunkSize);
         Chunk chunk = MapHandler.Chunks[chunkX + "." + chunkZ];
@@ -85,9 +95,13 @@ public class Player : NetworkBehaviour
         int x = Floor(pos.x) - chunkX * Chunk.ChunkSize,
             z = Floor(pos.z) - chunkZ * Chunk.ChunkSize;
         int i = (x * Chunk.ChunkSize + Floor(pos.y)) * Chunk.ChunkSize + z;
-
-        if (!IsPlacing) chunk.Blocks[i] = 0;
-        else chunk.Blocks[i] = 5;
+        int result = type;
+        if (!IsPlacing)
+        {
+            result = chunk.Blocks[i];
+            chunk.Blocks[i] = 0;
+        }
+        else chunk.Blocks[i] = type;
         chunk.BuildMesh();
 
         // update nearby chunks if placed on a chunk border
@@ -99,6 +113,7 @@ public class Player : NetworkBehaviour
         foreach (string chunkName in toCheck)
             if (MapHandler.Chunks.ContainsKey(chunkName))
                 MapHandler.Chunks[chunkName].BuildMesh();
+        return result;
     }
 
     void DetectPlaceBreak()
@@ -111,11 +126,34 @@ public class Player : NetworkBehaviour
             {
                 // move into or out of the block to get the right targeted block
                 hit.point += 0.01f * (right ? 1 : -1) * hit.normal;
-                PlaceBreak(hit.point, 5, right);        // place the block for this instance
+
+                int CurrentBlock = inventory.GetCurrentBlock(Hotbar.selectedIndex, 3);
+                if (right)
+                {
+                    int res = inventory.RemoveBlock(Hotbar.selectedIndex, 3);
+                    Debug.Log($"{res}");
+                    if (res < 0) return;
+                    if (res == 0)
+                    {
+
+                        Hotbar.ItemImages[Hotbar.selectedIndex].transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>().sprite = Sprites[0];
+                        Hotbar.ItemImages[Hotbar.selectedIndex].transform.GetChild(0).GetChild(0).gameObject.GetComponentInChildren<TMP_Text>().text = "";
+                    }
+                    else
+                        Hotbar.ItemImages[Hotbar.selectedIndex].transform.GetChild(0).GetChild(0).gameObject.GetComponentInChildren<TMP_Text>().text = $"{res}";
+                    Debug.Log($"Placing block id = {CurrentBlock}");
+                    PlaceBreak(hit.point, CurrentBlock, right);        // place the block for this instance
+                }
+                else
+                {
+                    int res = PlaceBreak(hit.point, CurrentBlock, right);        // place the block for this instance
+                    inventory.AddBlock(res, Sprites[res]);
+                }
+
                 if (isServer){
-                    ServerPlaceBreak(hit.point, 5, right);  // place the block for the clients
+                    ServerPlaceBreak(hit.point, CurrentBlock, right);  // place the block for the clients
                 }else{
-                    ClientPlaceBreak(hit.point, 5, right);  // place the block for the server
+                    ClientPlaceBreak(hit.point, CurrentBlock, right);  // place the block for the server
                 }
             }
         }
@@ -123,7 +161,10 @@ public class Player : NetworkBehaviour
     
     void Update()
     {
-        if (!isLocalPlayer) return; 
+        if (!isLocalPlayer) return;
+
+        Hotbar.updateHotBar(); 
+
         Body.Update(NetManager.IsPaused);
 
         if (Body.OnFloor) GroundedHeight = transform.position.y;

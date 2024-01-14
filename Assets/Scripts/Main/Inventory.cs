@@ -1,18 +1,63 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
-public class Inventory : MonoBehaviour
+public class Inventory
 {
-    // Start is called before the first frame update
-    void Start()
+    /*
+     *   Inventory format : x = item, v = quantity
+     *   hided:
+     *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
+     *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
+     *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
+     *   hotbar:
+     *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
+     */
+    public int[,,] inv = new int[9, 4, 2];
+    public Inventory() { }
+    public int AddBlock(int block, Sprite texture)
     {
-        
+        for (int j = 3; j >= 0; j--) 
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                if ((inv[i, j, 0] == block && inv[i, j, 1] < 64) || inv[i, j, 1] == 0)
+                {
+                    Debug.Log($"Input block = {block}, current = {inv[i, j, 0]}, quantity = {inv[i, j, 1]}, i = {i}, j = {j}");
+                    inv[i, j, 0] = block;
+                    inv[i, j, 1]++;
+                    Hotbar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>().sprite = texture;
+                    Hotbar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponentInChildren<TMP_Text>().text = $"{inv[i, j, 1]}";
+                    return inv[i, j, 1];
+                }
+            }
+        }
+        return -1;
     }
 
-    // Update is called once per frame
-    void Update()
+    // <summary>
+    // Remove 1 block from a slot
+    // <param> the x coordonate
+    // <param> the y coordonate
+    // <returns> returns -1 if the slot is empty, or the updated item count if successful 
+    // </summary>
+
+    public int RemoveBlock(int x, int y)
     {
-        
+        if (inv[x, y, 1] == 0) return -1;
+        else inv[x, y, 1]--;
+        return inv[x, y, 1];
+    }
+
+    public int GetCurrentBlockCount(int x, int y)
+    {
+        return inv[x, y, 1];
+    }
+
+    public int GetCurrentBlock(int x, int y)
+    {
+        return inv[x, y, 0];
     }
 }

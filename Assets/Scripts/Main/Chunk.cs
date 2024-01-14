@@ -27,7 +27,7 @@ class FaceUtils
 
 public class Chunk : MonoBehaviour
 {
-    [NonSerialized] public const int ChunkSize = 16;
+    [NonSerialized] public const int ChunkSize = 8;
     [NonSerialized] private const int ChunkSize2 = ChunkSize * ChunkSize;
     private const int Size1 = ChunkSize - 1;
     private Vector2 _pos;
