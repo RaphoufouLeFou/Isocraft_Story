@@ -22,26 +22,24 @@ public class Overlay : MonoBehaviour
         }
         else _iterations++;
         string text = "";
-        if(Settings.OverlayParam.DisplayFps) text = AddFps(text);
-        if(Settings.OverlayParam.DisplayMspf) text = AddMsps(text);
-        if(Settings.OverlayParam.DisplayCoordinates) text = AddCoordinates(text);
+        Vector3 pos = NetworkInfos.PlayerPos;
+        if (Settings.OverlayParam.DisplayFps) text += "Fps: " + Round(FPS, 1) + "\n";
+        if (Settings.OverlayParam.DisplayMspf) text += "Last frame time: " + Round(MS, 1) + "\n";
+        if (Settings.OverlayParam.DisplayCoordinates)
+            text += "Position: [" + Round(pos.x, 3) + ", " + Round(pos.y, 3) + ", " + Round(pos.z, 3) + "]\n";
         textData.text = text;
     }
 
-    string AddFps(string text)
+    string Round(float n, int digits)
     {
-        return text += $"Fps : {FPS}\n";
-    }
+        string s = (int)n + ".";
+        for (int i = 0; i < digits; i++)
+        {
+            n -= (int)n;
+            n *= 10;
+            s += (int)n;
+        }
 
-    string AddMsps(string text)
-    {
-        return text += $"Last frame time : {MS}\n";
+        return s;
     }
-
-    string AddCoordinates(string text)
-    {
-        return text += $"position : x = {Math.Round(NetworkInfos.PlayerPos.x, 3)} y = {Math.Round(NetworkInfos.PlayerPos.y, 3)}, z = {Math.Round(NetworkInfos.PlayerPos.z, 3)}\n";
-    }
-    
-
 }
