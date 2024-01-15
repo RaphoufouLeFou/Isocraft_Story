@@ -161,8 +161,8 @@ public class CustomRigidBody
         {
             float x = 0;
             float z = 0;
-            if (Input.GetKey(Settings.KeyMap["Forward"])) z++;
-            if (Input.GetKey(Settings.KeyMap["Backward"])) z--;
+            if (Input.GetKey(Settings.KeyMap["Forwards"])) z++;
+            if (Input.GetKey(Settings.KeyMap["Backwards"])) z--;
             if (Input.GetKey(Settings.KeyMap["Left"])) x--;
             if (Input.GetKey(Settings.KeyMap["Right"])) x++;
 
