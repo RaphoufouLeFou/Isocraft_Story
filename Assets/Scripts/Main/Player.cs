@@ -41,23 +41,22 @@ public class Player : NetworkBehaviour
         Debug.Log("Transform Tag is: " + camera.gameObject.tag);
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
-        SetSpawn(0, 0);
+        //SetSpawn(0, 0);
         tr.position = Spawn;
     }
 
     void SetSpawn(int x, int z)
     {
-        Spawn = new Vector3(x + 0.5f, Chunk.ChunkSize - 1, z + 0.5f);
+        Spawn = new Vector3(x + 0.5f, Chunk.Size1, z + 0.5f);
         int chunkX = x / Chunk.ChunkSize, chunkZ = z / Chunk.ChunkSize;
-        if(MapHandler.Chunks == null) return;
         if (MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
         {
-            int i = ((x - chunkX * Chunk.ChunkSize) * Chunk.ChunkSize - chunkZ) * Chunk.ChunkSize + z;
-            while (chunk.Blocks[i + (int)Spawn.y * Chunk.ChunkSize] == 0) Spawn.y--;
+            int modX = (x - chunkX * Chunk.ChunkSize) * Chunk.ChunkSize * Chunk.ChunkSize,
+                modZ = z - chunkZ * Chunk.ChunkSize;
+            while (chunk.Blocks[modX, (int)Spawn.y, modZ] == 0) Spawn.y--;
         }
         else
-            while (NoiseGen.GetBlock(Spawn) == 0)
-                Spawn.y--;
+            throw new ArgumentException("Cannot set spawn in unloaded chunk");
 
         Spawn.y++;
     }
@@ -93,15 +92,17 @@ public class Player : NetworkBehaviour
         Chunk chunk = MapHandler.Chunks[chunkX + "." + chunkZ];
 
         int x = Floor(pos.x) - chunkX * Chunk.ChunkSize,
+            y = Floor(pos.y),
             z = Floor(pos.z) - chunkZ * Chunk.ChunkSize;
-        int i = (x * Chunk.ChunkSize + Floor(pos.y)) * Chunk.ChunkSize + z;
-        int result = type;
-        if (!IsPlacing)
+
+        int result = type; // for inventory management
+        if (y < 0 || y >= Chunk.ChunkSize) return -1; // outside of world height
+        if (IsPlacing) chunk.Blocks[x, y, z] = type;
+        else
         {
-            result = chunk.Blocks[i];
-            chunk.Blocks[i] = 0;
+            result = chunk.Blocks[x, y, z];
+            chunk.Blocks[x, y, z] = 0;
         }
-        else chunk.Blocks[i] = type;
         chunk.BuildMesh();
 
         // update nearby chunks if placed on a chunk border
@@ -176,9 +177,7 @@ public class Player : NetworkBehaviour
             change = true;
             rotation.y += 45;
         }
-
-
-
+        
         if (change) playerCamera.GoalRot.y = rotation.y;
 
         rotation.y = camera.transform.rotation.eulerAngles.y;
@@ -195,6 +194,4 @@ public class Player : NetworkBehaviour
         Vector3 pos = transform.position;
         if (Input.GetKeyDown(KeyCode.R)) SetSpawn((int)pos.x, (int)pos.z); // set spawn
     }
-
-
 }

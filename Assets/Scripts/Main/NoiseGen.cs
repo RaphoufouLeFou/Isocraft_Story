@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class NoiseGen
@@ -11,17 +12,23 @@ public static class NoiseGen
         _noise.SetSeed(Game.Seed);
     }
     
-    public static int GetBlock(Vector3 pos)
+    public static IEnumerable<int> GetColumn(Vector3 pos)
     {
+        // pos should be (x, 0 (ignored), z)
         if (Game.Level == 0) // overWorld (temporary test)
         {
-            if (pos.y == 0) return Game.Blocks.Bedrock;
             float height = _noise.GetNoise(pos.x, pos.z) * 2 + 5 +
                            _noise.GetNoise(pos.x * 10 + 1000, pos.z * 10 + 1000) / 2;
-            if (pos.y > height) return Game.Blocks.Air;
-            if (pos.y + 1 > height) return Game.Blocks.Sand;
-            if (pos.y + 2 < height) return Game.Blocks.Sandstone;
-            return Game.Blocks.RedSand;
+            for (int y = 0; y < Chunk.ChunkSize; y++)
+            {
+                if (y == 0) yield return Game.Blocks.Bedrock;
+                else if (y > height) yield return Game.Blocks.Air;
+                else if (y + 1 > height) yield return Game.Blocks.Sand;
+                else if (y + 2 < height) yield return Game.Blocks.Sandstone;
+                else yield return Game.Blocks.RedSand;
+            }
+
+            yield break;
         }
 
         throw new ArgumentException("Incorrect level: " + Game.Level);

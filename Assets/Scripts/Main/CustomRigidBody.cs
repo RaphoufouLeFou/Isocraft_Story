@@ -46,13 +46,10 @@ public class CustomRigidBody
     {
         OnFloor = false;
 
-        //Vector3 pos = _transform.position;
         Vector3 movement = pos - _transform.position;
 
         int chunkX = (int)MathF.Floor(pos.x / Chunk.ChunkSize);
         int chunkZ = (int)MathF.Floor(pos.z / Chunk.ChunkSize);
-
-        if(MapHandler.Chunks == null) return;
 
         // check collisions with chunks around
         for (int i = chunkX - 1; i < chunkX + 2; i++)
@@ -76,7 +73,7 @@ public class CustomRigidBody
             {
                 if (x < 0 || x >= Chunk.ChunkSize || y < 0 || y >= Chunk.ChunkSize || z < 0 ||
                     z >= Chunk.ChunkSize) continue;
-                if (chunk.Blocks[(x * Chunk.ChunkSize + y) * Chunk.ChunkSize + z] == 0) continue;
+                if (chunk.Blocks[x, y, z] == 0) continue;
                 if (x + 1 > p.x - _width && x < p.x + _width &&
                     y + 1 > p.y - _height && y < p.y + _height &&
                     z + 1 > p.z - _width && z < p.z + _width)
@@ -94,15 +91,16 @@ public class CustomRigidBody
                 }
             }
 
-            // calculate collisions for all colliding blocks, from most depth to least
-            foreach (Quaternion correction in corrections)
+            // get final collision
+            Vector3 correction = Vector3.zero;
+            foreach (Quaternion corr in corrections)
             {
                 // correct position in the direction with the least depth
                 int toChange = -1; // 0: x, 1: y, 2: z
                 float min = 1000;
                 for (int k = 0; k < 3; k++)
                 {
-                    float coord = MathF.Abs(correction[k]);
+                    float coord = MathF.Abs(corr[k]);
                     if (coord != 0 && coord < min)
                     {
                         min = coord;
@@ -111,26 +109,42 @@ public class CustomRigidBody
                 }
                 if (toChange == 0) // x wall collision
                 {
-                    Movement.x = 0;
-                    pos.x += correction.x;
+                    if (MathF.Abs(corr.x) > MathF.Abs(correction.x)) correction.x = corr.x;
                 }
-                else if (toChange == 1)
+                else if (toChange == 1) // floor / ceiling collision
                 {
-                    pos.y += correction.y;
-                    if (movement.y < 0) // floor collision
+                    if (MathF.Abs(corr.y) > MathF.Abs(correction.y))
                     {
-                        OnFloor = true;
-                        Movement.y = 0;
+                        correction.y = corr.y;
+                        if (movement.y <= 0) break; // stop checking for collisions if on the ground
                     }
-                    else Movement.y *= -0.5f; // ceiling collision
-
-                    break; // if calculated floor/ceiling collision, no need to check for other collisions
                 }
                 else if (toChange == 2) // z wall collision
                 {
-                    pos.z += correction.z;
-                    Movement.z = 0;
+                    if (MathF.Abs(corr.z) > MathF.Abs(correction.z))
+                        correction.z = corr.z;
                 }
+                else throw new ArgumentException("Collision too big, gotta be an error somewhere");
+            }
+
+            // move by final collision
+            if (correction.x != 0)
+            {
+                Movement.x = 0;
+                pos.x += correction.x;
+            }
+
+            if (correction.y != 0)
+            {
+                if (movement.y <= 0) OnFloor = true; // floor collision
+                Movement.y = 0;
+                pos.y += correction.y;
+            }
+
+            if (correction.z != 0)
+            {
+                Movement.z = 0;
+                pos.z += correction.z;
             }
         }
 
@@ -143,10 +157,10 @@ public class CustomRigidBody
         float delta = Time.deltaTime;
         if (delta > 0.1f) delta = 0.1f;
 
-        if (!paused)
+        if (!paused) // keys movement
         {
-            // keys movement
-            MoveRelative = new Vector3(Input.GetAxisRaw("Horizontal") * 0.8f, 0, Input.GetAxisRaw("Vertical")).normalized;
+            MoveRelative = new Vector3(Input.GetAxisRaw("Horizontal") * 0.8f, 0, Input.GetAxisRaw("Vertical"))
+                .normalized;
             Vector3 move = _transform.rotation * MoveRelative;
             float speed = Input.GetKey(KeyCode.LeftControl) ? 1.7f * _speed : _speed;
             Movement += move * (speed * delta);

@@ -9,8 +9,8 @@ public class MapHandler : NetworkBehaviour
     public GameObject chunkParent;
     public Material material;
 
+    private Transform _chunksParent;
     [NonSerialized] public static Dictionary<string, Chunk> Chunks;
-
 
     [Command(requiresAuthority = false)]
     public void RequestChunks()

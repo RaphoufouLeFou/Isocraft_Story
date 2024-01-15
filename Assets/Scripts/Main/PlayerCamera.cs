@@ -18,17 +18,18 @@ public class PlayerCamera : MonoBehaviour
     void Start()
     {
         // force starting position to avoid clipping in ground
-        //player = GameObject.Find("Player [connId=0]").GetComponent<Player>();
         _currentPos = player.transform.position + new Vector3(0, 3, 0);
         _currentRot = new Vector3(45, 0, 0);
     }
 
     void Update()
     {
-        if (player.Body == null) return;  // if this is not the player, skip 
+        if (player.Body == null) return;  // if this is not the current player, skip 
 
         Transform tr = transform;
         Vector3 pPos = player.transform.position;
+        if (_lastPlayerY < 0) pPos.y = 0;
+        if (_lastPlayerY > Chunk.ChunkSize + 2) pPos.y = Chunk.ChunkSize + 2; 
         Vector3 m = player.Body.Movement;
 
         // don't update the player height if it is moving up, or jumping into no above block
@@ -36,23 +37,23 @@ public class PlayerCamera : MonoBehaviour
 
         // edit target position: use last Y, move camera when walking up/down, rotate when walking left/right
         pPos.y = _lastPlayerY + player.Body.MoveRelative.z * (m.x * m.x + m.z * m.z) * 3;
-        float goalRotY = GoalRot.y + player.Body.MoveRelative.x * 5;
+        float goalRotY = GoalRot.y + player.Body.MoveRelative.x * 5; 
 
         float fps = Time.deltaTime == 0 ? 10e6f : _moveDelay / Time.deltaTime;
         float posFps = _moveDelay * fps, rotFps = _rotDelay * (1 + _lastPlayerY / 4) * fps;
         float posFps1 = posFps - 1, rotFps1 = rotFps - 1;
-
+        
         // fix y rotation 360 wrapping
         float currentRotY = _currentRot.y;
         if (currentRotY - goalRotY > 180) goalRotY += 360;
         else if (goalRotY - currentRotY > 180) currentRotY += 360;
-
+        
         // smoothly interpolate according to fps
         _currentPos = (_currentPos * posFps1 + pPos) / posFps;
         _currentRot.x = (_currentRot.x * rotFps1 + 100 - _lastPlayerY * 10) / rotFps;
         _currentRot.y = (currentRotY * rotFps1 + goalRotY) / rotFps;
         cam.orthographicSize = (cam.orthographicSize * posFps1 + _zoom * (1 + _lastPlayerY / 10)) / posFps;
-
+        
         // update transform
         tr.rotation = Quaternion.Euler(_currentRot);
         tr.position = _currentPos + tr.rotation * new Vector3(0, 0, -20);

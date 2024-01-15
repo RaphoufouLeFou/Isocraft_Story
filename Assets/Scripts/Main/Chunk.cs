@@ -29,10 +29,9 @@ public class Chunk : MonoBehaviour
 {
     [NonSerialized] public const int ChunkSize = 8;
     [NonSerialized] private const int ChunkSize2 = ChunkSize * ChunkSize;
-    private const int Size1 = ChunkSize - 1;
+    [NonSerialized] public const int Size1 = ChunkSize - 1;
     private Vector2 _pos;
-
-    [NonSerialized] public List<int> Blocks;
+    [NonSerialized] public int[,,] Blocks = new int[ChunkSize, ChunkSize, ChunkSize];
 
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
@@ -46,20 +45,24 @@ public class Chunk : MonoBehaviour
         _pos = new Vector2(pos.x, pos.z);
         transform.position = pos * ChunkSize;
         GenerateBlocks();
-        BuildMesh();
+        BuildMesh(true);
     }
     
     void GenerateBlocks()
     {
-        Blocks = new List<int>();
         for (int x = 0; x < ChunkSize; x++)
-            for (int y = 0; y < ChunkSize; y++)
-            for (int z = 0; z < ChunkSize; z++)
-                Blocks.Add(NoiseGen.GetBlock(transform.position + new Vector3(x, y, z)));
+        for (int z = 0; z < ChunkSize; z++)
+        {
+            int y = 0;
+            foreach (int block in NoiseGen.GetColumn(transform.position + new Vector3(x, 0, z)))
+                Blocks[x, y++, z] = block;
+        }
     }
 
-    public void BuildMesh()
+    public void BuildMesh(bool newChunk = false)
     {
+        // returns a list of chunks that need to be updated
+
         Vector3 chunkPos = transform.position;
         Mesh mesh = new Mesh();
         List<Vector3> vertices = new List<Vector3>();
@@ -80,53 +83,51 @@ public class Chunk : MonoBehaviour
             for (int y = 0; y < ChunkSize; y++)
                 for (int z = 0; z < ChunkSize; z++)
                 {
-                    int i = (x * ChunkSize + y) * ChunkSize + z;
-                    if (Blocks[i] == 0) continue;
+                    if (Blocks[x, y, z] == 0) continue;
 
                     Vector3 pos = new Vector3(x, y, z);
                     for (int face = 0; face < 6; face++)
                     {
-                        int i2 = i + _offsetIndex[face];
-                        // handle blocks outside of chunks
+                        // get other block, offset according to face
                         Vector3 otherPos = pos;
-                        int other = -1;
-                        if (face == 0 && z == Size1) otherPos.z += 1;
-                        else if (face == 1 && z == 0) otherPos.z -= 1;
-                        else if (face == 2 && y == Size1) other = 0; // air on top
-                        else if (face == 3 && y == 0) other = 0; // air under
-                        else if (face == 4 && x == Size1) otherPos.x += 1;
-                        else if (face == 5 && x == 0) otherPos.x -= 1;
-                        else other = Blocks[i2];
-                        if (other == -1) // block out of chunk
+                        if (face == 0) otherPos.z++;
+                        else if (face == 1) otherPos.z--;
+                        else if (face == 2) otherPos.y++;
+                        else if (face == 3) otherPos.y--;
+                        else if (face == 4) otherPos.x++;
+                        else otherPos.x--;
+                        int other = -1; // other block
+                        int i = 0;
+                        if (otherPos.x < 0)
                         {
-                            // get block in generated chunk
-                            int j;
-                            Vector3 wrapped = otherPos; // other pos, once wrapped in its chunk
-                            if (wrapped.x < 0)
-                            {
-                                wrapped.x += ChunkSize;
-                                j = 0;
-                            }
-                            else if (wrapped.x > Size1)
-                            {
-                                wrapped.x -= ChunkSize;
-                                j = 1;
-                            }
-                            else if (wrapped.z < 0)
-                            {
-                                wrapped.z += ChunkSize;
-                                j = 2;
-                            }
-                            else
-                            {
-                                wrapped.z -= ChunkSize;
-                                j = 3;
-                            }
-
-                            other = neighbors.TryGetValue(j, out Chunk chunk)
-                                ? chunk.Blocks[(int)((wrapped.x * ChunkSize + wrapped.y) * ChunkSize + wrapped.z)]
-                                : NoiseGen.GetBlock(chunkPos + otherPos);
+                            otherPos.x += ChunkSize;
+                            i = 0;
                         }
+                        else if (otherPos.x > Size1)
+                        {
+                            otherPos.x -= ChunkSize;
+                            i = 1;
+                        }
+                        else if (otherPos.y < 0) other = 0; // air under
+                        else if (otherPos.y >= ChunkSize) other = 0; // air above
+                        else if (otherPos.z < 0)
+                        {
+                            otherPos.z += ChunkSize;
+                            i = 2;
+                        }
+                        else if (otherPos.z > Size1)
+                        {
+                            otherPos.z -= ChunkSize;
+                            i = 3;
+                        }
+                        else other = Blocks[(int)otherPos.x, (int)otherPos.y, (int)otherPos.z]; // block in the chunk
+
+                        if (other == -1) // block in another chunk
+                        {
+                            if (neighbors.TryGetValue(i, out Chunk chunk))
+                                other = chunk.Blocks[(int)otherPos.x, (int)otherPos.y, (int)otherPos.z];
+                            else other = 0; // air in unloaded chunks
+                        } 
                         if (other == 0)
                         {
                             // visible face
@@ -134,7 +135,7 @@ public class Chunk : MonoBehaviour
 
                             int n = nFaces << 2;
                             triangles.AddRange(new[] { n, n + 1, n + 2, n, n + 2, n + 3 });
-                            uvs.AddRange(Game.Blocks.FromId[Blocks[i]].GetUVs(face));
+                            uvs.AddRange(Game.Blocks.FromId[Blocks[x, y, z]].GetUVs(face));
                             nFaces++;
                         }
                     }
@@ -148,5 +149,10 @@ public class Chunk : MonoBehaviour
 
         _meshFilter.mesh = mesh;
         _meshCollider.sharedMesh = mesh;
+        
+        // update neighbors (remove side faces if needed) if newly created chunk
+        if (newChunk)
+            foreach (Chunk c in neighbors.Values)
+                c.BuildMesh();
     }
 }
