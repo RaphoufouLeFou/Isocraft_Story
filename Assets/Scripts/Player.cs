@@ -154,24 +154,24 @@ public class Player : NetworkBehaviour
         // rotate camera about the Y axis
         Vector3 rotation = transform.rotation.eulerAngles;
         bool change = false;
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(Parameters.KeyMap["CamLeft"]))
         {
             change = true;
             rotation.y -= 45;
         }
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(Parameters.KeyMap["CamRight"]))
         {
             change = true;
             rotation.y += 45;
         }
 
         // toggle camera target X rotation
-        if (Input.GetKeyDown(KeyCode.T)) playerCamera.TargetAbove = !playerCamera.TargetAbove;
+        if (Input.GetKeyDown(Parameters.KeyMap["TopView"])) playerCamera.TargetAbove = !playerCamera.TargetAbove;
         
         if (change) playerCamera.GoalRot.y = rotation.y;
         transform.rotation = Quaternion.Euler(rotation);
         
-        if (Input.GetKeyDown(KeyCode.K)) // kill
+        if (Input.GetKeyDown(Parameters.KeyMap["Kill"])) // kill
         {
             transform.position = Spawn;
             Body.Movement = Vector3.zero;
@@ -179,7 +179,7 @@ public class Player : NetworkBehaviour
 
         Vector3 pos = transform.position;
         // set spawn
-        if (Input.GetKeyDown(KeyCode.R)) SetSpawn((int)pos.x, (int)pos.z);
+        if (Input.GetKeyDown(Parameters.KeyMap["Spawn"])) SetSpawn((int)pos.x, (int)pos.z);
     }
     
     void Update()
