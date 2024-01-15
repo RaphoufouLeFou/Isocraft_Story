@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1734,7 +1734,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textData: {fileID: 1507678514}
-  updatePerSecond: 2
 --- !u!4 &124641303
 Transform:
   m_ObjectHideFlags: 0
@@ -1766,6 +1765,7 @@ MonoBehaviour:
   mainParamMenuButtons: {fileID: 1584630610}
   overlayMenu: {fileID: 1307468610}
   controlsMenu: {fileID: 1553792507}
+  inventoryMenu: {fileID: 0}
   pauseMenu: {fileID: 1931216963}
   pressKeyText: {fileID: 2012243992}
 --- !u!1 &142763497
@@ -12024,7 +12024,7 @@ GameObject:
   - component: {fileID: 1054336956}
   - component: {fileID: 1054336955}
   m_Layer: 5
-  m_Name: Parameters
+  m_Name: Settings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
