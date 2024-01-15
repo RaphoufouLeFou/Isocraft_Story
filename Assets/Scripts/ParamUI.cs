@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -15,12 +16,43 @@ public static class Parameters
     }
 
     public static Overlay OverlayParam;
-
-    public static void InitParam()
+}
+public class SaveParameters
+{       
+    public List<string> KeyMapListStr;
+    public List<KeyCode> KeyMapListKeys;
+    public bool IsPaused;
+    public bool DisplayFps;
+    public bool DisplayMspf;
+    public bool DisplayCoordonates;
+    
+    public void InitParm()
     {
-        OverlayParam.DisplayFps = true;
-        OverlayParam.DisplayMspf = true;
-        OverlayParam.DisplayCoordonates = true;
+        
+        KeyMapListStr = new List<string>();
+        KeyMapListKeys = new List<KeyCode>();
+        foreach (KeyValuePair<string,KeyCode> hKeyValuePair in Parameters.KeyMap)
+        {
+            KeyMapListStr.Add(hKeyValuePair.Key);
+            KeyMapListKeys.Add(hKeyValuePair.Value);
+        }
+        IsPaused = Parameters.IsPaused;
+        DisplayMspf = Parameters.OverlayParam.DisplayMspf;
+        DisplayFps = Parameters.OverlayParam.DisplayFps;
+        DisplayCoordonates = Parameters.OverlayParam.DisplayCoordonates;
+        Debug.Log($"init, coo = {DisplayCoordonates}");
+    }
+    public void RestoreParm()
+    {
+        Parameters.KeyMap = new Dictionary<string, KeyCode>();
+        for (int i = 0; i < KeyMapListStr.Count; i++)
+        {
+            Parameters.KeyMap.Add(KeyMapListStr[i], KeyMapListKeys[i]);
+        }
+        Parameters.IsPaused = IsPaused;
+        Parameters.OverlayParam.DisplayMspf = DisplayMspf;
+        Parameters.OverlayParam.DisplayFps = DisplayFps;
+        Parameters.OverlayParam.DisplayCoordonates = DisplayCoordonates;
     }
 }
 
@@ -44,19 +76,7 @@ public class ParamUI : MonoBehaviour
         mainParamMenuButtons.SetActive(false);
         pressKeyText.SetActive(false);
         overlayMenu.SetActive(false);
-        Parameters.InitParam();
-        
-        //defaults keys in qwerty:
-        
-        Parameters.KeyMap.Add("Forward", KeyCode.W);
-        Parameters.KeyMap.Add("Backward", KeyCode.S);
-        Parameters.KeyMap.Add("Left", KeyCode.A);
-        Parameters.KeyMap.Add("Right", KeyCode.D);
-        Parameters.KeyMap.Add("CamLeft", KeyCode.Q);
-        Parameters.KeyMap.Add("CamRight", KeyCode.E);
-        Parameters.KeyMap.Add("Kill", KeyCode.K);
-        Parameters.KeyMap.Add("TopView", KeyCode.T);
-        Parameters.KeyMap.Add("Spawn", KeyCode.R);
+        LoadParameters();
     }
 
     public void ToggleFps()
@@ -113,6 +133,52 @@ public class ParamUI : MonoBehaviour
     {
         Parameters.IsPaused = !Parameters.IsPaused;
         pauseMenu.SetActive(Parameters.IsPaused);
+        SaveParameters();
+    }
+
+    private void SaveParameters()
+    {
+        SaveParameters saveParameters = new SaveParameters();
+        saveParameters.InitParm();
+        string jsonSave = JsonUtility.ToJson(saveParameters, true);
+        string path = Application.persistentDataPath + "/Settings.json";
+        if(File.Exists(path)) File.Delete(path);
+        File.WriteAllText(path, jsonSave);
+    }
+
+    private void LoadParameters()
+    {
+
+        string path = Application.persistentDataPath + "/Settings.json";
+        if(File.Exists(path))
+        {
+            string jsonSaved = File.ReadAllText(path);
+            SaveParameters savedParam = JsonUtility.FromJson<SaveParameters>(jsonSaved);
+            savedParam.RestoreParm();
+        }
+        else
+        {
+
+            //defaults parameters
+
+            Parameters.OverlayParam.DisplayMspf = true;
+            Parameters.OverlayParam.DisplayFps = true;
+            Parameters.OverlayParam.DisplayCoordonates = true;
+            
+            //defaults keys in qwerty:
+            Parameters.KeyMap.Add("Forward", KeyCode.W);
+            Parameters.KeyMap.Add("Backward", KeyCode.S);
+            Parameters.KeyMap.Add("Left", KeyCode.A);
+            Parameters.KeyMap.Add("Right", KeyCode.D);
+            Parameters.KeyMap.Add("CamLeft", KeyCode.Q);
+            Parameters.KeyMap.Add("CamRight", KeyCode.E);
+            Parameters.KeyMap.Add("Kill", KeyCode.K);
+            Parameters.KeyMap.Add("TopView", KeyCode.T);
+            Parameters.KeyMap.Add("Spawn", KeyCode.R);
+
+            SaveParameters();
+        }
+
     }
     private void Update()
     {
@@ -122,6 +188,7 @@ public class ParamUI : MonoBehaviour
             {
                 Parameters.IsPaused = !Parameters.IsPaused;
                 pauseMenu.SetActive(Parameters.IsPaused);
+                if (Parameters.IsPaused == false) SaveParameters();
             }else if (mainParamMenuButtons.activeSelf) ReturnToPauseMenu();
             else if (
                 overlayMenu.activeSelf 

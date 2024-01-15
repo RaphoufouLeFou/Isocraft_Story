@@ -3958,7 +3958,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainMenuSceneName: MainMenu
-  pauseMenu: {fileID: 1931216963}
 --- !u!1 &524451472
 GameObject:
   m_ObjectHideFlags: 0
@@ -7974,8 +7973,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -8598,8 +8597,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 520568134}
-        m_TargetAssemblyTypeName: NetworkManagement, Assembly-CSharp
+      - m_Target: {fileID: 124641304}
+        m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: ButtonResumeClick
         m_Mode: 1
         m_Arguments:
