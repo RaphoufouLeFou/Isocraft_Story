@@ -192,11 +192,20 @@ public class Player : NetworkBehaviour
         Body.Update(Settings.IsPaused);
         NetworkInfos.PlayerPos = transform.position;
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
+
+        if (Input.GetKeyDown(Settings.KeyMap["Inventory"]))
+        {
+            InventoryUI inventoryUI = _scriptsGameObject.GetComponent<InventoryUI>();
+            if(Settings.IsPaused)
+                inventoryUI.HideInventory();
+            else
+                inventoryUI.DisplayInventory(Inventory, sprites);
+        }
+
         
         // update these if not paused
         if (Settings.IsPaused) return;
-        if (Input.GetKeyDown(Settings.KeyMap["Inventory"]))
-            _scriptsGameObject.GetComponent<InventoryUI>().DisplayInventory(Inventory, sprites);
+
         Hotbar.UpdateHotBar();
         DetectPlaceBreak();
         DetectOtherActions();
