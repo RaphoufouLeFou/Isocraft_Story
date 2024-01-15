@@ -25,7 +25,7 @@ public class PlayerCamera : MonoBehaviour
 
     void Update()
     {
-        if (player.Body == null) return;  // if this is not the current player, skip 
+        if (player.Body == null) return; // if this is not the current player, skip 
 
         Transform tr = transform;
         Vector3 pPos = player.transform.position;
@@ -33,7 +33,7 @@ public class PlayerCamera : MonoBehaviour
         if (_lastPlayerY > Chunk.Size + 2) pPos.y = Chunk.Size + 2; 
         Vector3 m = player.Body.Movement;
 
-        // don't update the player height if it is moving up, or jumping into no above block
+        // only update target height if the player is falling or on the ground
         if (m.y == 0 || (m.y < 0 && pPos.y < player.GroundedHeight)) _lastPlayerY = player.transform.position.y;
 
         // edit target position: use last Y, move camera when walking up/down, rotate when walking left/right
