@@ -54,10 +54,10 @@ public class Player : NetworkBehaviour
     void SetSpawn(int x, int z)
     {
         Spawn = new Vector3(x + 0.5f, Chunk.Size1, z + 0.5f);
-        int chunkX = x / Chunk.Size, chunkZ = z / Chunk.Size;
+        int chunkX = Floor((float)x / Chunk.Size), chunkZ = Floor((float)z / Chunk.Size);
         if (MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
         {
-            int modX = (x - chunkX * Chunk.Size) * Chunk.Size * Chunk.Size,
+            int modX = x - chunkX * Chunk.Size,
                 modZ = z - chunkZ * Chunk.Size;
             while (chunk.Blocks[modX, (int)Spawn.y, modZ] == 0) Spawn.y--;
         }
