@@ -68,5 +68,4 @@ public class MainMenu : MonoBehaviour
         NetworkInfos.StartedFromMainMenu = true;
         SceneManager.LoadScene(MainSceneName);
     }
-
 }

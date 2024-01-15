@@ -154,24 +154,24 @@ public class Player : NetworkBehaviour
         // rotate camera about the Y axis
         Vector3 rotation = transform.rotation.eulerAngles;
         bool change = false;
-        if (Input.GetKeyDown(Parameters.KeyMap["CamLeft"]))
+        if (Input.GetKeyDown(Settings.KeyMap["CamLeft"]))
         {
             change = true;
             rotation.y -= 45;
         }
-        if (Input.GetKeyDown(Parameters.KeyMap["CamRight"]))
+        if (Input.GetKeyDown(Settings.KeyMap["CamRight"]))
         {
             change = true;
             rotation.y += 45;
         }
 
         // toggle camera target X rotation
-        if (Input.GetKeyDown(Parameters.KeyMap["TopView"])) playerCamera.TargetAbove = !playerCamera.TargetAbove;
+        if (Input.GetKeyDown(Settings.KeyMap["TopView"])) playerCamera.TargetAbove = !playerCamera.TargetAbove;
         
         if (change) playerCamera.GoalRot.y = rotation.y;
         transform.rotation = Quaternion.Euler(rotation);
         
-        if (Input.GetKeyDown(Parameters.KeyMap["Kill"])) // kill
+        if (Input.GetKeyDown(Settings.KeyMap["Kill"])) // kill
         {
             transform.position = Spawn;
             Body.Movement = Vector3.zero;
@@ -179,7 +179,7 @@ public class Player : NetworkBehaviour
 
         Vector3 pos = transform.position;
         // set spawn
-        if (Input.GetKeyDown(Parameters.KeyMap["Spawn"])) SetSpawn((int)pos.x, (int)pos.z);
+        if (Input.GetKeyDown(Settings.KeyMap["Spawn"])) SetSpawn((int)pos.x, (int)pos.z);
     }
     
     void Update()
@@ -187,12 +187,12 @@ public class Player : NetworkBehaviour
         if (!isLocalPlayer) return;
 
         _healthImage.transform.localScale = new Vector3(health,1 ,1);
-        Body.Update(Parameters.IsPaused);
+        Body.Update(Settings.IsPaused);
         NetworkInfos.PlayerPos = transform.position;
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
         
         // update these if not paused
-        if (Parameters.IsPaused) return;
+        if (Settings.IsPaused) return;
         
         Hotbar.UpdateHotBar();
         DetectPlaceBreak();

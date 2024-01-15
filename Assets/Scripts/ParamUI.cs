@@ -4,20 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public static class Parameters
+public static class Settings
 {       
     public static bool IsPaused;
-    public static Dictionary<string, KeyCode> KeyMap = new Dictionary<string, KeyCode>(); 
+    public static Dictionary<string, KeyCode> KeyMap = new(); 
     public struct Overlay
     {
         public bool DisplayFps;
         public bool DisplayMspf;
-        public bool DisplayCoordonates;
+        public bool DisplayCoordinates;
     }
 
     public static Overlay OverlayParam;
 }
-public class SaveParameters
+public class SaveSettings
 {       
     public List<string> KeyMapListStr;
     public List<KeyCode> KeyMapListKeys;
@@ -31,28 +31,28 @@ public class SaveParameters
         
         KeyMapListStr = new List<string>();
         KeyMapListKeys = new List<KeyCode>();
-        foreach (KeyValuePair<string,KeyCode> hKeyValuePair in Parameters.KeyMap)
+        foreach (KeyValuePair<string,KeyCode> hKeyValuePair in Settings.KeyMap)
         {
             KeyMapListStr.Add(hKeyValuePair.Key);
             KeyMapListKeys.Add(hKeyValuePair.Value);
         }
-        IsPaused = Parameters.IsPaused;
-        DisplayMspf = Parameters.OverlayParam.DisplayMspf;
-        DisplayFps = Parameters.OverlayParam.DisplayFps;
-        DisplayCoordonates = Parameters.OverlayParam.DisplayCoordonates;
+        IsPaused = Settings.IsPaused;
+        DisplayMspf = Settings.OverlayParam.DisplayMspf;
+        DisplayFps = Settings.OverlayParam.DisplayFps;
+        DisplayCoordonates = Settings.OverlayParam.DisplayCoordinates;
         Debug.Log($"init, coo = {DisplayCoordonates}");
     }
     public void RestoreParm()
     {
-        Parameters.KeyMap = new Dictionary<string, KeyCode>();
+        Settings.KeyMap = new Dictionary<string, KeyCode>();
         for (int i = 0; i < KeyMapListStr.Count; i++)
         {
-            Parameters.KeyMap.Add(KeyMapListStr[i], KeyMapListKeys[i]);
+            Settings.KeyMap.Add(KeyMapListStr[i], KeyMapListKeys[i]);
         }
-        Parameters.IsPaused = IsPaused;
-        Parameters.OverlayParam.DisplayMspf = DisplayMspf;
-        Parameters.OverlayParam.DisplayFps = DisplayFps;
-        Parameters.OverlayParam.DisplayCoordonates = DisplayCoordonates;
+        Settings.IsPaused = IsPaused;
+        Settings.OverlayParam.DisplayMspf = DisplayMspf;
+        Settings.OverlayParam.DisplayFps = DisplayFps;
+        Settings.OverlayParam.DisplayCoordinates = DisplayCoordonates;
     }
 }
 
@@ -76,20 +76,20 @@ public class ParamUI : MonoBehaviour
         mainParamMenuButtons.SetActive(false);
         pressKeyText.SetActive(false);
         overlayMenu.SetActive(false);
-        LoadParameters();
+        LoadSettings();
     }
 
     public void ToggleFps()
     {
-        Parameters.OverlayParam.DisplayFps = !Parameters.OverlayParam.DisplayFps;
+        Settings.OverlayParam.DisplayFps = !Settings.OverlayParam.DisplayFps;
     }
     public void ToggleMspf()
     {
-        Parameters.OverlayParam.DisplayMspf = !Parameters.OverlayParam.DisplayMspf;
+        Settings.OverlayParam.DisplayMspf = !Settings.OverlayParam.DisplayMspf;
     }
-    public void ToggleCoordonates()
+    public void ToggleCoordinates()
     {
-        Parameters.OverlayParam.DisplayCoordonates = !Parameters.OverlayParam.DisplayCoordonates;
+        Settings.OverlayParam.DisplayCoordinates = !Settings.OverlayParam.DisplayCoordinates;
     }
     public void EnterOverlayParam()
     {
@@ -131,52 +131,52 @@ public class ParamUI : MonoBehaviour
     
     public void ButtonResumeClick()
     {
-        Parameters.IsPaused = !Parameters.IsPaused;
-        pauseMenu.SetActive(Parameters.IsPaused);
-        SaveParameters();
+        Settings.IsPaused = !Settings.IsPaused;
+        pauseMenu.SetActive(Settings.IsPaused);
+        SaveSettings();
     }
 
-    private void SaveParameters()
+    private void SaveSettings()
     {
-        SaveParameters saveParameters = new SaveParameters();
-        saveParameters.InitParm();
-        string jsonSave = JsonUtility.ToJson(saveParameters, true);
+        SaveSettings saveSettings = new SaveSettings();
+        saveSettings.InitParm();
+        string jsonSave = JsonUtility.ToJson(saveSettings, true);
         string path = Application.persistentDataPath + "/Settings.json";
         if(File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, jsonSave);
     }
 
-    private void LoadParameters()
+    private void LoadSettings()
     {
 
         string path = Application.persistentDataPath + "/Settings.json";
         if(File.Exists(path))
         {
             string jsonSaved = File.ReadAllText(path);
-            SaveParameters savedParam = JsonUtility.FromJson<SaveParameters>(jsonSaved);
+            SaveSettings savedParam = JsonUtility.FromJson<SaveSettings>(jsonSaved);
             savedParam.RestoreParm();
         }
         else
         {
 
-            //defaults parameters
+            //defaults Settings
 
-            Parameters.OverlayParam.DisplayMspf = true;
-            Parameters.OverlayParam.DisplayFps = true;
-            Parameters.OverlayParam.DisplayCoordonates = true;
+            Settings.OverlayParam.DisplayMspf = true;
+            Settings.OverlayParam.DisplayFps = true;
+            Settings.OverlayParam.DisplayCoordinates = true;
             
             //defaults keys in qwerty:
-            Parameters.KeyMap.Add("Forward", KeyCode.W);
-            Parameters.KeyMap.Add("Backward", KeyCode.S);
-            Parameters.KeyMap.Add("Left", KeyCode.A);
-            Parameters.KeyMap.Add("Right", KeyCode.D);
-            Parameters.KeyMap.Add("CamLeft", KeyCode.Q);
-            Parameters.KeyMap.Add("CamRight", KeyCode.E);
-            Parameters.KeyMap.Add("Kill", KeyCode.K);
-            Parameters.KeyMap.Add("TopView", KeyCode.T);
-            Parameters.KeyMap.Add("Spawn", KeyCode.R);
+            Settings.KeyMap.Add("Forward", KeyCode.W);
+            Settings.KeyMap.Add("Backward", KeyCode.S);
+            Settings.KeyMap.Add("Left", KeyCode.A);
+            Settings.KeyMap.Add("Right", KeyCode.D);
+            Settings.KeyMap.Add("CamLeft", KeyCode.Q);
+            Settings.KeyMap.Add("CamRight", KeyCode.E);
+            Settings.KeyMap.Add("Kill", KeyCode.K);
+            Settings.KeyMap.Add("TopView", KeyCode.T);
+            Settings.KeyMap.Add("Spawn", KeyCode.R);
 
-            SaveParameters();
+            SaveSettings();
         }
 
     }
@@ -184,11 +184,11 @@ public class ParamUI : MonoBehaviour
     {
         if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape))
         {
-            if (pauseMenu.activeSelf || !Parameters.IsPaused)
+            if (pauseMenu.activeSelf || !Settings.IsPaused)
             {
-                Parameters.IsPaused = !Parameters.IsPaused;
-                pauseMenu.SetActive(Parameters.IsPaused);
-                if (Parameters.IsPaused == false) SaveParameters();
+                Settings.IsPaused = !Settings.IsPaused;
+                pauseMenu.SetActive(Settings.IsPaused);
+                if (Settings.IsPaused == false) SaveSettings();
             }else if (mainParamMenuButtons.activeSelf) ReturnToPauseMenu();
             else if (
                 overlayMenu.activeSelf 
@@ -211,7 +211,7 @@ public class ParamUI : MonoBehaviour
                     
                     if(kcode == KeyCode.Escape) return;     //cancel if escape key is pressed
                     
-                    Parameters.KeyMap[_function] = kcode;
+                    Settings.KeyMap[_function] = kcode;
                     _keyText.text = kcode.ToString();
                     Debug.Log(_function + " is now " +  kcode);
                 }

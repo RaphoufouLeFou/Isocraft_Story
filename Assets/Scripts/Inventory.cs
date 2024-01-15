@@ -47,9 +47,9 @@ public class Inventory
     }
 
     // Remove 1 block from a slot
-    public int RemoveBlock(int x, int y, Sprite texture)
+    public void RemoveBlock(int x, int y, Sprite texture)
     {
-        if (Inv[x, y, 1] == 0) return -1;
+        if (Inv[x, y, 1] == 0) return;
         Inv[x, y, 1]--;
         if (Inv[x, y, 1] == 0)
         {
@@ -58,7 +58,6 @@ public class Inventory
         }
         else
             _tmpText[Hotbar.SelectedIndex].text = $"{Inv[x, y, 1]}";
-        return Inv[x, y, 1];
     }
 
     public int GetCurrentBlockCount(int x, int y)

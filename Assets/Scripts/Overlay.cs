@@ -22,9 +22,9 @@ public class Overlay : MonoBehaviour
         }
         else _iterations++;
         string text = "";
-        if(Parameters.OverlayParam.DisplayFps) text = AddFps(text);
-        if(Parameters.OverlayParam.DisplayMspf) text = AddMsps(text);
-        if(Parameters.OverlayParam.DisplayCoordonates) text = AddCoordonates(text);
+        if(Settings.OverlayParam.DisplayFps) text = AddFps(text);
+        if(Settings.OverlayParam.DisplayMspf) text = AddMsps(text);
+        if(Settings.OverlayParam.DisplayCoordinates) text = AddCoordinates(text);
         textData.text = text;
     }
 
@@ -38,7 +38,7 @@ public class Overlay : MonoBehaviour
         return text += $"Last frame time : {MS}\n";
     }
 
-    string AddCoordonates(string text)
+    string AddCoordinates(string text)
     {
         return text += $"position : x = {Math.Round(NetworkInfos.PlayerPos.x, 3)} y = {Math.Round(NetworkInfos.PlayerPos.y, 3)}, z = {Math.Round(NetworkInfos.PlayerPos.z, 3)}\n";
     }
