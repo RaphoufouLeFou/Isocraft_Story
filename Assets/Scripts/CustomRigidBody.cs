@@ -100,10 +100,10 @@ public class CustomRigidBody
                 float min = 1000;
                 for (int k = 0; k < 3; k++)
                 {
-                    float coord = MathF.Abs(corr[k]);
-                    if (coord != 0 && coord < min)
+                    float coords = MathF.Abs(corr[k]);
+                    if (coords != 0 && coords < min)
                     {
-                        min = coord;
+                        min = coords;
                         toChange = k;
                     }
                 }
@@ -159,25 +159,21 @@ public class CustomRigidBody
 
         if (!paused) // keys movement
         {
-            //MoveRelative = new Vector3(Input.GetAxisRaw("Horizontal") * 0.8f, 0, Input.GetAxisRaw("Vertical"))
-            //    .normalized;
             float x = 0;
             float z = 0;
+            if (Input.GetKey(Parameters.KeyMap["Forward"])) z++;
+            if (Input.GetKey(Parameters.KeyMap["Backward"])) z--;
+            if (Input.GetKey(Parameters.KeyMap["Left"])) x--;
+            if (Input.GetKey(Parameters.KeyMap["Right"])) x++;
 
-            if (Input.GetKey(Parameters.KeyMap["Forward"]) || Input.GetKey(KeyCode.UpArrow)) z++;
-            if (Input.GetKey(Parameters.KeyMap["Backward"]) || Input.GetKey(KeyCode.DownArrow)) z--;
-            if (Input.GetKey(Parameters.KeyMap["Left"]) || Input.GetKey(KeyCode.LeftArrow)) x--;
-            if (Input.GetKey(Parameters.KeyMap["Right"]) || Input.GetKey(KeyCode.RightArrow)) x++;
-
-            MoveRelative = new Vector3(x * 0.8f, 0, z)
-                .normalized;
+            MoveRelative = new Vector3(x * 0.8f, 0, z).normalized;
             Vector3 move = _transform.rotation * MoveRelative;
             float speed = Input.GetKey(KeyCode.LeftControl) ? 1.7f * _speed : _speed;
             Movement += move * (speed * delta);
             if (Input.GetKey("space") && OnFloor) Movement.y = _jumpForce;
         }
 
-        // move according to movement
+        // move according to Movement
         float drag = MathF.Pow(_drag, 100 * delta);
         Movement.x *= drag;
         Movement.y += _gravity * delta;
