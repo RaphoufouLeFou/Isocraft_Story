@@ -8,3 +8,4 @@ public static class NetworkInfos
     public static Vector3 PlayerPos { get; set; }
 }
 
+

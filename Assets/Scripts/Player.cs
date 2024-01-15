@@ -29,7 +29,7 @@ public class Player : NetworkBehaviour
         if (!isLocalPlayer) return;
 
         // set up objects
-        Parameters.InitParam();
+        
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
         netManager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
         //camera = GameObject.Find("Main Camera").GetComponent<Camera>();

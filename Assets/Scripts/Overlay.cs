@@ -43,16 +43,5 @@ public class Overlay : MonoBehaviour
         return text += $"position : x = {Math.Round(NetworkInfos.PlayerPos.x, 3)} y = {Math.Round(NetworkInfos.PlayerPos.y, 3)}, z = {Math.Round(NetworkInfos.PlayerPos.z, 3)}\n";
     }
     
-    public static void ToggleFps()
-    {
-        Parameters.OverlayParam.DisplayFps = !Parameters.OverlayParam.DisplayFps;
-    }
-    public static void ToggleMspf()
-    {
-        Parameters.OverlayParam.DisplayMspf = !Parameters.OverlayParam.DisplayMspf;
-    }
-    public static void ToggleCoordonates()
-    {
-        Parameters.OverlayParam.DisplayCoordonates = !Parameters.OverlayParam.DisplayCoordonates;
-    }
+
 }
