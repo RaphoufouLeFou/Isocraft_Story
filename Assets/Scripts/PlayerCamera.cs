@@ -41,20 +41,21 @@ public class PlayerCamera : MonoBehaviour
 
         float fps = Time.deltaTime == 0 ? 10e6f : _moveDelay / Time.deltaTime;
         float posFps = _moveDelay * fps, rotFps = _rotDelay * (1 + _lastPlayerY / 4) * fps;
-        float posFps1 = posFps - 1, rotFps1 = rotFps - 1;
         
         // fix y rotation 360 wrapping
         float currentRotY = _currentRot.y;
         while (currentRotY - goalRotY > 180) goalRotY += 360;
         while (goalRotY - currentRotY > 180) currentRotY += 360;
         
-        // smoothly interpolate according to fps
+        // smoothly interpolate according to fps:
+        // (current * (fps-1) + goal) / fps
+        float posFps1 = posFps - 1, rotFps1 = rotFps - 1;
         _currentPos = (_currentPos * posFps1 + pPos) / posFps;
         _currentRot.x = (_currentRot.x * rotFps1 + 80 - _lastPlayerY * 4) / rotFps;
         _currentRot.y = (currentRotY * rotFps1 + goalRotY) / rotFps;
         cam.orthographicSize = (cam.orthographicSize * posFps1 + _zoom * (1 + _lastPlayerY / 10)) / posFps;
         
-        // update transform
+        // update transform: go to currentPos, rotate, then move back
         tr.rotation = Quaternion.Euler(_currentRot);
         tr.position = _currentPos + tr.rotation * new Vector3(0, 0, -20);
     }
