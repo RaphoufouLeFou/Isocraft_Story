@@ -1,19 +1,17 @@
 using UnityEngine;
 using TMPro;
 using System;
-using UnityEngine.Serialization;
-using Mirror;
 
 public class Overlay : MonoBehaviour
 {
     public TMP_Text textData;
     private float _displayFps, _displayMs;
-    private int _lastUpdate = 0;
-    private const int UpdateDelay = 500; // ms
+    private long _lastUpdate;
+    private const long UpdateDelay = 500; // ms
 
     void Update()
     {
-        int now = DateTime.Now.Millisecond;
+        long now = DateTime.Now.Ticks / 10000;
         if (now >= _lastUpdate + UpdateDelay)
         {
             _displayFps = Time.deltaTime == 0 ? 1000000 : 1.0f / Time.deltaTime;
