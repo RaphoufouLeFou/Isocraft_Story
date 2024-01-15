@@ -186,7 +186,7 @@ public class Player : NetworkBehaviour
         
         if (change) playerCamera.GoalRot.y = rotation.y;
 
-        rotation.y = camera.transform.rotation.eulerAngles.y;
+        //rotation.y = camera.transform.rotation.eulerAngles.y;
         transform.rotation = Quaternion.Euler(rotation);
 
         DetectPlaceBreak();
