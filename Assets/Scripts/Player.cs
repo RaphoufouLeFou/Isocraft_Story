@@ -170,6 +170,11 @@ public class Player : NetworkBehaviour
             change = true;
             rotation.y += 45;
         }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            playerCamera.TargetAbove = !playerCamera.TargetAbove;
+        }
         
         if (change) playerCamera.GoalRot.y = rotation.y;
 

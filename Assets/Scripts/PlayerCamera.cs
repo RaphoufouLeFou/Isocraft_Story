@@ -14,6 +14,7 @@ public class PlayerCamera : MonoBehaviour
 
     private Vector3 _goalPos;
     [NonSerialized] public Vector3 GoalRot;
+    [NonSerialized] public bool TargetAbove = false;
     
     void Start()
     {
@@ -47,11 +48,14 @@ public class PlayerCamera : MonoBehaviour
         while (currentRotY - goalRotY > 180) goalRotY += 360;
         while (goalRotY - currentRotY > 180) currentRotY += 360;
         
+        // set target X rotation
+        float targetX = TargetAbove ? 90 : 80 - _lastPlayerY * 4;
+        
         // smoothly interpolate according to fps:
         // (current * (fps-1) + goal) / fps
         float posFps1 = posFps - 1, rotFps1 = rotFps - 1;
         _currentPos = (_currentPos * posFps1 + pPos) / posFps;
-        _currentRot.x = (_currentRot.x * rotFps1 + 80 - _lastPlayerY * 4) / rotFps;
+        _currentRot.x = (_currentRot.x * rotFps1 + targetX) / rotFps;
         _currentRot.y = (currentRotY * rotFps1 + goalRotY) / rotFps;
         cam.orthographicSize = (cam.orthographicSize * posFps1 + _zoom * (1 + _lastPlayerY / 10)) / posFps;
         
