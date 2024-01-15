@@ -36,11 +36,12 @@ public class SaveSettings
             KeyMapListStr.Add(hKeyValuePair.Key);
             KeyMapListKeys.Add(hKeyValuePair.Value);
         }
+
         IsPaused = Settings.IsPaused;
         DisplayMspf = Settings.OverlayParam.DisplayMspf;
         DisplayFps = Settings.OverlayParam.DisplayFps;
         DisplayCoordonates = Settings.OverlayParam.DisplayCoordinates;
-        Debug.Log($"init, coo = {DisplayCoordonates}");
+
     }
     public void RestoreParm()
     {
@@ -62,6 +63,7 @@ public class ParamUI : MonoBehaviour
     public GameObject mainParamMenuButtons;
     public GameObject overlayMenu;
     public GameObject controlsMenu;
+    public GameObject inventoryMenu;
     public GameObject pauseMenu;
     public GameObject pressKeyText;
 
@@ -166,6 +168,7 @@ public class ParamUI : MonoBehaviour
             Settings.OverlayParam.DisplayCoordinates = true;
             
             //defaults keys in qwerty:
+
             Settings.KeyMap.Add("Forward", KeyCode.W);
             Settings.KeyMap.Add("Backward", KeyCode.S);
             Settings.KeyMap.Add("Left", KeyCode.A);
@@ -175,6 +178,7 @@ public class ParamUI : MonoBehaviour
             Settings.KeyMap.Add("Kill", KeyCode.K);
             Settings.KeyMap.Add("TopView", KeyCode.T);
             Settings.KeyMap.Add("Spawn", KeyCode.R);
+            Settings.KeyMap.Add("Inventory", KeyCode.Tab);
 
             SaveSettings();
         }
@@ -184,7 +188,7 @@ public class ParamUI : MonoBehaviour
     {
         if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape))
         {
-            if (pauseMenu.activeSelf || !Settings.IsPaused)
+            if (pauseMenu.activeSelf || (!Settings.IsPaused && !inventoryMenu.activeSelf))
             {
                 Settings.IsPaused = !Settings.IsPaused;
                 pauseMenu.SetActive(Settings.IsPaused);
@@ -193,7 +197,7 @@ public class ParamUI : MonoBehaviour
             else if (
                 overlayMenu.activeSelf 
                 || controlsMenu.activeSelf
-                // otherMenu windows
+                // otherMenu parameters
                 // ...
             ) ReturnToMainParam();
         }

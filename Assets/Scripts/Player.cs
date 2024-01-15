@@ -17,11 +17,13 @@ public class Player : NetworkBehaviour
 
     private GameObject _healthImage;
 
+    private GameObject _scriptsGameObject;
+
     public float health; // from 0 to 1
 
     public Inventory Inventory;
     
-    [FormerlySerializedAs("Sprites")] public Sprite[] sprites;
+    public Sprite[] sprites;
 
     void Start()
     {
@@ -29,7 +31,7 @@ public class Player : NetworkBehaviour
         if (!isLocalPlayer) return;
 
         // set up objects
-        
+        _scriptsGameObject = GameObject.Find("Scripts");
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
         netManager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
         //camera = GameObject.Find("Main Camera").GetComponent<Camera>();
@@ -193,7 +195,8 @@ public class Player : NetworkBehaviour
         
         // update these if not paused
         if (Settings.IsPaused) return;
-        
+        if (Input.GetKeyDown(Settings.KeyMap["Inventory"]))
+            _scriptsGameObject.GetComponent<InventoryUI>().DisplayInventory(Inventory);
         Hotbar.UpdateHotBar();
         DetectPlaceBreak();
         DetectOtherActions();
