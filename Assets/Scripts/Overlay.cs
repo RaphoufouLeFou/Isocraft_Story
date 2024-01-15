@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.Serialization;
-using UnityEngine.UI;
+using Mirror;
 
 public class Overlay : MonoBehaviour
 {
@@ -18,10 +18,28 @@ public class Overlay : MonoBehaviour
         {
             FPS = 1.0f / Time.deltaTime;
             MS = Time.deltaTime * 1000.0f;
-            string text = $"Fps : {FPS}\nLast frame time : {MS} ms";
-            textData.text = text;
             _iterations = 0;
         }
         else _iterations++;
+        string text = "";
+        text = AddFps(text);
+        text = AddMsps(text);
+        text = AddCoordonates(text);
+        textData.text = text;
+    }
+
+    string AddFps(string text)
+    {
+        return text += $"Fps : {FPS}\n";
+    }
+
+    string AddMsps(string text)
+    {
+        return text += $"Last frame time : {MS}\n";
+    }
+
+    string AddCoordonates(string text)
+    {
+        return text += $"position : x = {Math.Round(NetworkInfos.PlayerPos.x, 3)} y = {Math.Round(NetworkInfos.PlayerPos.y, 3)}, z = {Math.Round(NetworkInfos.PlayerPos.z, 3)}\n";
     }
 }

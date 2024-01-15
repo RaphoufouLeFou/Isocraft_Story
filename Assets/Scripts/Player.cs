@@ -158,8 +158,8 @@ public class Player : NetworkBehaviour
         if (!isLocalPlayer) return;
 
         _healthImage.transform.localScale = new Vector3(health,1 ,1);
-        Hotbar.UpdateHotBar(); 
-
+        Hotbar.UpdateHotBar();
+        NetworkInfos.PlayerPos = transform.position;
         Body.Update(netManager.IsPaused);
 
         if (Body.OnFloor) GroundedHeight = transform.position.y;
