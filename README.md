@@ -2,20 +2,29 @@
 
 this is a good game
 
-# Installation :
+## Links
 
-* clone the repo somwere in your machine
-* download the entire prodject "IsoCraft Story (1).zip" from [here](https://drive.google.com/drive/u/0/folders/1eLwcwYeZIpldG1B9WUpeLuSKw6Ah3_26) (Make sure to get the version from Raphoulefou, aka the blue circle)
-* extract the project from the .zip to the cloned repo on your machine
-* If windows tells you if you want to replace some files, say NO. github is the newest
-* finally, you can go to the Unity hub and add the prodject, and then work on it
+- [Google drive][drive]
+- [Trello todo list](https://trello.com/b/w8ktY6gF/isocraft-story)
 
-# Commits :
+<details>
+  <summary><h2>Unity project installation</h2></summary>
 
-* Before opening the project to make modification, **check if you have the latest version !!**
-* Once you have done your modification, commit your changes WITH A CLEAR NAME AND A SHORT DESCRIPTION
-* then push
+1. Clone the repo somewhere in your machine.
+2. [Download the entire project][drive] in `.zip` format.  
+   Make sure to get the version from Raphoulefou, aka the blue circle.
+4. Extract the project to the cloned repo on your machine
+5. If windows tells you if you want to replace some files, say **NO**. Github files are the newest.
 
-# Tips 
+Finally, you can go to Unity hub and add the project, and then work on it. Using your IDE should work too.
+</details>
 
-* Use Github Desktop, it is way simpler than the command line
+## Commits
+
+- Before opening the project in Unity, **make sure you have the latest version!**
+- Once you have done changes, commit them **with a clear name and a short description**
+- Then push
+
+**Tips:** Use Github Desktop or github.dev
+
+[drive]: https://drive.google.com/drive/u/0/folders/1eLwcwYeZIpldG1B9WUpeLuSKw6Ah3_26
