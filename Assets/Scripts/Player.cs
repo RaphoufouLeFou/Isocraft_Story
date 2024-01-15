@@ -196,7 +196,7 @@ public class Player : NetworkBehaviour
         // update these if not paused
         if (Settings.IsPaused) return;
         if (Input.GetKeyDown(Settings.KeyMap["Inventory"]))
-            _scriptsGameObject.GetComponent<InventoryUI>().DisplayInventory(Inventory);
+            _scriptsGameObject.GetComponent<InventoryUI>().DisplayInventory(Inventory, sprites);
         Hotbar.UpdateHotBar();
         DetectPlaceBreak();
         DetectOtherActions();

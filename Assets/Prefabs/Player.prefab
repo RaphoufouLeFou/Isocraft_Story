@@ -213,12 +213,13 @@ MonoBehaviour:
   syncInterval: 0.1
   camera: {fileID: 3026982836658294228}
   playerCamera: {fileID: 6770091861329838762}
-  NetManager: {fileID: 0}
-  Sprites:
+  netManager: {fileID: 0}
+  health: 0
+  sprites:
   - {fileID: 21300000, guid: 433482b1419840d42bca7ae9771092a2, type: 3}
   - {fileID: 21300000, guid: 9c57b1e3bc5a73d418e564a5e46e4e8b, type: 3}
-  - {fileID: 21300000, guid: 8547a9dde11e7f848b3c020ce31413c7, type: 3}
   - {fileID: 21300000, guid: 89172d63cbcd58243b354338e1a84fd1, type: 3}
+  - {fileID: 21300000, guid: 8547a9dde11e7f848b3c020ce31413c7, type: 3}
   - {fileID: 21300000, guid: ebdb3c9a29e0b5c40a674d9afbabd677, type: 3}
   - {fileID: 21300000, guid: 4dde7984332bf7d4eb2255ff7faa52f9, type: 3}
 --- !u!114 &1785628987695432156

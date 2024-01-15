@@ -6,7 +6,6 @@ using TMPro;
 
 public class InventoryUI : MonoBehaviour
 {
-    public Sprite[] sprites;
     public GameObject content;
     public GameObject inventoryMenu;
     void Start()
@@ -19,7 +18,7 @@ public class InventoryUI : MonoBehaviour
 
     }
 
-    public void DisplayInventory(Inventory inventory)
+    public void DisplayInventory(Inventory inventory, Sprite[] sprites)
     {
         inventoryMenu.SetActive(true);
         for (int i = 0; i < 9; i++)
@@ -27,8 +26,8 @@ public class InventoryUI : MonoBehaviour
             for (int j = 0; j < 4; j++)
             {
                 Transform childTransform = content.transform.GetChild(j).GetChild(j);
-                childTransform.GetComponent<Image>().sprite =
-                    sprites[inventory.GetCurrentBlock(i, j)];
+                int index = inventory.GetCurrentBlock(i, j);
+                childTransform.GetComponent<Image>().sprite = sprites[index];
                 childTransform.GetComponentInChildren<TMP_Text>().text = $"{inventory.GetCurrentBlockCount(i, j)}";
             }
         }
