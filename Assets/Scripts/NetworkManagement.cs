@@ -10,18 +10,18 @@ public class NetworkManagement : MonoBehaviour
     private NetworkManager _manager;
     private bool _isHost;
 
-    [FormerlySerializedAs("MainMenuSceneName")] public string mainMenuSceneName = "MainMenu";
+    public string mainMenuSceneName = "MainMenu";
 
-    [NonSerialized] public bool IsPaused;
+    
 
-    [FormerlySerializedAs("PauseMenu")] public GameObject pauseMenu;
+
 
     [NonSerialized] public bool AreChunksReady;
     //private Dictionary<string, Chunk> _chunks;
 
     void Start()
     {
-        pauseMenu.SetActive(false);
+        
         _manager = GetComponent<NetworkManager>();
 
         if (!NetworkInfos.StartedFromMainMenu)
@@ -38,21 +38,6 @@ public class NetworkManagement : MonoBehaviour
         if (_isHost) _manager.StartHost();
         else _manager.StartClient();
     }
-
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            IsPaused = !IsPaused;
-            pauseMenu.SetActive(IsPaused);
-        }
-    }
-
-    public void ButtonResumeClick()
-    {
-        IsPaused = !IsPaused;
-        pauseMenu.SetActive(IsPaused);
-    }
-
     public void LeaveGameButtonClick()
     {
         if (_isHost)

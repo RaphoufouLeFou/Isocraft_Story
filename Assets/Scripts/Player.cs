@@ -187,13 +187,14 @@ public class Player : NetworkBehaviour
         if (!isLocalPlayer) return;
 
         _healthImage.transform.localScale = new Vector3(health,1 ,1);
-        Body.Update(netManager.IsPaused);
+        Body.Update(Parameters.IsPaused);
         NetworkInfos.PlayerPos = transform.position;
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
-        Hotbar.UpdateHotBar();
-
+        
         // update these if not paused
-        if (netManager.IsPaused) return;
+        if (Parameters.IsPaused) return;
+        
+        Hotbar.UpdateHotBar();
         DetectPlaceBreak();
         DetectOtherActions();
     }

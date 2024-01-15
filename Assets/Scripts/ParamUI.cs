@@ -5,7 +5,7 @@ using TMPro;
 
 public static class Parameters
 {       
-
+    public static bool IsPaused;
     public static Dictionary<string, KeyCode> KeyMap = new Dictionary<string, KeyCode>(); 
     public struct Overlay
     {
@@ -38,6 +38,7 @@ public class ParamUI : MonoBehaviour
     private TMP_Text _keyText;
     void Start()
     {
+        pauseMenu.SetActive(false);
         mainParamMenu.SetActive(false);
         controlsMenu.SetActive(false);
         mainParamMenuButtons.SetActive(false);
@@ -106,9 +107,30 @@ public class ParamUI : MonoBehaviour
         _function = function.name;      //For optimization, the function name is the name of the object in the UI
         _keyText = function.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); //get the text of the button
     }
-
+   
+    
+    public void ButtonResumeClick()
+    {
+        Parameters.IsPaused = !Parameters.IsPaused;
+        pauseMenu.SetActive(Parameters.IsPaused);
+    }
     private void Update()
     {
+        if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (pauseMenu.activeSelf || !Parameters.IsPaused)
+            {
+                Parameters.IsPaused = !Parameters.IsPaused;
+                pauseMenu.SetActive(Parameters.IsPaused);
+            }else if (mainParamMenuButtons.activeSelf) ReturnToPauseMenu();
+            else if (
+                overlayMenu.activeSelf 
+                || controlsMenu.activeSelf
+                // otherMenu windows
+                // ...
+            ) ReturnToMainParam();
+        }
+        
         if (!_isReadingKey) return;
 
         if (Input.anyKey)
@@ -119,10 +141,12 @@ public class ParamUI : MonoBehaviour
                 {
                     _isReadingKey = false;
                     pressKeyText.SetActive(_isReadingKey);
+                    
+                    if(kcode == KeyCode.Escape) return;     //cancel if escape key is pressed
+                    
                     Parameters.KeyMap[_function] = kcode;
                     _keyText.text = kcode.ToString();
-                    Debug.Log(_function + " = " +  kcode);
-                    Debug.Log(Parameters.KeyMap[_function]);
+                    Debug.Log(_function + " is now " +  kcode);
                 }
             }
         }

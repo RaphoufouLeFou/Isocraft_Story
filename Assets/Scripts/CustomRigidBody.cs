@@ -164,10 +164,10 @@ public class CustomRigidBody
             float x = 0;
             float z = 0;
 
-            if (Input.GetKey(Parameters.KeyMap["Forward"])) z++;
-            if (Input.GetKey(Parameters.KeyMap["Backward"])) z--;
-            if (Input.GetKey(Parameters.KeyMap["Left"])) x--;
-            if (Input.GetKey(Parameters.KeyMap["Right"])) x++;
+            if (Input.GetKey(Parameters.KeyMap["Forward"]) || Input.GetKey(KeyCode.UpArrow)) z++;
+            if (Input.GetKey(Parameters.KeyMap["Backward"]) || Input.GetKey(KeyCode.DownArrow)) z--;
+            if (Input.GetKey(Parameters.KeyMap["Left"]) || Input.GetKey(KeyCode.LeftArrow)) x--;
+            if (Input.GetKey(Parameters.KeyMap["Right"]) || Input.GetKey(KeyCode.RightArrow)) x++;
 
             MoveRelative = new Vector3(x * 0.8f, 0, z)
                 .normalized;
