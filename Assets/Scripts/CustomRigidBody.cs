@@ -48,8 +48,8 @@ public class CustomRigidBody
 
         Vector3 movement = pos - _transform.position;
 
-        int chunkX = (int)MathF.Floor(pos.x / Chunk.ChunkSize);
-        int chunkZ = (int)MathF.Floor(pos.z / Chunk.ChunkSize);
+        int chunkX = (int)MathF.Floor(pos.x / Chunk.Size);
+        int chunkZ = (int)MathF.Floor(pos.z / Chunk.Size);
 
         // check collisions with chunks around
         for (int i = chunkX - 1; i < chunkX + 2; i++)
@@ -65,14 +65,14 @@ public class CustomRigidBody
             
             // check collisions with blocks around
             // only calculate collisions with the block with the most depth
-            Vector3 p = pos - new Vector3(i * Chunk.ChunkSize, 0, j * Chunk.ChunkSize); // pos in the chunk
+            Vector3 p = pos - new Vector3(i * Chunk.Size, 0, j * Chunk.Size); // pos in the chunk
             List<Quaternion> corrections = new List<Quaternion>();
             for (int x = (int)p.x - 1; x < (int)p.x + 2; x++)
             for (int y = (int)p.y - 3; y < (int)p.y + 3; y++)
             for (int z = (int)p.z - 1; z < (int)p.z + 2; z++)
             {
-                if (x < 0 || x >= Chunk.ChunkSize || y < 0 || y >= Chunk.ChunkSize || z < 0 ||
-                    z >= Chunk.ChunkSize) continue;
+                if (x < 0 || x >= Chunk.Size || y < 0 || y >= Chunk.Size || z < 0 ||
+                    z >= Chunk.Size) continue;
                 if (chunk.Blocks[x, y, z] == 0) continue;
                 if (x + 1 > p.x - _width && x < p.x + _width &&
                     y + 1 > p.y - _height && y < p.y + _height &&

@@ -19,7 +19,7 @@ public static class NoiseGen
         {
             float height = _noise.GetNoise(pos.x, pos.z) * 2 + 5 +
                            _noise.GetNoise(pos.x * 10 + 1000, pos.z * 10 + 1000) / 2;
-            for (int y = 0; y < Chunk.ChunkSize; y++)
+            for (int y = 0; y < Chunk.Size; y++)
             {
                 if (y == 0) yield return Game.Blocks.Bedrock;
                 else if (y > height) yield return Game.Blocks.Air;

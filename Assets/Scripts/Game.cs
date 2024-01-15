@@ -58,7 +58,6 @@ public class Block
 
 public class Game : MonoBehaviour
 {
-    public Texture atlas;
     [NonSerialized] public static float TickRate = 20;
     [NonSerialized] public static int Level = 0;
     [NonSerialized] public static int Seed = 69;

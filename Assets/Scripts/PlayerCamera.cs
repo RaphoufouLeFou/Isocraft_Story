@@ -29,7 +29,7 @@ public class PlayerCamera : MonoBehaviour
         Transform tr = transform;
         Vector3 pPos = player.transform.position;
         if (_lastPlayerY < 0) pPos.y = 0;
-        if (_lastPlayerY > Chunk.ChunkSize + 2) pPos.y = Chunk.ChunkSize + 2; 
+        if (_lastPlayerY > Chunk.Size + 2) pPos.y = Chunk.Size + 2; 
         Vector3 m = player.Body.Movement;
 
         // don't update the player height if it is moving up, or jumping into no above block
@@ -45,12 +45,12 @@ public class PlayerCamera : MonoBehaviour
         
         // fix y rotation 360 wrapping
         float currentRotY = _currentRot.y;
-        if (currentRotY - goalRotY > 180) goalRotY += 360;
-        else if (goalRotY - currentRotY > 180) currentRotY += 360;
+        while (currentRotY - goalRotY > 180) goalRotY += 360;
+        while (goalRotY - currentRotY > 180) currentRotY += 360;
         
         // smoothly interpolate according to fps
         _currentPos = (_currentPos * posFps1 + pPos) / posFps;
-        _currentRot.x = (_currentRot.x * rotFps1 + 100 - _lastPlayerY * 10) / rotFps;
+        _currentRot.x = (_currentRot.x * rotFps1 + 80 - _lastPlayerY * 4) / rotFps;
         _currentRot.y = (currentRotY * rotFps1 + goalRotY) / rotFps;
         cam.orthographicSize = (cam.orthographicSize * posFps1 + _zoom * (1 + _lastPlayerY / 10)) / posFps;
         

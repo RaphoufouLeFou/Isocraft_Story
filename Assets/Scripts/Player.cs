@@ -47,11 +47,11 @@ public class Player : NetworkBehaviour
     void SetSpawn(int x, int z)
     {
         Spawn = new Vector3(x + 0.5f, Chunk.Size1, z + 0.5f);
-        int chunkX = x / Chunk.ChunkSize, chunkZ = z / Chunk.ChunkSize;
+        int chunkX = x / Chunk.Size, chunkZ = z / Chunk.Size;
         if (MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
         {
-            int modX = (x - chunkX * Chunk.ChunkSize) * Chunk.ChunkSize * Chunk.ChunkSize,
-                modZ = z - chunkZ * Chunk.ChunkSize;
+            int modX = (x - chunkX * Chunk.Size) * Chunk.Size * Chunk.Size,
+                modZ = z - chunkZ * Chunk.Size;
             while (chunk.Blocks[modX, (int)Spawn.y, modZ] == 0) Spawn.y--;
         }
         else throw new ArgumentException("Cannot set spawn in unloaded chunk");
@@ -85,16 +85,16 @@ public class Player : NetworkBehaviour
 
     int PlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
-        int chunkX = Floor(pos.x / Chunk.ChunkSize),
-            chunkZ = Floor(pos.z / Chunk.ChunkSize);
+        int chunkX = Floor(pos.x / Chunk.Size),
+            chunkZ = Floor(pos.z / Chunk.Size);
         Chunk chunk = MapHandler.Chunks[chunkX + "." + chunkZ];
 
-        int x = Floor(pos.x) - chunkX * Chunk.ChunkSize,
+        int x = Floor(pos.x) - chunkX * Chunk.Size,
             y = Floor(pos.y),
-            z = Floor(pos.z) - chunkZ * Chunk.ChunkSize;
+            z = Floor(pos.z) - chunkZ * Chunk.Size;
 
         int result = type; // for inventory management
-        if (y < 0 || y >= Chunk.ChunkSize) return -1; // outside of world height
+        if (y < 0 || y >= Chunk.Size) return -1; // outside of world height
         if (isPlacing) chunk.Blocks[x, y, z] = type;
         else
         {
@@ -106,9 +106,9 @@ public class Player : NetworkBehaviour
         // update nearby chunks if placed on a chunk border
         List<string> toCheck = new();
         if (x == 0) toCheck.Add(chunkX - 1 + "." + chunkZ);
-        else if (x == Chunk.ChunkSize - 1) toCheck.Add(chunkX + 1 + "." + chunkZ);
+        else if (x == Chunk.Size1) toCheck.Add(chunkX + 1 + "." + chunkZ);
         if (z == 0) toCheck.Add(chunkX + "." + (chunkZ - 1));
-        else if (z == Chunk.ChunkSize - 1) toCheck.Add(chunkX + "." + (chunkZ + 1));
+        else if (z == Chunk.Size1) toCheck.Add(chunkX + "." + (chunkZ + 1));
         foreach (string chunkName in toCheck)
             if (MapHandler.Chunks.ContainsKey(chunkName))
                 MapHandler.Chunks[chunkName].BuildMesh();

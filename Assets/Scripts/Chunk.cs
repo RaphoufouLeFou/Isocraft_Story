@@ -27,10 +27,10 @@ class FaceUtils
 
 public class Chunk : MonoBehaviour
 {
-    [NonSerialized] public const int ChunkSize = 8;
-    [NonSerialized] public const int Size1 = ChunkSize - 1;
+    [NonSerialized] public const int Size = 16;
+    [NonSerialized] public const int Size1 = Size - 1;
     private Vector2 _pos;
-    [NonSerialized] public int[,,] Blocks = new int[ChunkSize, ChunkSize, ChunkSize];
+    [NonSerialized] public int[,,] Blocks = new int[Size, Size, Size];
 
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
@@ -41,15 +41,15 @@ public class Chunk : MonoBehaviour
         _meshFilter = GetComponent<MeshFilter>();
         _meshCollider = GetComponent<MeshCollider>();
         _pos = new Vector2(pos.x, pos.z);
-        transform.position = pos * ChunkSize;
+        transform.position = pos * Size;
         GenerateBlocks();
         BuildMesh(true);
     }
     
     void GenerateBlocks()
     {
-        for (int x = 0; x < ChunkSize; x++)
-        for (int z = 0; z < ChunkSize; z++)
+        for (int x = 0; x < Size; x++)
+        for (int z = 0; z < Size; z++)
         {
             int y = 0;
             foreach (int block in NoiseGen.GetColumn(transform.position + new Vector3(x, 0, z)))
@@ -76,9 +76,9 @@ public class Chunk : MonoBehaviour
                 neighbors.Add(i, chunk);
         }
 
-        for (int x = 0; x < ChunkSize; x++)
-            for (int y = 0; y < ChunkSize; y++)
-                for (int z = 0; z < ChunkSize; z++)
+        for (int x = 0; x < Size; x++)
+            for (int y = 0; y < Size; y++)
+                for (int z = 0; z < Size; z++)
                 {
                     if (Blocks[x, y, z] == 0) continue;
 
@@ -97,24 +97,24 @@ public class Chunk : MonoBehaviour
                         int i = 0;
                         if (otherPos.x < 0)
                         {
-                            otherPos.x += ChunkSize;
+                            otherPos.x += Size;
                             i = 0;
                         }
                         else if (otherPos.x > Size1)
                         {
-                            otherPos.x -= ChunkSize;
+                            otherPos.x -= Size;
                             i = 1;
                         }
                         else if (otherPos.y < 0) other = 0; // air under
-                        else if (otherPos.y >= ChunkSize) other = 0; // air above
+                        else if (otherPos.y >= Size) other = 0; // air above
                         else if (otherPos.z < 0)
                         {
-                            otherPos.z += ChunkSize;
+                            otherPos.z += Size;
                             i = 2;
                         }
                         else if (otherPos.z > Size1)
                         {
-                            otherPos.z -= ChunkSize;
+                            otherPos.z -= Size;
                             i = 3;
                         }
                         else other = Blocks[(int)otherPos.x, (int)otherPos.y, (int)otherPos.z]; // block in the chunk
