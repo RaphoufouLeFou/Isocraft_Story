@@ -124,8 +124,8 @@ public class ParamUI : MonoBehaviour
     {
         _isReadingKey = true;
         pressKeyText.SetActive(_isReadingKey);
-        _function = function.name;      //For optimization, the function name is the name of the object in the UI
-        _keyText = function.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); //get the text of the button
+        _function = function.name; // for optimization, the function name is the name of the object in the UI
+        _keyText = function.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); // get the text of the button
     }
    
     
@@ -159,22 +159,22 @@ public class ParamUI : MonoBehaviour
         else
         {
 
-            //defaults Settings
+            // default settings
 
             Settings.OverlayParam.DisplayMspf = true;
             Settings.OverlayParam.DisplayFps = true;
             Settings.OverlayParam.DisplayCoordinates = true;
             
-            //defaults keys in qwerty:
-            Settings.KeyMap.Add("Forward", KeyCode.W);
-            Settings.KeyMap.Add("Backward", KeyCode.S);
+            // default keys in qwerty:
+            Settings.KeyMap.Add("Forwards", KeyCode.W);
+            Settings.KeyMap.Add("Backwards", KeyCode.S);
             Settings.KeyMap.Add("Left", KeyCode.A);
             Settings.KeyMap.Add("Right", KeyCode.D);
             Settings.KeyMap.Add("CamLeft", KeyCode.Q);
             Settings.KeyMap.Add("CamRight", KeyCode.E);
             Settings.KeyMap.Add("Kill", KeyCode.K);
             Settings.KeyMap.Add("TopView", KeyCode.T);
-            Settings.KeyMap.Add("Spawn", KeyCode.R);
+            Settings.KeyMap.Add("Respawn", KeyCode.R);
 
             SaveSettings();
         }

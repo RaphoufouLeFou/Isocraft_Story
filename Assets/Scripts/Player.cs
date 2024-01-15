@@ -179,7 +179,7 @@ public class Player : NetworkBehaviour
 
         Vector3 pos = transform.position;
         // set spawn
-        if (Input.GetKeyDown(Settings.KeyMap["Spawn"])) SetSpawn((int)pos.x, (int)pos.z);
+        if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn((int)pos.x, (int)pos.z);
     }
     
     void Update()
