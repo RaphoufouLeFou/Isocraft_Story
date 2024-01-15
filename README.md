@@ -7,6 +7,10 @@ this is a good game
 - [Google drive][drive]
 - [Trello todo list](https://trello.com/b/w8ktY6gF/isocraft-story)
 
+## Task progress
+
+![](tasks.png)
+
 <details>
   <summary><h2>Unity project installation</h2></summary>
 

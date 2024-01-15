@@ -40,7 +40,7 @@ public class Player : NetworkBehaviour
         Debug.Log("Transform Tag is: " + camera.gameObject.tag);
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
-        //SetSpawn(0, 0);
+        SetSpawn(0, 0);
         tr.position = Spawn;
     }
 

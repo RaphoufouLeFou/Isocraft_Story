@@ -17,7 +17,7 @@ public static class NoiseGen
         // pos should be (x, 0 (ignored), z)
         if (Game.Level == 0) // overWorld (temporary test)
         {
-            float height = _noise.GetNoise(pos.x, pos.z) * 2 + 5 +
+            float height = _noise.GetNoise(pos.x, pos.z) * 2 + 7 +
                            _noise.GetNoise(pos.x * 10 + 1000, pos.z * 10 + 1000) / 2;
             for (int y = 0; y < Chunk.Size; y++)
             {
