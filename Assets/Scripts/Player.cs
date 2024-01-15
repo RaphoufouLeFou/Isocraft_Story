@@ -2,7 +2,6 @@ using Mirror;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Serialization;
 
 public class Player : NetworkBehaviour
@@ -16,7 +15,7 @@ public class Player : NetworkBehaviour
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     [NonSerialized] public Vector3 Spawn;
 
-    private GameObject HealthImgae;
+    private GameObject _healthImage;
 
     public float health;  //heath : 0 = 0%, 1 = 100%
 
@@ -31,7 +30,7 @@ public class Player : NetworkBehaviour
             return;
         }
         camera.enabled = true;
-        HealthImgae = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
+        _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
         health = 1.0f;
         //camera = GameObject.Find("Main Camera").GetComponent<Camera>();
         GameObject items = GameObject.Find("HotBarBackground");
@@ -158,7 +157,7 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
-        HealthImgae.transform.localScale = new Vector3(health,1 ,1);
+        _healthImage.transform.localScale = new Vector3(health,1 ,1);
         Hotbar.UpdateHotBar(); 
 
         Body.Update(netManager.IsPaused);
