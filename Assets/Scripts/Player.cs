@@ -152,19 +152,9 @@ public class Player : NetworkBehaviour
             }
         }
     }
-    
-    void Update()
+
+    void DetectOtherActions()
     {
-        if (!isLocalPlayer) return;
-
-        _healthImage.transform.localScale = new Vector3(health,1 ,1);
-        Hotbar.UpdateHotBar(); 
-
-        Body.Update(netManager.IsPaused);
-
-        if (Body.OnFloor) GroundedHeight = transform.position.y;
-
-        if (netManager.IsPaused) return;
         // rotate camera about the Y axis
         Vector3 rotation = transform.rotation.eulerAngles;
         bool change = false;
@@ -179,18 +169,12 @@ public class Player : NetworkBehaviour
             rotation.y += 45;
         }
 
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            playerCamera.TargetAbove = !playerCamera.TargetAbove;
-        }
+        // toggle camera target X rotation
+        if (Input.GetKeyDown(KeyCode.T)) playerCamera.TargetAbove = !playerCamera.TargetAbove;
         
         if (change) playerCamera.GoalRot.y = rotation.y;
-
-        //rotation.y = camera.transform.rotation.eulerAngles.y;
         transform.rotation = Quaternion.Euler(rotation);
-
-        DetectPlaceBreak();
-
+        
         if (Input.GetKeyDown(KeyCode.K)) // kill
         {
             transform.position = Spawn;
@@ -198,6 +182,22 @@ public class Player : NetworkBehaviour
         }
 
         Vector3 pos = transform.position;
-        if (Input.GetKeyDown(KeyCode.R)) SetSpawn((int)pos.x, (int)pos.z); // set spawn
+        // set spawn
+        if (Input.GetKeyDown(KeyCode.R)) SetSpawn((int)pos.x, (int)pos.z);
+    }
+    
+    void Update()
+    {
+        if (!isLocalPlayer) return;
+
+        _healthImage.transform.localScale = new Vector3(health,1 ,1);
+        Body.Update(netManager.IsPaused);
+        if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
+        Hotbar.UpdateHotBar();
+
+        // update these if not paused
+        if (netManager.IsPaused) return;
+        DetectPlaceBreak();
+        DetectOtherActions();
     }
 }
