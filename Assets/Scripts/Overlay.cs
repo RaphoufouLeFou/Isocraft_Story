@@ -22,9 +22,9 @@ public class Overlay : MonoBehaviour
         }
         else _iterations++;
         string text = "";
-        text = AddFps(text);
-        text = AddMsps(text);
-        text = AddCoordonates(text);
+        if(Parameters.OverlayParam.DisplayFps) text = AddFps(text);
+        if(Parameters.OverlayParam.DisplayMspf) text = AddMsps(text);
+        if(Parameters.OverlayParam.DisplayCoordonates) text = AddCoordonates(text);
         textData.text = text;
     }
 
@@ -41,5 +41,18 @@ public class Overlay : MonoBehaviour
     string AddCoordonates(string text)
     {
         return text += $"position : x = {Math.Round(NetworkInfos.PlayerPos.x, 3)} y = {Math.Round(NetworkInfos.PlayerPos.y, 3)}, z = {Math.Round(NetworkInfos.PlayerPos.z, 3)}\n";
+    }
+    
+    public static void ToggleFps()
+    {
+        Parameters.OverlayParam.DisplayFps = !Parameters.OverlayParam.DisplayFps;
+    }
+    public static void ToggleMspf()
+    {
+        Parameters.OverlayParam.DisplayMspf = !Parameters.OverlayParam.DisplayMspf;
+    }
+    public static void ToggleCoordonates()
+    {
+        Parameters.OverlayParam.DisplayCoordonates = !Parameters.OverlayParam.DisplayCoordonates;
     }
 }
