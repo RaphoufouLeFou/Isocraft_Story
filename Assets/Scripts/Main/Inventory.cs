@@ -25,7 +25,7 @@ public class Inventory
             {
                 if ((inv[i, j, 0] == block && inv[i, j, 1] < 64) || inv[i, j, 1] == 0)
                 {
-                    Debug.Log($"Input block = {block}, current = {inv[i, j, 0]}, quantity = {inv[i, j, 1]}, i = {i}, j = {j}");
+                    //Debug.Log($"Input block = {block}, current = {inv[i, j, 0]}, quantity = {inv[i, j, 1]}, i = {i}, j = {j}");
                     inv[i, j, 0] = block;
                     inv[i, j, 1]++;
                     if(j == 3) { 

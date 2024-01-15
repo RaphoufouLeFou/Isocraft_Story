@@ -131,12 +131,10 @@ public class Player : NetworkBehaviour
                 int CurrentBlock = inventory.GetCurrentBlock(Hotbar.selectedIndex, 3);
                 if (right)
                 {
-                    int res = inventory.RemoveBlock(Hotbar.selectedIndex, 3, Sprites[0]);
-                    Debug.Log($"{res}");
-                    if (res < 0) return;
-                    
-                    Debug.Log($"Placing block id = {CurrentBlock}");
-                    PlaceBreak(hit.point, CurrentBlock, right);        // place the block for this instance
+                    int count = inventory.GetCurrentBlockCount(Hotbar.selectedIndex, 3);
+                    if (count < 0) return;
+                    int res = PlaceBreak(hit.point, CurrentBlock, right);        // place the block for this instance
+                    if(res!=-1) inventory.RemoveBlock(Hotbar.selectedIndex, 3, Sprites[0]);
                 }
                 else
                 {
