@@ -16,7 +16,6 @@ public class Player : NetworkBehaviour
     [NonSerialized] public Vector3 Spawn;
 
     public Inventory Inventory;
-
     
     [FormerlySerializedAs("Sprites")] public Sprite[] sprites;
 
@@ -55,8 +54,7 @@ public class Player : NetworkBehaviour
                 modZ = z - chunkZ * Chunk.ChunkSize;
             while (chunk.Blocks[modX, (int)Spawn.y, modZ] == 0) Spawn.y--;
         }
-        else
-            throw new ArgumentException("Cannot set spawn in unloaded chunk");
+        else throw new ArgumentException("Cannot set spawn in unloaded chunk");
 
         Spawn.y++;
     }
@@ -133,20 +131,17 @@ public class Player : NetworkBehaviour
                 {
                     int count = Inventory.GetCurrentBlockCount(Hotbar.SelectedIndex, 3);
                     if (count <= 0) return;
-                    int res = PlaceBreak(hit.point, currentBlock, true);        // place the block for this instance
-                    if(res!=-1) Inventory.RemoveBlock(Hotbar.SelectedIndex, 3, sprites[0]);
+                    int res = PlaceBreak(hit.point, currentBlock, true); // place the block for this instance
+                    if (res != -1) Inventory.RemoveBlock(Hotbar.SelectedIndex, 3, sprites[0]);
                 }
                 else
                 {
-                    int res = PlaceBreak(hit.point, currentBlock, false);        // place the block for this instance
-                    if(res!=-1) Inventory.AddBlock(res, sprites[res]);
+                    int res = PlaceBreak(hit.point, currentBlock, false); // place the block for this instance
+                    if (res != -1) Inventory.AddBlock(res, sprites[res]);
                 }
 
-                if (isServer){
-                    ServerPlaceBreak(hit.point, currentBlock, right);  // place the block for the clients
-                }else{
-                    ClientPlaceBreak(hit.point, currentBlock, right);  // place the block for the server
-                }
+                if (isServer) ServerPlaceBreak(hit.point, currentBlock, right); // server tells clients to place the block
+                else ClientPlaceBreak(hit.point, currentBlock, right); // client tells the server to place the block
             }
         }
     }

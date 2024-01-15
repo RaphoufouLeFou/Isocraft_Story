@@ -39,37 +39,14 @@ public class MapHandler : NetworkBehaviour
         NetworkManagement manager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
         Transform parent = chunkParent.transform;
 
-        if (/*NetworkInfos.IsHost*/ 1==1) {
+        // if (NetworkInfos.IsHost) {
+        _chunksParent = chunkParent.transform;
+        Chunks = new Dictionary<string, Chunk>();
+        transform.position = new Vector3(0, 0, 0);
 
-            _chunksParent = chunkParent.transform;
-            Chunks = new Dictionary<string, Chunk>();
-            transform.position = new Vector3(0, 0, 0);
-
-
-            for (int x = -4; x < 5; x++)
-                for (int z = -4; z < 5; z++)
-                {
-                    /*
-                    Vector3 pos = new Vector3(x, 0, z);
-                    GameObject chunkObject = Instantiate(chunkPlane, parent);
-                    
-                    chunkObject.name = pos.x + "." + pos.z;
-
-                    NetworkIdentity ni = chunkObject.GetComponent<NetworkIdentity>();
-
-                    Chunk chunk = chunkObject.GetComponent<Chunk>();
-                    MeshRenderer meshRenderer = chunkObject.GetComponent<MeshRenderer>();
-                    meshRenderer.material = material;
-                    chunk.Init(pos);            
-                    Chunks.Add(chunkObject.name, chunk);
-                    */
-                    
-                    GenChunk(x, z);
-
-                    
-                } 
-            //manager.ReadyToSendChunks(Chunks);
-        }
+        for (int x = -4; x < 5; x++)
+        for (int z = -4; z < 5; z++)
+            GenChunk(x, z);
         
         //else
         //{

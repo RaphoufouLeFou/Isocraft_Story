@@ -28,7 +28,6 @@ class FaceUtils
 public class Chunk : MonoBehaviour
 {
     [NonSerialized] public const int ChunkSize = 8;
-    [NonSerialized] private const int ChunkSize2 = ChunkSize * ChunkSize;
     [NonSerialized] public const int Size1 = ChunkSize - 1;
     private Vector2 _pos;
     [NonSerialized] public int[,,] Blocks = new int[ChunkSize, ChunkSize, ChunkSize];
@@ -36,7 +35,6 @@ public class Chunk : MonoBehaviour
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
     private readonly FaceUtils _faceUtils = new();
-    private readonly int[] _offsetIndex = { 1, -1, ChunkSize, -ChunkSize, ChunkSize2, -ChunkSize2 };
 
     public void Init(Vector3 pos)
     {
@@ -63,7 +61,6 @@ public class Chunk : MonoBehaviour
     {
         // returns a list of chunks that need to be updated
 
-        Vector3 chunkPos = transform.position;
         Mesh mesh = new Mesh();
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
@@ -123,11 +120,9 @@ public class Chunk : MonoBehaviour
                         else other = Blocks[(int)otherPos.x, (int)otherPos.y, (int)otherPos.z]; // block in the chunk
 
                         if (other == -1) // block in another chunk
-                        {
-                            if (neighbors.TryGetValue(i, out Chunk chunk))
-                                other = chunk.Blocks[(int)otherPos.x, (int)otherPos.y, (int)otherPos.z];
-                            else other = 0; // air in unloaded chunks
-                        } 
+                            other = neighbors.TryGetValue(i, out Chunk chunk)
+                                ? chunk.Blocks[(int)otherPos.x, (int)otherPos.y, (int)otherPos.z] // block in neighbor chunk
+                                : 0; // air in unloaded chunks
                         if (other == 0)
                         {
                             // visible face

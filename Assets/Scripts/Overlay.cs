@@ -10,19 +10,18 @@ public class Overlay : MonoBehaviour
     [NonSerialized] public float FPS;
     [NonSerialized] public float MS;
     [FormerlySerializedAs("UpdatePerSecond")] public int updatePerSecond = 2;
-    private int _itterations = 1;
+    private int _iterations = 1;
 
     void Update()
     {
-        if(_itterations >= FPS / updatePerSecond)
+        if(_iterations >= FPS / updatePerSecond)
         {
             FPS = 1.0f / Time.deltaTime;
             MS = Time.deltaTime * 1000.0f;
             string text = $"Fps : {FPS}\nLast frame time : {MS} ms";
             textData.text = text;
-            _itterations = 0;
+            _iterations = 0;
         }
-        else
-            _itterations++;
+        else _iterations++;
     }
 }

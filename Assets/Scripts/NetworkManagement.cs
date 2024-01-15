@@ -16,9 +16,8 @@ public class NetworkManagement : MonoBehaviour
 
     [FormerlySerializedAs("PauseMenu")] public GameObject pauseMenu;
 
-    [NonSerialized] public bool IsChunksReady;
+    [NonSerialized] public bool AreChunksReady;
     //private Dictionary<string, Chunk> _chunks;
-
 
     void Start()
     {
@@ -36,13 +35,9 @@ public class NetworkManagement : MonoBehaviour
 
         _manager.maxConnections = isOnline ? 2 : 1;
 
-        if (_isHost)
-            _manager.StartHost();
-        else
-            _manager.StartClient();
+        if (_isHost) _manager.StartHost();
+        else _manager.StartClient();
     }
-
-
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -70,8 +65,7 @@ public class NetworkManagement : MonoBehaviour
 
     public void ReadyToSendChunks(Dictionary<string, Chunk> chunks)
     {
-        IsChunksReady = true;
+        AreChunksReady = true;
         //_chunks = chunks;
     }
-
 }

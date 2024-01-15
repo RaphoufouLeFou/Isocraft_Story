@@ -50,7 +50,7 @@ public class Inventory
     public int RemoveBlock(int x, int y, Sprite texture)
     {
         if (Inv[x, y, 1] == 0) return -1;
-        else Inv[x, y, 1]--;
+        Inv[x, y, 1]--;
         if (Inv[x, y, 1] == 0)
         {
             _images[Hotbar.SelectedIndex].sprite = texture;
