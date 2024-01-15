@@ -1,0 +1,77 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Mirror;
+using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
+
+public class NetworkManagement : MonoBehaviour
+{
+    private NetworkManager _manager;
+    private bool _isHost;
+
+    [FormerlySerializedAs("MainMenuSceneName")] public string mainMenuSceneName = "MainMenu";
+
+    [NonSerialized] public bool IsPaused;
+
+    [FormerlySerializedAs("PauseMenu")] public GameObject pauseMenu;
+
+    [NonSerialized] public bool IsChunksReady;
+    //private Dictionary<string, Chunk> _chunks;
+
+
+    void Start()
+    {
+        pauseMenu.SetActive(false);
+        _manager = GetComponent<NetworkManager>();
+
+        if (!NetworkInfos.StartedFromMainMenu)
+        {
+            NetworkInfos.IsHost = true;
+            NetworkInfos.IsMultiplayerGame = true;
+        }
+
+        bool isOnline = NetworkInfos.IsMultiplayerGame;
+        _isHost = NetworkInfos.IsHost;
+
+        _manager.maxConnections = isOnline ? 2 : 1;
+
+        if (_isHost)
+            _manager.StartHost();
+        else
+            _manager.StartClient();
+    }
+
+
+
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            IsPaused = !IsPaused;
+            pauseMenu.SetActive(IsPaused);
+        }
+    }
+
+    public void ButtonResumeClick()
+    {
+        IsPaused = !IsPaused;
+        pauseMenu.SetActive(IsPaused);
+    }
+
+    public void LeaveGameButtonClick()
+    {
+        if (_isHost)
+            _manager.StopHost();
+        else
+            _manager.StopClient();
+
+        SceneManager.LoadScene(mainMenuSceneName);
+    }
+
+    public void ReadyToSendChunks(Dictionary<string, Chunk> chunks)
+    {
+        IsChunksReady = true;
+        //_chunks = chunks;
+    }
+
+}

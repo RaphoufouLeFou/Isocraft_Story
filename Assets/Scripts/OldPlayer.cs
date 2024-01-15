@@ -42,7 +42,6 @@ public class OldPlayer : MonoBehaviour
             int offset = 1 - (int)x;
             return (int)(x + offset) - offset;
         }
-
         return (int)x;
     }
     

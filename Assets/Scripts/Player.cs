@@ -2,33 +2,33 @@ using Mirror;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+using UnityEngine.Serialization;
 
 public class Player : NetworkBehaviour
 {
     public new Camera camera;
     public PlayerCamera playerCamera;
 
-    public NetworkManagement NetManager;
+    [FormerlySerializedAs("NetManager")] public NetworkManagement netManager;
 
     [NonSerialized] public CustomRigidBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     [NonSerialized] public Vector3 Spawn;
-    
-    public Inventory inventory = new Inventory();
+
+    public Inventory Inventory;
 
     
-    public Sprite[] Sprites;
+    [FormerlySerializedAs("Sprites")] public Sprite[] sprites;
 
     void Start()
     {
         //camera = GameObject.Find("Main Camera").GetComponent<Camera>();
-        GameObject Items = GameObject.Find("HotBarBackground");
+        GameObject items = GameObject.Find("HotBarBackground");
         for (int i = 0; i < 9; i++)
         {
-            Hotbar.ItemImages[i] = Items.transform.GetChild(i).gameObject;
+            Hotbar.ItemImages[i] = items.transform.GetChild(i).gameObject;
         }
+        Inventory = new Inventory();
         camera = GetComponentInChildren<Camera>();
         if (!isLocalPlayer) { 
             camera.enabled = false;
@@ -36,7 +36,7 @@ public class Player : NetworkBehaviour
         }
         camera.enabled = true;
 
-        NetManager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
+        netManager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
 
         Debug.Log("Transform Tag is: " + camera.gameObject.tag);
         Transform tr = transform;
@@ -74,18 +74,18 @@ public class Player : NetworkBehaviour
 
 
     [ClientRpc]
-    void ServerPlaceBreak(Vector3 pos, int type, bool IsPlacing)
+    void ServerPlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
-        PlaceBreak(pos, type, IsPlacing);
+        PlaceBreak(pos, type, isPlacing);
     }
 
     [Command]
-    void ClientPlaceBreak(Vector3 pos, int type, bool IsPlacing)
+    void ClientPlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
-        PlaceBreak(pos, type, IsPlacing);
+        PlaceBreak(pos, type, isPlacing);
     }
 
-    int PlaceBreak(Vector3 pos, int type, bool IsPlacing)
+    int PlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
         int chunkX = Floor(pos.x / Chunk.ChunkSize),
             chunkZ = Floor(pos.z / Chunk.ChunkSize);
@@ -97,7 +97,7 @@ public class Player : NetworkBehaviour
 
         int result = type; // for inventory management
         if (y < 0 || y >= Chunk.ChunkSize) return -1; // outside of world height
-        if (IsPlacing) chunk.Blocks[x, y, z] = type;
+        if (isPlacing) chunk.Blocks[x, y, z] = type;
         else
         {
             result = chunk.Blocks[x, y, z];
@@ -128,24 +128,24 @@ public class Player : NetworkBehaviour
                 // move into or out of the block to get the right targeted block
                 hit.point += 0.01f * (right ? 1 : -1) * hit.normal;
 
-                int CurrentBlock = inventory.GetCurrentBlock(Hotbar.selectedIndex, 3);
+                int currentBlock = Inventory.GetCurrentBlock(Hotbar.SelectedIndex, 3);
                 if (right)
                 {
-                    int count = inventory.GetCurrentBlockCount(Hotbar.selectedIndex, 3);
-                    if (count < 0) return;
-                    int res = PlaceBreak(hit.point, CurrentBlock, right);        // place the block for this instance
-                    if(res!=-1) inventory.RemoveBlock(Hotbar.selectedIndex, 3, Sprites[0]);
+                    int count = Inventory.GetCurrentBlockCount(Hotbar.SelectedIndex, 3);
+                    if (count <= 0) return;
+                    int res = PlaceBreak(hit.point, currentBlock, true);        // place the block for this instance
+                    if(res!=-1) Inventory.RemoveBlock(Hotbar.SelectedIndex, 3, sprites[0]);
                 }
                 else
                 {
-                    int res = PlaceBreak(hit.point, CurrentBlock, right);        // place the block for this instance
-                    inventory.AddBlock(res, Sprites[res]);
+                    int res = PlaceBreak(hit.point, currentBlock, false);        // place the block for this instance
+                    if(res!=-1) Inventory.AddBlock(res, sprites[res]);
                 }
 
                 if (isServer){
-                    ServerPlaceBreak(hit.point, CurrentBlock, right);  // place the block for the clients
+                    ServerPlaceBreak(hit.point, currentBlock, right);  // place the block for the clients
                 }else{
-                    ClientPlaceBreak(hit.point, CurrentBlock, right);  // place the block for the server
+                    ClientPlaceBreak(hit.point, currentBlock, right);  // place the block for the server
                 }
             }
         }
@@ -155,13 +155,13 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
-        Hotbar.updateHotBar(); 
+        Hotbar.UpdateHotBar(); 
 
-        Body.Update(NetManager.IsPaused);
+        Body.Update(netManager.IsPaused);
 
         if (Body.OnFloor) GroundedHeight = transform.position.y;
 
-        if (NetManager.IsPaused) return;
+        if (netManager.IsPaused) return;
         // rotate camera about the Y axis
         Vector3 rotation = transform.rotation.eulerAngles;
         bool change = false;

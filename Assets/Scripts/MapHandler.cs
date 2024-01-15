@@ -11,7 +11,8 @@ public class MapHandler : NetworkBehaviour
 
     private Transform _chunksParent;
     [NonSerialized] public static Dictionary<string, Chunk> Chunks;
-
+    
+    /*
     [Command(requiresAuthority = false)]
     public void RequestChunks()
     {
@@ -19,8 +20,8 @@ public class MapHandler : NetworkBehaviour
         foreach (var chunk in Chunks)
         {
 
-            NetworkManager Nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-            Nm.spawnPrefabs.Add(chunk.Value.gameObject);
+            NetworkManager nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+            nm.spawnPrefabs.Add(chunk.Value.gameObject);
 
             System.Guid creatureAssetId = System.Guid.NewGuid();
             
@@ -31,7 +32,7 @@ public class MapHandler : NetworkBehaviour
             NetworkServer.Spawn(chunk.Value.gameObject);
         }
 
-    }
+    }*/
 
     void Start()
     {
@@ -39,42 +40,63 @@ public class MapHandler : NetworkBehaviour
         Transform parent = chunkParent.transform;
 
         if (/*NetworkInfos.IsHost*/ 1==1) {
+
+            _chunksParent = chunkParent.transform;
             Chunks = new Dictionary<string, Chunk>();
             transform.position = new Vector3(0, 0, 0);
-            
+
 
             for (int x = -4; x < 5; x++)
                 for (int z = -4; z < 5; z++)
                 {
+                    /*
                     Vector3 pos = new Vector3(x, 0, z);
                     GameObject chunkObject = Instantiate(chunkPlane, parent);
                     
                     chunkObject.name = pos.x + "." + pos.z;
 
-                    NetworkIdentity Ni = chunkObject.GetComponent<NetworkIdentity>();
+                    NetworkIdentity ni = chunkObject.GetComponent<NetworkIdentity>();
 
                     Chunk chunk = chunkObject.GetComponent<Chunk>();
                     MeshRenderer meshRenderer = chunkObject.GetComponent<MeshRenderer>();
                     meshRenderer.material = material;
-                    chunk.Init(pos);              
-
+                    chunk.Init(pos);            
                     Chunks.Add(chunkObject.name, chunk);
+                    */
+                    
+                    GenChunk(x, z);
+
+                    
                 } 
-            manager.ReadyToSendChunks(Chunks);
+            //manager.ReadyToSendChunks(Chunks);
         }
-        else
-        {
+        
+        //else
+        //{
             //while (!manager.IsChunksReady) ;
 
-            Debug.Log("Requesting chunks");
-            RequestChunks();
-            Debug.Log("Requested chunks");
+        //    Debug.Log("Requesting chunks");
+        //    RequestChunks();
+        //    Debug.Log("Requested chunks");
             /*
             foreach (var chunk in Chunks)
             {
                 GameObject InstanciedChunk = Instantiate(chunk.Value.gameObject, parent);
                 InstanciedChunk.name = chunk.Key;
             }*/
-        }
+        //}
+    }
+    
+    void GenChunk(int x, int z)
+    {
+        Vector3 pos = new Vector3(x, 0, z);
+        GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
+        chunkObject.name = pos.x + "." + pos.z;
+
+        Chunk chunk = chunkObject.GetComponent<Chunk>();
+        MeshRenderer meshRenderer = chunkObject.GetComponent<MeshRenderer>();
+        meshRenderer.material = material;
+        Chunks.Add(chunkObject.name, chunk);
+        chunk.Init(pos);
     }
 }
