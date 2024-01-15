@@ -151,16 +151,6 @@ public class Player : NetworkBehaviour
 
     void DetectOtherActions()
     {
-        if (!isLocalPlayer) return;
-
-        _healthImage.transform.localScale = new Vector3(health,1 ,1);
-        Hotbar.UpdateHotBar();
-        NetworkInfos.PlayerPos = transform.position;
-        Body.Update(netManager.IsPaused);
-
-        if (Body.OnFloor) GroundedHeight = transform.position.y;
-
-        if (netManager.IsPaused) return;
         // rotate camera about the Y axis
         Vector3 rotation = transform.rotation.eulerAngles;
         bool change = false;
@@ -198,6 +188,7 @@ public class Player : NetworkBehaviour
 
         _healthImage.transform.localScale = new Vector3(health,1 ,1);
         Body.Update(netManager.IsPaused);
+        NetworkInfos.PlayerPos = transform.position;
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
         Hotbar.UpdateHotBar();
 
