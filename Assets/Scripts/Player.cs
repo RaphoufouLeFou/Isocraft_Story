@@ -17,7 +17,7 @@ public class Player : NetworkBehaviour
 
     private GameObject _healthImage;
 
-    public float health;  //heath : 0 = 0%, 1 = 100%
+    public float health; // from 0 to 1
 
     public Inventory Inventory;
     
@@ -25,26 +25,21 @@ public class Player : NetworkBehaviour
 
     void Start()
     {
-        if (!isLocalPlayer) { 
-            camera.enabled = false;
-            return;
-        }
-        camera.enabled = true;
+        camera.enabled = isLocalPlayer;
+        if (!isLocalPlayer) return;
+
+        // set up objects
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
-        health = 1.0f;
+        netManager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
         //camera = GameObject.Find("Main Camera").GetComponent<Camera>();
         GameObject items = GameObject.Find("HotBarBackground");
-        for (int i = 0; i < 9; i++)
-        {
-            Hotbar.ItemImages[i] = items.transform.GetChild(i).gameObject;
-        }
+
+        health = 1.0f;
+        for (int i = 0; i < 9; i++) Hotbar.ItemImages[i] = items.transform.GetChild(i).gameObject;
         Inventory = new Inventory();
-        camera = GetComponentInChildren<Camera>();
-
-
-        netManager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
-
         Debug.Log("Transform Tag is: " + camera.gameObject.tag);
+
+        // body settings
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
         SetSpawn(0, 0);
