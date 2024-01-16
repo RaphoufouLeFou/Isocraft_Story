@@ -25,12 +25,18 @@ public class InventoryUI : MonoBehaviour
         for (int j = 0; j < 4; j++) // iterate through all cells
         for (int i = 0; i < 9; i++)
         { 
-            cells[j * 9 + i].GetComponent<Image>().sprite = sprites[inventory.GetCurrentBlock(i, j)]; // set the sprite
+            
             int count = inventory.GetCurrentBlockCount(i, j);
-            if(count > 0) // set the number in the cell
+            if (count > 0) // set the number in the cell
+            {
+                cells[j * 9 + i].GetComponent<Image>().sprite = sprites[inventory.GetCurrentBlock(i, j)]; // set the sprite
                 cells[j * 9 + i].GetComponentInChildren<TMP_Text>().text = $"{count}";
+            }
             else // hide the number in the cell
+            {
+                cells[j * 9 + i].GetComponent<Image>().sprite = sprites[0]; // set the sprite
                 cells[j * 9 + i].GetComponentInChildren<TMP_Text>().text = "";
+            }
         }
     } 
     public void HideInventory()

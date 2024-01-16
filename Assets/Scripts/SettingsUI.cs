@@ -172,7 +172,7 @@ public class SettingsUI : MonoBehaviour
     private void Update()
     {
         if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape)) // if the escape key is pressed but not while assigning a key
-            if ((pauseMenu.activeSelf || !Settings.IsPaused) && !inventoryMenu.activeSelf) // toggle the pause menu except the inventory is shown
+            if (pauseMenu.activeSelf || (!Settings.IsPaused && !inventoryMenu.activeSelf)) // toggle the pause menu except the inventory is shown
             {
                 Settings.IsPaused = !Settings.IsPaused;
                 pauseMenu.SetActive(Settings.IsPaused);
