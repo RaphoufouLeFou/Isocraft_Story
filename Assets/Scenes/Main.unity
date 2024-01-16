@@ -1783,6 +1783,17 @@ MonoBehaviour:
   inventoryMenu: {fileID: 457259301}
   pauseMenu: {fileID: 1931216963}
   pressKeyText: {fileID: 2012243992}
+  keysFields:
+  - {fileID: 506174223}
+  - {fileID: 1462010604}
+  - {fileID: 168691364}
+  - {fileID: 935137065}
+  - {fileID: 1750732466}
+  - {fileID: 225381296}
+  - {fileID: 9739250}
+  - {fileID: 1823724358}
+  - {fileID: 1873415638}
+  - {fileID: 576068644}
 --- !u!1 &142763497
 GameObject:
   m_ObjectHideFlags: 0

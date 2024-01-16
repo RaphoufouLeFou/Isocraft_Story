@@ -29,12 +29,13 @@ public class SettingsUI : MonoBehaviour
     public GameObject inventoryMenu;
     public GameObject pauseMenu;
     public GameObject pressKeyText;
+    public GameObject[] keysFields;
 
     private string _path;
 
     // variables when assigning a key
     private bool _isReadingKey; 
-    private string _function;
+    private string _key;
     private TMP_Text _keyText;
     
     // unity button event functions
@@ -51,12 +52,12 @@ public class SettingsUI : MonoBehaviour
         controlsMenu.SetActive(true); // show the controls menu buttons
         mainParamMenuButtons.SetActive(false);  // hide the main settings buttons
     }
-    public void AssignKey(GameObject function)
+    public void AssignKey(GameObject obj)
     {
         _isReadingKey = true;
         pressKeyText.SetActive(true); // show the "press a key" text
-        _function = function.name; // the function name is also the name of the UI input
-        _keyText = function.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); // get the pressed key Text to hide it later
+        _key = obj.name; // the function name is also the name of the UI input
+        _keyText = obj.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); // get the pressed key Text to hide it later
     }
     public void ButtonResumeClick()
     {
@@ -195,7 +196,7 @@ public class SettingsUI : MonoBehaviour
                     
                     if(key == KeyCode.Escape) return; // cancel if escape key is pressed
                     
-                    Settings.KeyMap[_function] = key; // map the key in the dictionary
+                    Settings.KeyMap[_key] = key; // map the key in the dictionary
                     _keyText.text = key.ToString();  // update the button text of the parameter 
                 }
     }
