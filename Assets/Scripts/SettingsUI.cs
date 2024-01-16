@@ -55,9 +55,9 @@ public class SettingsUI : MonoBehaviour
     public void AssignKey(GameObject function)
     {
         _isReadingKey = true;
-        pressKeyText.SetActive(_isReadingKey); // show the "press a key" text
+        pressKeyText.SetActive(true); // show the "press a key" text
         _function = function.name; // the function name is also the name of the UI input
-        _keyText = function.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); // get the press Key Text to hide it later
+        _keyText = function.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); // get the pressed key Text to hide it later
     }
     public void ButtonResumeClick()
     {
@@ -67,7 +67,7 @@ public class SettingsUI : MonoBehaviour
         SaveSettings();
     }
     
-    public void ReturnToMainSettings()
+    public void BackToMainSettings()
     {
         // go back button in sub-settings
         mainParamMenu.SetActive(true);
@@ -80,7 +80,7 @@ public class SettingsUI : MonoBehaviour
         mainParamMenuButtons.SetActive(true);
     }
 
-    public void ReturnToPauseMenu()
+    public void BackToPauseMenu()
     {
         // go back to main settings
         mainParamMenu.SetActive(false);
@@ -142,6 +142,7 @@ public class SettingsUI : MonoBehaviour
                 else if (key == "Fps") Settings.OverlayParam.DisplayFps = value == "True";
                 else if (key == "Coords") Settings.OverlayParam.DisplayCoords = value == "True";
                 else if (int.TryParse(value, out i)) Settings.KeyMap[key] = (KeyCode)i;
+                Debug.Log("change value of " + key + " to " + Settings.OverlayParam.DisplayFps);
             }
             file.Close();
         }
@@ -171,13 +172,13 @@ public class SettingsUI : MonoBehaviour
                 Settings.IsPaused = !Settings.IsPaused;
                 pauseMenu.SetActive(Settings.IsPaused);
                 if (Settings.IsPaused == false) SaveSettings(); // save the settings
-            } else if (mainParamMenuButtons.activeSelf) ReturnToPauseMenu();
+            } else if (mainParamMenuButtons.activeSelf) BackToPauseMenu();
             else if (
                 overlayMenu.activeSelf 
                 || controlsMenu.activeSelf
                 // otherMenu parameters
                 // ...
-            ) ReturnToMainSettings(); // get back of one setting window
+            ) BackToMainSettings(); // get back of one setting window
         
         if (!_isReadingKey) return; // if is not in key assign mode, the update is done
 

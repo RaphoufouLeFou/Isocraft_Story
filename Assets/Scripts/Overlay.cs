@@ -31,6 +31,8 @@ public class Overlay : MonoBehaviour
     string Round(float n, int digits)
     {
         string s = (int)n + ".";
+        if (digits == 0) return s;
+
         if (n < 0) n = -n;
         for (int i = 0; i < digits; i++)
         {
