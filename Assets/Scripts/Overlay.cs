@@ -21,8 +21,8 @@ public class Overlay : MonoBehaviour
 
         string text = "";
         Vector3 pos = NetworkInfos.PlayerPos;
-        if (Settings.Overlay.DisplayFps) text += Round(_displayFps, 0) + " FPS";
-        if (Settings.Overlay.DisplayMs) text += " (last: " + Round(_displayMs, 0) + "ms)";
+        if (Settings.Overlay.DisplayFps) text += Round(_displayFps, 1) + " FPS";
+        if (Settings.Overlay.DisplayMs) text += " (last: " + Round(_displayMs, 1) + "ms)";
         if (Settings.Overlay.DisplayCoords)
             text += "\n[" + Round(pos.x, 3) + ", " + Round(pos.y, 3) + ", " + Round(pos.z, 3) + "]";
         textData.text = text;

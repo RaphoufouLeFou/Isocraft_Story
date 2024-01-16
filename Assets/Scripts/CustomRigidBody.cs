@@ -168,9 +168,9 @@ public class CustomRigidBody
 
             MoveRelative = new Vector3(x * 0.8f, 0, z).normalized;
             Vector3 move = _transform.rotation * MoveRelative;
-            float speed = Input.GetKey(KeyCode.LeftControl) ? 1.7f * _speed : _speed;
+            float speed = Input.GetKey(Settings.KeyMap["Sprint"]) ? 1.7f * _speed : _speed;
             Movement += move * (speed * delta);
-            if (Input.GetKey("space") && OnFloor) Movement.y = _jumpForce;
+            if (Input.GetKey(Settings.KeyMap["Jump"]) && OnFloor) Movement.y = _jumpForce;
         }
 
         // move according to Movement

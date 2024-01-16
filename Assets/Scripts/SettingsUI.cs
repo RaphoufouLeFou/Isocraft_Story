@@ -115,13 +115,15 @@ public class SettingsUI : MonoBehaviour
             { "Kill", KeyCode.K },
             { "TopView", KeyCode.T },
             { "Inventory", KeyCode.Tab },
-            { "Respawn", KeyCode.R }
+            { "Respawn", KeyCode.R },
+            { "Sprint", KeyCode.LeftControl },
+            { "Jump", KeyCode.Space }
         };
 
         string[] keys =
         {
             "Ms", "Fps", "Coords", "Forwards", "Backwards", "Left", "Right", "CamLeft", "CamRight", "Kill", "TopView",
-            "Inventory", "Respawn"
+            "Inventory", "Respawn", "Sprint", "Jump"
         }; // correct keys in save file
 
         // replace by existing settings in file
