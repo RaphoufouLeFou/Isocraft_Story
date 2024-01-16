@@ -37,14 +37,34 @@ public static class NoiseGen
         throw new ArgumentException("Incorrect level: " + Game.Level);
     }
 
+    private static int Mod(int a, int b)
+    {
+        return (a % b + b) % b;
+    }
+
+    private static int _randA = 8765179, _randB = 3579547, _randC = 2468273;
+    private static int Prng(int seed)
+    {
+        return Mod(_randA * seed + _randB, _randC);
+    }
+
+    private static float PrngPos(int x, int z)
+    {
+        int posSeed = Prng(Prng(Prng(x)) + Prng(z) + Game.Seed);
+        return Prng(posSeed) / (float)_randC;
+    }
+
     public static (int, Structure) GetStruct(int x, int z)
     {
         // if structure in this column, return it, otherwise null
-        float p = (x * 3 + z * 5) % 10 / 10.0f;
-        if (p < 0.1)
+
+        // get prng based on position, but not tileable
+        float p = PrngPos(x, z);
+
+        if (p < 0.02)
         {
             int y = (int)GetHeight(x, z) + 1;
-            return (y, Structures.Structs["Trunk"]);
+            return (y, Structures.Structs["Tree"]);
         }
         
         return (-1, new Structure());

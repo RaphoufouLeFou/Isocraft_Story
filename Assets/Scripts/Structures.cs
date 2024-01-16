@@ -35,7 +35,7 @@ public class Structure
             for (int i = 0; i < data.Length; i++)
             {
                 int b = data[i] == "" ? -1 : int.Parse(data[i]); // empty value: -1 (ignore)
-                Blocks[i % X, i / X % Y, i / X / Y] = b;
+                Blocks[i % X, i / X / Z, i / X % Z] = b;
             }
         }
         catch
@@ -48,16 +48,18 @@ public class Structure
 public static class Structures
 {
     public static Dictionary<string, Structure> Structs = new();
-    private static readonly string[] _names = { "Trunk", "Tree" };
+    private static readonly string[] Names = { "Trunk", "Tree" };
     [NonSerialized] public static int MaxSize; // how many blocks out can structures be searched for
 
     public static void Init()
     {
-        foreach (string name in _names)
+        foreach (string name in Names)
         {
             Structure s = new Structure("Assets/Structures/" + name + ".txt");
             MaxSize = MaxSize > s.X ? MaxSize > s.Z ? MaxSize : s.Z : s.X > s.Z ? s.X : s.Z;
             Structs.Add(name, s);
         }
+
+        MaxSize = 0;
     }
 }
