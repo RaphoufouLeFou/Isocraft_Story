@@ -45,13 +45,12 @@ public static class NoiseGen
     private static int _randA = 8765179, _randB = 3579547, _randC = 2468273;
     private static int Prng(int seed)
     {
-        return Mod(_randA * seed + _randB, _randC);
+        return Mod(_randA + _randB * seed, _randC);
     }
 
     private static float PrngPos(int x, int z)
     {
-        int posSeed = Prng(Prng(Prng(x)) + Prng(z) + Game.Seed);
-        return Prng(posSeed) / (float)_randC;
+        return Prng(Game.Seed + Prng(31 * x ^ 37 * z)) / (float)_randC;
     }
 
     public static (int, Structure) GetStruct(int x, int z)
