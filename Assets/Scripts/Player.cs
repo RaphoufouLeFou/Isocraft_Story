@@ -9,8 +9,6 @@ public class Player : NetworkBehaviour
     public new Camera camera;
     public PlayerCamera playerCamera;
 
-    [FormerlySerializedAs("NetManager")] public NetworkManagement netManager;
-
     [NonSerialized] public CustomRigidBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     [NonSerialized] public Vector3 Spawn;
@@ -33,7 +31,6 @@ public class Player : NetworkBehaviour
         // set up objects
         _scriptsGameObject = GameObject.Find("Scripts");
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
-        netManager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
         //camera = GameObject.Find("Main Camera").GetComponent<Camera>();
         GameObject items = GameObject.Find("HotBarBackground");
 
@@ -188,6 +185,7 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
+        if (health > 1) health = 1;
         _healthImage.transform.localScale = new Vector3(health,1 ,1);
         Body.Update(Settings.IsPaused);
         NetworkInfos.PlayerPos = transform.position;
