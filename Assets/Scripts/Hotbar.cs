@@ -20,14 +20,4 @@ public static class Hotbar
             selectedObject.SetActive(i == SelectedIndex);
         }
     }
-
-    public static int GetCurrentBlock(int[,,] inventory)
-    {
-        if(inventory[SelectedIndex, 3, 1] > 0)
-        {
-            inventory[SelectedIndex, 3, 1]--;
-            return inventory[SelectedIndex, 3, 0];
-        }
-        return -1; // the player doesn't have the item
-    }
 }

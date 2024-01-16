@@ -58,6 +58,24 @@ public class Inventory
             }
         return -1;
     }
+    
+    public int AddBlockAt(int x, int y, int block, int count, Sprite texture)
+    {
+        int remaining = 0;
+        Inv[x, y, 0] = block; // increment the inventory cell block count by the given count
+        if (count + Inv[x, y, 1] > 64)
+        {
+            int newCount = 64 - Inv[x, y, 1];
+            remaining = count - newCount;
+            count = newCount;
+        }
+        Inv[x, y, 1]+= count; // increment the inventory cell block count by the given count
+        if(y == 3) {
+            _images[x].sprite = texture; // set the hotbar texture to the sprite if the block is in the hotbar
+            _tmpText[x].text = $"{Inv[x, y, 1]}"; // update the hotbar number
+        }
+        return remaining; //return the updated block count
+    }
 
     // Remove 1 block from a slot
     public void RemoveBlock(int x, int y, Sprite texture)
@@ -66,10 +84,18 @@ public class Inventory
         Inv[x, y, 1]--; // remove one block from the cell
         if (Inv[x, y, 1] == 0) // update the hotbar
         {
-            _images[Hotbar.SelectedIndex].sprite = texture;
-            _tmpText[Hotbar.SelectedIndex].text = "";
+            _images[x].sprite = texture;
+            _tmpText[x].text = "";
         }
-        else _tmpText[Hotbar.SelectedIndex].text = $"{Inv[x, y, 1]}";
+        else _tmpText[x].text = $"{Inv[x, y, 1]}";
+    }
+    
+    public void RemoveAllBlocks(int x, int y, Sprite texture)
+    {
+        if (Inv[x, y, 1] == 0) return;  // if the inventory doesn't have a block at the given x and y, return;
+        Inv[x, y, 1] = 0;               // remove one block from the cell
+        _images[x].sprite = texture;
+        _tmpText[x].text = "";
     }
 
     public int GetCurrentBlockCount(int x, int y)
