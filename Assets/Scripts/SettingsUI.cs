@@ -42,12 +42,12 @@ public class SettingsUI : MonoBehaviour
     public void ToggleFps() { Settings.OverlayParam.DisplayFps = !Settings.OverlayParam.DisplayFps; }
     public void ToggleMs() { Settings.OverlayParam.DisplayMs = !Settings.OverlayParam.DisplayMs; }
     public void ToggleCoordinates() { Settings.OverlayParam.DisplayCoords = !Settings.OverlayParam.DisplayCoords; }
-    public void EnterOverlayParam()
+    public void EnterOverlaySettings()
     {
         overlayMenu.SetActive(true); // show the overlay menu buttons
         mainParamMenuButtons.SetActive(false);  // hide the main settings buttons
     }
-    public void EnterControlsParam()
+    public void EnterControlsSettings()
     {
         controlsMenu.SetActive(true); // show the controls menu buttons
         mainParamMenuButtons.SetActive(false);  // hide the main settings buttons
@@ -67,9 +67,9 @@ public class SettingsUI : MonoBehaviour
         SaveSettings();
     }
     
-    private void ReturnToMainParam()
+    public void ReturnToMainSettings()
     {
-        // do back button in sub-settings
+        // go back button in sub-settings
         mainParamMenu.SetActive(true);
         // all sub-settings
         overlayMenu.SetActive(false);
@@ -80,7 +80,7 @@ public class SettingsUI : MonoBehaviour
         mainParamMenuButtons.SetActive(true);
     }
 
-    private void ReturnToPauseMenu()
+    public void ReturnToPauseMenu()
     {
         // go back to main settings
         mainParamMenu.SetActive(false);
@@ -93,7 +93,7 @@ public class SettingsUI : MonoBehaviour
         string s = "Ms:" + Settings.OverlayParam.DisplayMs + "\n";
         s += "Fps:" + Settings.OverlayParam.DisplayFps + "\n";
         s += "Coords:" + Settings.OverlayParam.DisplayCoords + "\n";
-        foreach (KeyValuePair<string, KeyCode> key in Settings.KeyMap) s += key.Key + ":" + (int)key.Value;
+        foreach (KeyValuePair<string, KeyCode> key in Settings.KeyMap) s += key.Key + ":" + (int)key.Value + "\n";
         if (File.Exists(_path)) File.Delete(_path);
         File.WriteAllText(_path, s);
     }
@@ -150,7 +150,7 @@ public class SettingsUI : MonoBehaviour
         SaveSettings();
     }
 
-    void Start()
+    private void Start()
     {
         _path = Application.persistentDataPath + "/Settings.json";
         // set all settings to hidden
@@ -177,7 +177,7 @@ public class SettingsUI : MonoBehaviour
                 || controlsMenu.activeSelf
                 // otherMenu parameters
                 // ...
-            ) ReturnToMainParam(); // get back of one setting window
+            ) ReturnToMainSettings(); // get back of one setting window
         
         if (!_isReadingKey) return; // if is not in key assign mode, the update is done
 
