@@ -55,7 +55,7 @@ public class CustomRigidBody
         for (int i = chunkX - 1; i < chunkX + 2; i++)
         for (int j = chunkZ - 1; j < chunkZ + 2; j++)
         {
-            // no collissons for unloaded chunks
+            // no collisions for unloaded chunks
             if (!MapHandler.Chunks.ContainsKey(i + "." + j)) continue;
 
             Chunk chunk = MapHandler.Chunks[i + "." + j];
