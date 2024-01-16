@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -11335,7 +11335,7 @@ GameObject:
   - component: {fileID: 1015907055}
   - component: {fileID: 1015907054}
   m_Layer: 5
-  m_Name: Mspf
+  m_Name: Ms
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15848,8 +15848,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 124641304}
-        m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
-        m_MethodName: ToggleMspf
+        m_TargetAssemblyTypeName: SettingsUI, Assembly-CSharp
+        m_MethodName: ToggleMs
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
