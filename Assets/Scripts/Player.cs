@@ -201,7 +201,6 @@ public class Player : NetworkBehaviour
             else
                 inventoryUI.DisplayInventory(Inventory, sprites);
         }
-
         
         // update these if not paused
         if (Settings.IsPaused) return;
