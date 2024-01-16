@@ -770,7 +770,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: AssignKey
         m_Mode: 2
@@ -904,7 +904,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: ToggleFps
         m_Mode: 1
@@ -1075,7 +1075,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: EnterOverlayParam
         m_Mode: 1
@@ -1208,7 +1208,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: ReturnToPauseMenu
         m_Mode: 1
@@ -1713,8 +1713,8 @@ GameObject:
   m_Component:
   - component: {fileID: 124641303}
   - component: {fileID: 124641302}
-  - component: {fileID: 124641304}
   - component: {fileID: 124641305}
+  - component: {fileID: 124641306}
   m_Layer: 0
   m_Name: Scripts
   m_TagString: Untagged
@@ -1750,25 +1750,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &124641304
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 124641301}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 418787edc960eb84884d1808b4900339, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainParamMenu: {fileID: 1054336953}
-  mainParamMenuButtons: {fileID: 1584630610}
-  overlayMenu: {fileID: 1307468610}
-  controlsMenu: {fileID: 1553792507}
-  inventoryMenu: {fileID: 457259301}
-  pauseMenu: {fileID: 1931216963}
-  pressKeyText: {fileID: 2012243992}
 --- !u!114 &124641305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1783,6 +1764,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   content: {fileID: 293223697}
   inventoryMenu: {fileID: 457259301}
+--- !u!114 &124641306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124641301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5bf6cdc567741aba04bf7f34e209289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainParamMenu: {fileID: 1054336953}
+  mainParamMenuButtons: {fileID: 1584630610}
+  overlayMenu: {fileID: 1307468610}
+  controlsMenu: {fileID: 1553792507}
+  inventoryMenu: {fileID: 457259301}
+  pauseMenu: {fileID: 1931216963}
+  pressKeyText: {fileID: 2012243992}
 --- !u!1 &142763497
 GameObject:
   m_ObjectHideFlags: 0
@@ -4338,7 +4338,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: AssignKey
         m_Mode: 2
@@ -5770,7 +5770,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: EnterControlsParam
         m_Mode: 1
@@ -6451,7 +6451,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: AssignKey
         m_Mode: 2
@@ -6584,7 +6584,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: ReturnToMainParam
         m_Mode: 1
@@ -6987,7 +6987,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: AssignKey
         m_Mode: 2
@@ -8871,7 +8871,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: ToggleCoordonates
         m_Mode: 1
@@ -10510,7 +10510,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: AssignKey
         m_Mode: 2
@@ -10911,7 +10911,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: AssignKey
         m_Mode: 2
@@ -12325,7 +12325,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: ReturnToMainParam
         m_Mode: 1
@@ -13402,7 +13402,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: ButtonResumeClick
         m_Mode: 1
@@ -13669,9 +13669,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
-        m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
-        m_MethodName: ReturnToMainParam
+      - m_Target: {fileID: 11500000, guid: b5bf6cdc567741aba04bf7f34e209289, type: 3}
+        m_TargetAssemblyTypeName: UnityEngine.Object, UnityEngine
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15847,7 +15847,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SettingsUI, Assembly-CSharp
         m_MethodName: ToggleMs
         m_Mode: 1
@@ -16055,7 +16055,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: AssignKey
         m_Mode: 2
@@ -17648,7 +17648,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: AssignKey
         m_Mode: 2
@@ -19524,7 +19524,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: AssignKey
         m_Mode: 2
@@ -21537,7 +21537,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 124641304}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ParamUI, Assembly-CSharp
         m_MethodName: AssignKey
         m_Mode: 2

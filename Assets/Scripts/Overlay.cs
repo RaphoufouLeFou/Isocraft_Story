@@ -23,7 +23,7 @@ public class Overlay : MonoBehaviour
         Vector3 pos = NetworkInfos.PlayerPos;
         if (Settings.OverlayParam.DisplayFps) text += "Fps: " + Round(_displayFps, 1) + "\n";
         if (Settings.OverlayParam.DisplayMs) text += "Last frame time: " + Round(_displayMs, 1) + "\n";
-        if (Settings.OverlayParam.DisplayCoordinates)
+        if (Settings.OverlayParam.DisplayCoords)
             text += "Position: [" + Round(pos.x, 3) + ", " + Round(pos.y, 3) + ", " + Round(pos.z, 3) + "]\n";
         textData.text = text;
     }

@@ -1,63 +1,25 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using TMPro;
 
 public static class Settings
 {       
     public static bool IsPaused;
-    public static Dictionary<string, KeyCode> KeyMap = new(); // key: input name, value: keycode
-    public struct Overlay  // overlay info struct
+    public static Dictionary<string, KeyCode> KeyMap; // key: input name, value: keycode
+
+    public struct Overlay // overlay info struct
     {
         public bool DisplayFps; // displayed FPS
         public bool DisplayMs; // displayed ms per frame
-        public bool DisplayCoordinates; //player coordinates
+        public bool DisplayCoords; //player coordinates
     }
-
     public static Overlay OverlayParam; // overlay infos to be displayed
 }
 
-// setting formatted to be understood by unity's json converter
-public class SaveSettings
-{       
-    private List<string> _keyMapListStr;
-    private List<KeyCode> _keyMapListKeys;
-    private bool _isPaused;
-    private bool _displayFps;
-    private bool _displayMs;
-    private bool _displayCoordinates;
-    
-    public void InitParm()
-    {
-        //Convert the dictionary to two lists for the json
-        _keyMapListStr = new List<string>();
-        _keyMapListKeys = new List<KeyCode>();
-        foreach (KeyValuePair<string,KeyCode> hKeyValuePair in Settings.KeyMap)
-        {
-            _keyMapListStr.Add(hKeyValuePair.Key);
-            _keyMapListKeys.Add(hKeyValuePair.Value);
-        }
-        // set the values to be saved
-        _isPaused = Settings.IsPaused;
-        _displayMs = Settings.OverlayParam.DisplayMs;
-        _displayFps = Settings.OverlayParam.DisplayFps;
-        _displayCoordinates = Settings.OverlayParam.DisplayCoordinates;
-    }
-    public void RestoreParam()
-    {
-        // convert the thw saved lists back to the dictionary
-        Settings.KeyMap = new Dictionary<string, KeyCode>();
-        for (int i = 0; i < _keyMapListStr.Count; i++) Settings.KeyMap.Add(_keyMapListStr[i], _keyMapListKeys[i]);
-        
-        // restore the saved values
-        Settings.IsPaused = _isPaused;
-        Settings.OverlayParam.DisplayMs = _displayMs;
-        Settings.OverlayParam.DisplayFps = _displayFps;
-        Settings.OverlayParam.DisplayCoordinates = _displayCoordinates;
-    }
-}
-
+// settings formatted to be understood by Unity's json converter
 public class SettingsUI : MonoBehaviour
 {
     // menu GameObjects
@@ -69,48 +31,43 @@ public class SettingsUI : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject pressKeyText;
 
+    private string _path;
+
     // variables when assigning a key
     private bool _isReadingKey; 
     private string _function;
     private TMP_Text _keyText;
     
-    void Start()
-    {
-        // set all settings to hidden
-        pauseMenu.SetActive(false);
-        mainParamMenu.SetActive(false);
-        controlsMenu.SetActive(false);
-        mainParamMenuButtons.SetActive(false);
-        pressKeyText.SetActive(false);
-        overlayMenu.SetActive(false);
-        LoadSettings();
-    }
-
-    public void ToggleFps()
-    {
-        Settings.OverlayParam.DisplayFps = !Settings.OverlayParam.DisplayFps;
-    }
-    public void ToggleMs()
-    {
-        Settings.OverlayParam.DisplayMs = !Settings.OverlayParam.DisplayMs;
-    }
-    public void ToggleCoordinates()
-    {
-        Settings.OverlayParam.DisplayCoordinates = !Settings.OverlayParam.DisplayCoordinates;
-    }
+    // unity button event functions
+    public void ToggleFps() { Settings.OverlayParam.DisplayFps = !Settings.OverlayParam.DisplayFps; }
+    public void ToggleMs() { Settings.OverlayParam.DisplayMs = !Settings.OverlayParam.DisplayMs; }
+    public void ToggleCoordinates() { Settings.OverlayParam.DisplayCoords = !Settings.OverlayParam.DisplayCoords; }
     public void EnterOverlayParam()
     {
         overlayMenu.SetActive(true); // show the overlay menu buttons
         mainParamMenuButtons.SetActive(false);  // hide the main settings buttons
     }
-    
     public void EnterControlsParam()
     {
         controlsMenu.SetActive(true); // show the controls menu buttons
         mainParamMenuButtons.SetActive(false);  // hide the main settings buttons
     }
-
-    public void ReturnToMainParam()
+    public void AssignKey(GameObject function)
+    {
+        _isReadingKey = true;
+        pressKeyText.SetActive(_isReadingKey); // show the "press a key" text
+        _function = function.name; // the function name is also the name of the UI input
+        _keyText = function.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); // get the press Key Text to hide it later
+    }
+    public void ButtonResumeClick()
+    {
+        // hide the pause menu
+        Settings.IsPaused = !Settings.IsPaused;
+        pauseMenu.SetActive(Settings.IsPaused);
+        SaveSettings();
+    }
+    
+    private void ReturnToMainParam()
     {
         // do back button in sub-settings
         mainParamMenu.SetActive(true);
@@ -123,7 +80,7 @@ public class SettingsUI : MonoBehaviour
         mainParamMenuButtons.SetActive(true);
     }
 
-    public void ReturnToPauseMenu()
+    private void ReturnToPauseMenu()
     {
         // go back to main settings
         mainParamMenu.SetActive(false);
@@ -131,67 +88,81 @@ public class SettingsUI : MonoBehaviour
         mainParamMenuButtons.SetActive(false);
     }
 
-    public void AssignKey(GameObject function)
-    {
-        _isReadingKey = true;
-        pressKeyText.SetActive(_isReadingKey); // show the "press a key" text
-        _function = function.name; // the function name is also the name of the UI input
-        _keyText = function.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); // get the press Key Text to hide it later
-    }
-   
-    public void ButtonResumeClick()
-    {
-        // hide the pause menu
-        Settings.IsPaused = !Settings.IsPaused;
-        pauseMenu.SetActive(Settings.IsPaused);
-        SaveSettings();
-    }
-
     private void SaveSettings()
     {
-        // save the settings into a json file in the AppData folder
-        SaveSettings saveSettings = new SaveSettings();
-        saveSettings.InitParm();
-        string jsonSave = JsonUtility.ToJson(saveSettings, true);
-        string path = Application.persistentDataPath + "/Settings.json";
-        if(File.Exists(path)) File.Delete(path);
-        File.WriteAllText(path, jsonSave);
+        string s = "Ms:" + Settings.OverlayParam.DisplayMs + "\n";
+        s += "Fps:" + Settings.OverlayParam.DisplayFps + "\n";
+        s += "Coords:" + Settings.OverlayParam.DisplayCoords + "\n";
+        foreach (KeyValuePair<string, KeyCode> key in Settings.KeyMap) s += key.Key + ":" + (int)key.Value;
+        if (File.Exists(_path)) File.Delete(_path);
+        File.WriteAllText(_path, s);
     }
 
     private void LoadSettings()
     {
-        // read the settings from the json file
-        string path = Application.persistentDataPath + "/Settings.json";
-        if(File.Exists(path))
-        {
-            string jsonSaved = File.ReadAllText(path);
-            SaveSettings savedParam = JsonUtility.FromJson<SaveSettings>(jsonSaved);
-            savedParam.RestoreParam();
-        }
-        else
-        {
-            // default settings
-            Settings.OverlayParam.DisplayMs = true;
-            Settings.OverlayParam.DisplayFps = true;
-            Settings.OverlayParam.DisplayCoordinates = true;
-            
-            // default keys in qwerty:
-            Settings.KeyMap.Add("Forwards", KeyCode.W);
-            Settings.KeyMap.Add("Backwards", KeyCode.S);
-            Settings.KeyMap.Add("Left", KeyCode.A);
-            Settings.KeyMap.Add("Right", KeyCode.D);
-            Settings.KeyMap.Add("CamLeft", KeyCode.Q);
-            Settings.KeyMap.Add("CamRight", KeyCode.E);
-            Settings.KeyMap.Add("Kill", KeyCode.K);
-            Settings.KeyMap.Add("TopView", KeyCode.T);
-            Settings.KeyMap.Add("Inventory", KeyCode.Tab);
-            Settings.KeyMap.Add("Respawn", KeyCode.R);
-            
-            // save the default settings
-            SaveSettings();
-        }
+        // set all settings to default
+        Settings.OverlayParam.DisplayMs = true;
+        Settings.OverlayParam.DisplayFps = true;
+        Settings.OverlayParam.DisplayCoords = true;
 
+        Settings.KeyMap = new Dictionary<string, KeyCode>
+        {
+            { "Forwards", KeyCode.W },
+            { "Backwards", KeyCode.S },
+            { "Left", KeyCode.A },
+            { "Right", KeyCode.D },
+            { "CamLeft", KeyCode.Q },
+            { "CamRight", KeyCode.E },
+            { "Kill", KeyCode.K },
+            { "TopView", KeyCode.T },
+            { "Inventory", KeyCode.Tab },
+            { "Respawn", KeyCode.R }
+        };
+
+        string[] keys =
+        {
+            "Forwards", "Backwards", "Left", "Right", "CamLeft", "CamRight", "Kill", "TopView", "Inventory", "Respawn"
+        }; // correct keys in save file
+
+        Debug.Log("Loading settings");
+
+        // replace by existing settings in file
+        if (File.Exists(_path))
+        {
+            StreamReader file = new StreamReader(_path);
+            while (file.ReadLine() is { } line)
+            {
+                // check if valid line and edit settings
+                int i;
+                for (i = 0; i < line.Length; i++) if (line[i] == ':') break;
+                if (i == line.Length) continue;
+                string key = line.Substring(0, i), value = line.Substring(i + 1);
+                if (i == line.Length - 1 || !keys.Contains(key)) continue;
+                if (key == "Ms") Settings.OverlayParam.DisplayMs = value == "True";
+                else if (key == "Fps") Settings.OverlayParam.DisplayFps = value == "True";
+                else if (key == "Coords") Settings.OverlayParam.DisplayCoords = value == "True";
+                else if (int.TryParse(value, out i)) Settings.KeyMap[key] = (KeyCode)i;
+            }
+            file.Close();
+        }
+        
+        // save all settings to file again
+        SaveSettings();
     }
+
+    void Start()
+    {
+        _path = Application.persistentDataPath + "/Settings.json";
+        // set all settings to hidden
+        pauseMenu.SetActive(false);
+        mainParamMenu.SetActive(false);
+        controlsMenu.SetActive(false);
+        mainParamMenuButtons.SetActive(false);
+        pressKeyText.SetActive(false);
+        overlayMenu.SetActive(false);
+        LoadSettings();
+    }
+
     private void Update()
     {
         if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape)) // if the escape key is pressed but not while assigning a key
