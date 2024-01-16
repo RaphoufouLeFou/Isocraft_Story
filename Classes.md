@@ -45,6 +45,10 @@ functions :
 - AddBlock -> add a block in the inventory and update the hotbar if nessesary
 - RemoveBlock -> remove a block from the inventory and update the hotbar if nessesary
 
+## inventoryUI.cs
+by Raphaël
+
+UI inventory functions, like hide ans display
 
 ## MapHandler.cs
 by Léo
@@ -71,6 +75,11 @@ nose generation for the blocks type
 by Raphaël
 
 Quick overlay of debug informations like fps and mspf
+
+## ParamUI.cs
+by Raphaël
+
+all settings functions
 
 ## Player.cs
 by Léo + Raphaël
