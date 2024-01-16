@@ -139,7 +139,7 @@ public class Player : NetworkBehaviour
                 else
                 {
                     int res = PlaceBreak(hit.point, currentBlock, false); // place the block for this instance
-                    if (res > 0) _inventory.AddBlock(res, sprites[res]);           // fixed collecting air
+                    if (res > 0) _inventory.AddBlock(res, sprites[res]); // fixed collecting air
                 }
 
                 if (isServer) ServerPlaceBreak(hit.point, currentBlock, right); // server tells clients to place the block

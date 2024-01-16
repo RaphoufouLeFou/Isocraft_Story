@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public static class NoiseGen
 {
@@ -38,11 +37,16 @@ public static class NoiseGen
         throw new ArgumentException("Incorrect level: " + Game.Level);
     }
 
-    public static Structure? GetStruct(int x, int z)
+    public static (int, Structure) GetStruct(int x, int z)
     {
         // if structure in this column, return it, otherwise null
-        int type = (5 * x + 3 * z) % 10;
-        if (type < 5) return Structures.Structs["Trunk"];
-        return null;
+        float p = (x * 3 + z * 5) % 10 / 10.0f;
+        if (p < 0.1)
+        {
+            int y = (int)GetHeight(x, z) + 1;
+            return (y, Structures.Structs["Trunk"]);
+        }
+        
+        return (-1, new Structure());
     }
 }

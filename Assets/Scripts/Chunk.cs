@@ -64,16 +64,15 @@ public class Chunk : MonoBehaviour
         int size = Structures.MaxSize;
         for (int x = -size; x < Size; x++) for(int z = -size; z < Size; z++)
         {
-            Structure? s = NoiseGen.GetStruct((int)_pos.x * Size + x, (int)_pos.y * Size + z);
-            if (s != null)
+            (int y, Structure s) = NoiseGen.GetStruct((int)_pos.x * Size + x, (int)_pos.y * Size + z);
+            if (y != -1)
             {
                 for(int dx = 0; dx < s.X; dx++) for(int dy = 0; dy < s.Y; dy++)
                 for (int dz = 0; dz < s.Z; dz++)
                 {
-                    if (x+dx is >= 0 and < Size && z+dz is >= 0 and < Size) {
+                    if (x+dx is >= 0 and < Size && y+dy is >= 0 and < Size && z+dz is >= 0 and < Size) {
                         int b = s.Blocks[dx, dy, dz];
-                        if (b == -1) Blocks[x + dx, dy, z + dz] = Game.Blocks.Air;
-                        else if (b > 0) Blocks[x + dx, dy, z + dz] = b;
+                        if (b != -1) Blocks[x + dx, y + dy, z + dz] = b;
                     }
                 }
             }

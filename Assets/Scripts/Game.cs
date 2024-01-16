@@ -6,7 +6,7 @@ using Random = System.Random;
 public class Tile
 {
     public readonly Vector2[] UVs;
-    private readonly int _texWidth = 3, _texHeight = 3;
+    private readonly int _texWidth = 4, _texHeight = 3;
     private readonly float _offset = 0.5f / 32f; // prevent texture bleeding
 
     public Tile(Vector2 pos)
@@ -68,11 +68,14 @@ public class Game : MonoBehaviour
         public static readonly Tile
             Bedrock = new(new Vector2(0, 2)),
             Cobblestone = new(new Vector2(1, 2)),
-            RedSand = new(new Vector2(2, 2)),
-            SandstoneSide = new(new Vector2(0, 1)),
-            SandstoneTop = new(new Vector2(1, 1)),
-            SandSide = new(new Vector2(2, 1)),
-            SandTop = new(new Vector2(0, 0));
+            OakLeaves = new(new Vector2(2, 2)),
+            OakLog = new(new Vector2(3, 2)),
+            OakLogTop = new(new Vector2(0, 1)),
+            RedSand = new(new Vector2(1, 1)),
+            SandstoneSide = new(new Vector2(2, 1)),
+            SandstoneTop = new(new Vector2(3, 1)),
+            SandSide = new(new Vector2(0, 0)),
+            SandTop = new(new Vector2(1, 0));
     }
 
     public static class Blocks
@@ -83,7 +86,9 @@ public class Game : MonoBehaviour
             RedSand = 2,
             Sandstone = 3,
             Bedrock = 4,
-            Cobblestone = 5;
+            Cobblestone = 5,
+            OakLog = 6,
+            OakLeaves = 7;
         
         public static readonly Dictionary<int, Block> FromId = new()
         {
@@ -92,7 +97,9 @@ public class Game : MonoBehaviour
             {RedSand, new Block(RedSand, Tiles.RedSand)},
             {Sandstone, new Block(Sandstone, Tiles.SandstoneTop, Tiles.SandstoneSide, Tiles.SandstoneTop)},
             {Bedrock, new Block(Bedrock, Tiles.Bedrock)},
-            {Cobblestone, new Block(Cobblestone, Tiles.Cobblestone)}
+            {Cobblestone, new Block(Cobblestone, Tiles.Cobblestone)},
+            {OakLog, new Block(OakLog, Tiles.OakLogTop, Tiles.OakLog, Tiles.OakLogTop)},
+            {OakLeaves, new Block(OakLeaves, Tiles.OakLeaves)}
         };
     }
 

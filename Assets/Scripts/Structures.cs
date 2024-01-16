@@ -14,6 +14,11 @@ public class Structure
         return line.Split(".");
     }
 
+    public Structure()
+    {
+        // dummy constructor, no data
+    }
+
     public Structure(string path)
     {
         try
@@ -29,7 +34,8 @@ public class Structure
             if (data.Length != X * Y * Z) throw new Exception();
             for (int i = 0; i < data.Length; i++)
             {
-                Blocks[i % X, i / X % Y, i / X / Y] = int.Parse(data[i]);
+                int b = data[i] == "" ? -1 : int.Parse(data[i]); // empty value: -1 (ignore)
+                Blocks[i % X, i / X % Y, i / X / Y] = b;
             }
         }
         catch
