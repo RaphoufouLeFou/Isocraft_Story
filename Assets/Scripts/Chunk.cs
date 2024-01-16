@@ -27,17 +27,21 @@ class FaceUtils
 
 public class Chunk : MonoBehaviour
 {
+    //public GameObject game;
+    private Game _game;
+
     [NonSerialized] public const int Size = 16;
     [NonSerialized] public const int Size1 = Size - 1;
-    private Vector2 _pos;
-    [NonSerialized] public int[,,] Blocks = new int[Size, Size, Size];
+    [NonSerialized] public readonly int[,,] Blocks = new int[Size, Size, Size];
 
+    private Vector2 _pos;
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
     private readonly FaceUtils _faceUtils = new();
 
     public void Init(Vector3 pos)
     {
+        //_game = game.GetComponent<Game>();
         _meshFilter = GetComponent<MeshFilter>();
         _meshCollider = GetComponent<MeshCollider>();
         _pos = new Vector2(pos.x, pos.z);
@@ -52,13 +56,15 @@ public class Chunk : MonoBehaviour
         for (int z = 0; z < Size; z++)
         {
             int y = 0;
-            foreach (int block in NoiseGen.GetColumn(transform.position + new Vector3(x, 0, z)))
+            Vector3 pos = transform.position;
+            foreach (int block in NoiseGen.GetColumn((int)pos.x + x, (int)pos.z + z))
                 Blocks[x, y++, z] = block;
         }
     }
 
     public void BuildMesh(bool newChunk = false)
     {
+        // builds mesh from blocks and structures
         // returns a list of chunks that need to be updated
 
         Mesh mesh = new Mesh();
@@ -66,6 +72,15 @@ public class Chunk : MonoBehaviour
         List<int> triangles = new List<int>();
         List<Vector2> uvs = new List<Vector2>();
         int nFaces = 0;
+        
+        // get eventual structures around
+        /*List<(Vector3, int)> structures = new();
+        int s = _game.Structs.MaxSize;
+        for (int x = -s; x < Size + s; x++) for(int z = -s; z < Size + s; z++)
+        {
+            (Vector3 pos, int type) = NoiseGen.GetStruct((int)_pos.x * Size + x, (int)_pos.y * Size + z);
+            if (type != -1) structures.Add((pos, type));
+        }*/
         
         // get neighbors
         Dictionary<int, Chunk> neighbors = new ();

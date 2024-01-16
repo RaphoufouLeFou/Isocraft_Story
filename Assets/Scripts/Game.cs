@@ -62,6 +62,7 @@ public class Game : MonoBehaviour
     [NonSerialized] public static float TickRate = 20;
     [NonSerialized] public static int Level = 0;
     [NonSerialized] public static long Seed;
+    [NonSerialized] public readonly Structures Structs = new();
 
     static class Tiles
     {
@@ -88,11 +89,11 @@ public class Game : MonoBehaviour
         public static readonly Dictionary<int, Block> FromId = new()
         {
             {Air, new Block()},
-            {Sand, new Block(1, Tiles.SandTop, Tiles.SandSide, Tiles.SandTop)},
-            {RedSand, new Block(2, Tiles.RedSand)},
-            {Sandstone, new Block(3, Tiles.SandstoneTop, Tiles.SandstoneSide, Tiles.SandstoneTop)},
-            {Bedrock, new Block(4, Tiles.Bedrock)},
-            {Cobblestone, new Block(5, Tiles.Cobblestone)}
+            {Sand, new Block(Sand, Tiles.SandTop, Tiles.SandSide, Tiles.SandTop)},
+            {RedSand, new Block(RedSand, Tiles.RedSand)},
+            {Sandstone, new Block(Sandstone, Tiles.SandstoneTop, Tiles.SandstoneSide, Tiles.SandstoneTop)},
+            {Bedrock, new Block(Bedrock, Tiles.Bedrock)},
+            {Cobblestone, new Block(Cobblestone, Tiles.Cobblestone)}
         };
     }
 

@@ -214,7 +214,7 @@ MonoBehaviour:
   camera: {fileID: 3026982836658294228}
   playerCamera: {fileID: 6770091861329838762}
   netManager: {fileID: 0}
-  health: 0
+  health: 1
   sprites:
   - {fileID: 21300000, guid: 433482b1419840d42bca7ae9771092a2, type: 3}
   - {fileID: 21300000, guid: 9c57b1e3bc5a73d418e564a5e46e4e8b, type: 3}
