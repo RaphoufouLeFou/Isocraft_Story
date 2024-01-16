@@ -38,11 +38,11 @@ public static class NoiseGen
         throw new ArgumentException("Incorrect level: " + Game.Level);
     }
 
-    public static (Vector3, int) GetStruct(int x, int z)
+    public static Structure? GetStruct(int x, int z)
     {
-        // if structure in this column, returns (origin, type), otherwise ((0, 0, 0), -1)
+        // if structure in this column, return it, otherwise null
         int type = (5 * x + 3 * z) % 10;
-        if (type < 5) return (new Vector3(x, (int)GetHeight(x, z), z), type);
-        return (new Vector3(), -1);
+        if (type < 5) return Structures.Structs["Trunk"];
+        return null;
     }
 }

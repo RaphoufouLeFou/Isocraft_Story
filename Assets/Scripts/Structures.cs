@@ -39,13 +39,13 @@ public class Structure
     }
 }
 
-public class Structures
+public static class Structures
 {
-    public Dictionary<string, Structure> Structs = new();
-    private readonly string[] _names = { "Trunk", "Tree" };
-    [NonSerialized] public readonly int MaxSize; // how many blocks out can structures be searched for
+    public static Dictionary<string, Structure> Structs = new();
+    private static readonly string[] _names = { "Trunk", "Tree" };
+    [NonSerialized] public static int MaxSize; // how many blocks out can structures be searched for
 
-    public Structures()
+    public static void Init()
     {
         foreach (string name in _names)
         {

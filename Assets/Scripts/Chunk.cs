@@ -27,9 +27,6 @@ class FaceUtils
 
 public class Chunk : MonoBehaviour
 {
-    //public GameObject game;
-    private Game _game;
-
     [NonSerialized] public const int Size = 16;
     [NonSerialized] public const int Size1 = Size - 1;
     [NonSerialized] public readonly int[,,] Blocks = new int[Size, Size, Size];
@@ -41,7 +38,6 @@ public class Chunk : MonoBehaviour
 
     public void Init(Vector3 pos)
     {
-        //_game = game.GetComponent<Game>();
         _meshFilter = GetComponent<MeshFilter>();
         _meshCollider = GetComponent<MeshCollider>();
         _pos = new Vector2(pos.x, pos.z);
@@ -52,6 +48,9 @@ public class Chunk : MonoBehaviour
     
     void GenerateBlocks()
     {
+        // generate blocks and structures from NoiseGen
+
+        // blocks
         for (int x = 0; x < Size; x++)
         for (int z = 0; z < Size; z++)
         {
@@ -60,11 +59,30 @@ public class Chunk : MonoBehaviour
             foreach (int block in NoiseGen.GetColumn((int)pos.x + x, (int)pos.z + z))
                 Blocks[x, y++, z] = block;
         }
+
+        // get intersecting structures
+        int size = Structures.MaxSize;
+        for (int x = -size; x < Size; x++) for(int z = -size; z < Size; z++)
+        {
+            Structure? s = NoiseGen.GetStruct((int)_pos.x * Size + x, (int)_pos.y * Size + z);
+            if (s != null)
+            {
+                for(int dx = 0; dx < s.X; dx++) for(int dy = 0; dy < s.Y; dy++)
+                for (int dz = 0; dz < s.Z; dz++)
+                {
+                    if (x+dx is >= 0 and < Size && z+dz is >= 0 and < Size) {
+                        int b = s.Blocks[dx, dy, dz];
+                        if (b == -1) Blocks[x + dx, dy, z + dz] = Game.Blocks.Air;
+                        else if (b > 0) Blocks[x + dx, dy, z + dz] = b;
+                    }
+                }
+            }
+        }
     }
 
     public void BuildMesh(bool newChunk = false)
     {
-        // builds mesh from blocks and structures
+        // builds mesh from blocks
         // returns a list of chunks that need to be updated
 
         Mesh mesh = new Mesh();
@@ -73,16 +91,7 @@ public class Chunk : MonoBehaviour
         List<Vector2> uvs = new List<Vector2>();
         int nFaces = 0;
         
-        // get eventual structures around
-        /*List<(Vector3, int)> structures = new();
-        int s = _game.Structs.MaxSize;
-        for (int x = -s; x < Size + s; x++) for(int z = -s; z < Size + s; z++)
-        {
-            (Vector3 pos, int type) = NoiseGen.GetStruct((int)_pos.x * Size + x, (int)_pos.y * Size + z);
-            if (type != -1) structures.Add((pos, type));
-        }*/
-        
-        // get neighbors
+        // get neighboring chunks
         Dictionary<int, Chunk> neighbors = new ();
         for (int i = 0; i < 4; i++)
         {
