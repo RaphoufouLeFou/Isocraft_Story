@@ -22,6 +22,14 @@ public static class Settings
 
 public class SettingsUI : MonoBehaviour
 {
+    private void Start()
+    {
+        _path = Application.persistentDataPath + "/options.txt";
+        LoadSettings();
+        // close all menus
+        GoToMenu("None");
+    }
+
     // menu GameObjects
     public GameObject settingsMenu;
     public GameObject settingsMenuButtons;
@@ -150,14 +158,6 @@ public class SettingsUI : MonoBehaviour
         UpdateSceneSettings();
         // save fixed settings to file
         SaveSettings();
-    }
-
-    private void Start()
-    {
-        _path = Application.persistentDataPath + "/options.txt";
-        LoadSettings();
-        // close all menus
-        GoToMenu("None");
     }
 
     private void Update()

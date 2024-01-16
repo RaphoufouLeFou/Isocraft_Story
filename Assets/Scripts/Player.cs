@@ -40,6 +40,7 @@ public class Player : NetworkBehaviour
         health = 1.0f;
         for (int i = 0; i < 9; i++) Hotbar.ItemImages[i] = items.transform.GetChild(i).gameObject;
         _inventory = new Inventory();
+        _inventory.AddBlock(Game.Blocks.Cobblestone, sprites[Game.Blocks.Cobblestone], 64);
 
         // body settings
         Transform tr = transform;

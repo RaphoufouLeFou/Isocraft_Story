@@ -22,7 +22,6 @@ public class Inventory
         {
             _images[i] = Hotbar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();   
             _tmpText[i] = Hotbar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponentInChildren<TMP_Text>();
-
         }
     }
     

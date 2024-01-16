@@ -9,13 +9,13 @@ public static class NoiseGen
     {
         _noise = new FastNoiseLite();
         _noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        _noise.SetSeed(Game.Seed);
+        _noise.SetSeed((int)Game.Seed);
     }
     
     public static IEnumerable<int> GetColumn(Vector3 pos)
     {
         // pos should be (x, 0 (ignored), z)
-        if (Game.Level == 0) // overWorld (temporary test)
+        if (Game.Level == 0) // overworld (temporary test)
         {
             float height = _noise.GetNoise(pos.x, pos.z) * 2 + 7 +
                            _noise.GetNoise(pos.x * 10 + 1000, pos.z * 10 + 1000) / 2;

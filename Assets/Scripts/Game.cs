@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = System.Random;
 
 public class Tile
 {
     public readonly Vector2[] UVs;
     private readonly int _texWidth = 3, _texHeight = 3;
-    private readonly float _offset = 0.5f/32f; // prevent texture bleeding
+    private readonly float _offset = 0.5f / 32f; // prevent texture bleeding
 
     public Tile(Vector2 pos)
     {
@@ -60,7 +61,7 @@ public class Game : MonoBehaviour
 {
     [NonSerialized] public static float TickRate = 20;
     [NonSerialized] public static int Level = 0;
-    [NonSerialized] public static int Seed = 69;
+    [NonSerialized] public static long Seed;
 
     static class Tiles
     {
@@ -84,8 +85,7 @@ public class Game : MonoBehaviour
             Bedrock = 4,
             Cobblestone = 5;
         
-        
-        public static readonly Dictionary<int, Block> FromId = new Dictionary<int, Block>
+        public static readonly Dictionary<int, Block> FromId = new()
         {
             {Air, new Block()},
             {Sand, new Block(1, Tiles.SandTop, Tiles.SandSide, Tiles.SandTop)},
@@ -98,6 +98,8 @@ public class Game : MonoBehaviour
 
     void Start()
     {
+        Random rand = new Random();
+        Seed = (long)rand.NextDouble();
         NoiseGen.Init();
     }
-}    
+}
