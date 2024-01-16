@@ -59,7 +59,5 @@ public static class Structures
             MaxSize = MaxSize > s.X ? MaxSize > s.Z ? MaxSize : s.Z : s.X > s.Z ? s.X : s.Z;
             Structs.Add(name, s);
         }
-
-        MaxSize = 0;
     }
 }

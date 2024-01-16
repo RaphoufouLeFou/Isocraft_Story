@@ -61,7 +61,7 @@ public static class NoiseGen
         // get prng based on position, but not tileable
         float p = PrngPos(x, z);
 
-        if (p < 0.02)
+        if (p < 0.005)
         {
             int y = (int)GetHeight(x, z) + 1;
             return (y, Structures.Structs["Tree"]);
