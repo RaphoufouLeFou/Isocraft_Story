@@ -10,6 +10,7 @@ public class CustomRigidBody
 
     private readonly Transform _transform;
     private readonly float _speed, _drag, _jumpForce, _gravity;
+    private bool _sprinting;
 
     private readonly float _width, _height;
     
@@ -107,6 +108,7 @@ public class CustomRigidBody
                 if (toChange == 0) // x wall collision
                 {
                     if (MathF.Abs(corr.x) > MathF.Abs(correction.x)) correction.x = corr.x;
+                    _sprinting = false; // reset sprint when bonking on wall
                 }
                 else if (toChange == 1) // floor / ceiling collision
                 {
@@ -118,8 +120,8 @@ public class CustomRigidBody
                 }
                 else if (toChange == 2) // z wall collision
                 {
-                    if (MathF.Abs(corr.z) > MathF.Abs(correction.z))
-                        correction.z = corr.z;
+                    if (MathF.Abs(corr.z) > MathF.Abs(correction.z)) correction.z = corr.z;
+                    _sprinting = false;
                 }
                 else throw new Exception("Way too much correction, gotta be an error somewhere");
             }
@@ -158,14 +160,19 @@ public class CustomRigidBody
         {
             float x = 0;
             float z = 0;
-            if (Input.GetKey(Settings.KeyMap["Forwards"])) z++;
-            if (Input.GetKey(Settings.KeyMap["Backwards"])) z--;
+            bool forwards = Input.GetKey(Settings.KeyMap["Forwards"]);
+            bool backwards = Input.GetKey(Settings.KeyMap["Backwards"]);
+            if (forwards) z++;
+            if (backwards) z--;
             if (Input.GetKey(Settings.KeyMap["Left"])) x--;
             if (Input.GetKey(Settings.KeyMap["Right"])) x++;
 
+            if (Input.GetKey(Settings.KeyMap["Sprint"])) _sprinting = true;
+            if (!forwards || backwards) _sprinting = false;
+
             MoveRelative = new Vector3(x * 0.8f, 0, z).normalized;
             Vector3 move = _transform.rotation * MoveRelative;
-            float speed = Input.GetKey(Settings.KeyMap["Sprint"]) ? 1.7f * _speed : _speed;
+            float speed = _sprinting ? 1.7f * _speed : _speed;
             Movement += move * (speed * delta);
             if (Input.GetKey(Settings.KeyMap["Jump"]) && OnFloor) Movement.y = _jumpForce;
         }
