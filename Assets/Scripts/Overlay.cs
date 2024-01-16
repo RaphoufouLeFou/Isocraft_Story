@@ -21,17 +21,17 @@ public class Overlay : MonoBehaviour
 
         string text = "";
         Vector3 pos = NetworkInfos.PlayerPos;
-        if (Settings.OverlayParam.DisplayFps) text += "Fps: " + Round(_displayFps, 1) + "\n";
-        if (Settings.OverlayParam.DisplayMs) text += "Last frame time: " + Round(_displayMs, 1) + "\n";
-        if (Settings.OverlayParam.DisplayCoords)
+        if (Settings.Overlay.DisplayFps) text += "Fps: " + Round(_displayFps, 0) + "\n";
+        if (Settings.Overlay.DisplayMs) text += "Last frame time: " + Round(_displayMs, 0) + "\n";
+        if (Settings.Overlay.DisplayCoords)
             text += "Position: [" + Round(pos.x, 3) + ", " + Round(pos.y, 3) + ", " + Round(pos.z, 3) + "]\n";
         textData.text = text;
     }
 
     string Round(float n, int digits)
     {
+        if (digits == 0) return (int)n + "";
         string s = (int)n + ".";
-        if (digits == 0) return s;
 
         if (n < 0) n = -n;
         for (int i = 0; i < digits; i++)

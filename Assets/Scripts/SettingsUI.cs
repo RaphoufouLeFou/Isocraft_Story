@@ -10,16 +10,15 @@ public static class Settings
     public static bool IsPaused;
     public static Dictionary<string, KeyCode> KeyMap; // key: input name, value: keycode
 
-    public struct Overlay // overlay info struct
+    public struct OverlayStruct // overlay info struct
     {
         public bool DisplayFps; // displayed FPS
         public bool DisplayMs; // displayed ms per frame
         public bool DisplayCoords; //player coordinates
     }
-    public static Overlay OverlayParam; // overlay infos to be displayed
+    public static OverlayStruct Overlay; // overlay infos to be displayed
 }
 
-// settings formatted to be understood by Unity's json converter
 public class SettingsUI : MonoBehaviour
 {
     // menu GameObjects
@@ -39,9 +38,9 @@ public class SettingsUI : MonoBehaviour
     private TMP_Text _keyText;
     
     // unity button event functions
-    public void ToggleFps() { Settings.OverlayParam.DisplayFps = !Settings.OverlayParam.DisplayFps; }
-    public void ToggleMs() { Settings.OverlayParam.DisplayMs = !Settings.OverlayParam.DisplayMs; }
-    public void ToggleCoordinates() { Settings.OverlayParam.DisplayCoords = !Settings.OverlayParam.DisplayCoords; }
+    public void ToggleFps() { Settings.Overlay.DisplayFps = !Settings.Overlay.DisplayFps; }
+    public void ToggleMs() { Settings.Overlay.DisplayMs = !Settings.Overlay.DisplayMs; }
+    public void ToggleCoordinates() { Settings.Overlay.DisplayCoords = !Settings.Overlay.DisplayCoords; }
     public void EnterOverlaySettings()
     {
         overlayMenu.SetActive(true); // show the overlay menu buttons
@@ -90,20 +89,25 @@ public class SettingsUI : MonoBehaviour
 
     private void SaveSettings()
     {
-        string s = "Ms:" + Settings.OverlayParam.DisplayMs + "\n";
-        s += "Fps:" + Settings.OverlayParam.DisplayFps + "\n";
-        s += "Coords:" + Settings.OverlayParam.DisplayCoords + "\n";
+        string s = "Ms:" + Settings.Overlay.DisplayMs + "\n";
+        s += "Fps:" + Settings.Overlay.DisplayFps + "\n";
+        s += "Coords:" + Settings.Overlay.DisplayCoords + "\n";
         foreach (KeyValuePair<string, KeyCode> key in Settings.KeyMap) s += key.Key + ":" + (int)key.Value + "\n";
         if (File.Exists(_path)) File.Delete(_path);
         File.WriteAllText(_path, s);
     }
 
+    private void UpdateSceneSettings()
+    {
+        
+    }
+    
     private void LoadSettings()
     {
         // set all settings to default
-        Settings.OverlayParam.DisplayMs = true;
-        Settings.OverlayParam.DisplayFps = true;
-        Settings.OverlayParam.DisplayCoords = true;
+        Settings.Overlay.DisplayMs = true;
+        Settings.Overlay.DisplayFps = true;
+        Settings.Overlay.DisplayCoords = true;
 
         Settings.KeyMap = new Dictionary<string, KeyCode>
         {
@@ -121,10 +125,9 @@ public class SettingsUI : MonoBehaviour
 
         string[] keys =
         {
-            "Forwards", "Backwards", "Left", "Right", "CamLeft", "CamRight", "Kill", "TopView", "Inventory", "Respawn"
+            "Ms", "Fps", "Coords", "Forwards", "Backwards", "Left", "Right", "CamLeft", "CamRight", "Kill", "TopView",
+            "Inventory", "Respawn"
         }; // correct keys in save file
-
-        Debug.Log("Loading settings");
 
         // replace by existing settings in file
         if (File.Exists(_path))
@@ -137,23 +140,24 @@ public class SettingsUI : MonoBehaviour
                 for (i = 0; i < line.Length; i++) if (line[i] == ':') break;
                 if (i == line.Length) continue;
                 string key = line.Substring(0, i), value = line.Substring(i + 1);
-                if (i == line.Length - 1 || !keys.Contains(key)) continue;
-                if (key == "Ms") Settings.OverlayParam.DisplayMs = value == "True";
-                else if (key == "Fps") Settings.OverlayParam.DisplayFps = value == "True";
-                else if (key == "Coords") Settings.OverlayParam.DisplayCoords = value == "True";
+                if (!keys.Contains(key)) continue;
+                if (key == "Ms") Settings.Overlay.DisplayMs = value == "True";
+                else if (key == "Fps") Settings.Overlay.DisplayFps = value == "True";
+                else if (key == "Coords") Settings.Overlay.DisplayCoords = value == "True";
                 else if (int.TryParse(value, out i)) Settings.KeyMap[key] = (KeyCode)i;
-                Debug.Log("change value of " + key + " to " + Settings.OverlayParam.DisplayFps);
             }
             file.Close();
         }
-        
-        // save all settings to file again
+
+        // update fields in scene
+        UpdateSceneSettings();
+        // save fixed settings to file
         SaveSettings();
     }
 
     private void Start()
     {
-        _path = Application.persistentDataPath + "/Settings.json";
+        _path = Application.persistentDataPath + "/options.txt";
         // set all settings to hidden
         pauseMenu.SetActive(false);
         mainParamMenu.SetActive(false);
