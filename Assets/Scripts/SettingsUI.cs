@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
+using UnityEditor;
 
 public static class Settings
 {       
@@ -100,7 +101,12 @@ public class SettingsUI : MonoBehaviour
 
     private void UpdateSceneSettings()
     {
-        
+        GameObject go = GameObject.Find("AssignContent");
+        for (int i = 0; i < Settings.KeyMap.Count; i++)
+        {
+            Transform child = go.transform.GetChild(i);
+            child.GetChild(1).GetComponentInChildren<TMP_Text>().text = Settings.KeyMap[child.gameObject.name].ToString();
+        }
     }
     
     private void LoadSettings()
