@@ -93,7 +93,7 @@ public class SettingsUI : MonoBehaviour
         string s = "Ms:" + Settings.OverlayParam.DisplayMs + "\n";
         s += "Fps:" + Settings.OverlayParam.DisplayFps + "\n";
         s += "Coords:" + Settings.OverlayParam.DisplayCoords + "\n";
-        foreach (KeyValuePair<string, KeyCode> key in Settings.KeyMap) s += key.Key + ":" + (int)key.Value;
+        foreach (KeyValuePair<string, KeyCode> key in Settings.KeyMap) s += key.Key + ":" + (int)key.Value + "\n";
         if (File.Exists(_path)) File.Delete(_path);
         File.WriteAllText(_path, s);
     }
