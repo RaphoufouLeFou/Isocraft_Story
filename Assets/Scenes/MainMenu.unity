@@ -747,11 +747,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3397f28f29e6b2b4ca4be32776e2b5c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MainSceneName: Main
-  MainParent: {fileID: 17497782}
-  NewGameParent: {fileID: 671925053}
-  LoadGameParent: {fileID: 1609900254}
-  BackButton: {fileID: 184182221}
+  mainSceneName: Main
+  mainParent: {fileID: 17497782}
+  newGameParent: {fileID: 671925053}
+  loadGameParent: {fileID: 1609900254}
+  backButton: {fileID: 184182221}
 --- !u!1 &294114615
 GameObject:
   m_ObjectHideFlags: 0
@@ -1942,7 +1942,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 271196908}
         m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
-        m_MethodName: JoinGameButtonClick
+        m_MethodName: LoadGameButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

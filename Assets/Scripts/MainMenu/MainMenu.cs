@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
-
 public class MainMenu : MonoBehaviour
 {
 
@@ -20,7 +16,6 @@ public class MainMenu : MonoBehaviour
         newGameParent.SetActive(false);
         loadGameParent.SetActive(false);
     }
-    void Update() { }
 
     public void NewGameButtonClick()
     {
