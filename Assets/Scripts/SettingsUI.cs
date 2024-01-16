@@ -3,8 +3,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
-using UnityEditor;
 
 public static class Settings
 {       
@@ -23,14 +23,14 @@ public static class Settings
 public class SettingsUI : MonoBehaviour
 {
     // menu GameObjects
-    public GameObject mainParamMenu;
-    public GameObject mainParamMenuButtons;
+    public GameObject settingsMenu;
+    public GameObject settingsMenuButtons;
     public GameObject overlayMenu;
     public GameObject controlsMenu;
     public GameObject inventoryMenu;
     public GameObject pauseMenu;
     public GameObject pressKeyText;
-    public GameObject[] keysFields;
+    public GameObject scrollParent;
 
     private string _path;
 
@@ -43,16 +43,6 @@ public class SettingsUI : MonoBehaviour
     public void ToggleFps() { Settings.Overlay.DisplayFps = !Settings.Overlay.DisplayFps; }
     public void ToggleMs() { Settings.Overlay.DisplayMs = !Settings.Overlay.DisplayMs; }
     public void ToggleCoordinates() { Settings.Overlay.DisplayCoords = !Settings.Overlay.DisplayCoords; }
-    public void EnterOverlaySettings()
-    {
-        overlayMenu.SetActive(true); // show the overlay menu buttons
-        mainParamMenuButtons.SetActive(false);  // hide the main settings buttons
-    }
-    public void EnterControlsSettings()
-    {
-        controlsMenu.SetActive(true); // show the controls menu buttons
-        mainParamMenuButtons.SetActive(false);  // hide the main settings buttons
-    }
     public void AssignKey(GameObject obj)
     {
         _isReadingKey = true;
@@ -60,33 +50,24 @@ public class SettingsUI : MonoBehaviour
         _key = obj.name; // the function name is also the name of the UI input
         _keyText = obj.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); // get the pressed key Text to hide it later
     }
-    public void ButtonResumeClick()
-    {
-        // hide the pause menu
-        Settings.IsPaused = !Settings.IsPaused;
-        pauseMenu.SetActive(Settings.IsPaused);
-        SaveSettings();
-    }
     
-    public void BackToMainSettings()
+    public void GoToMenu(string menu)
     {
-        // go back button in sub-settings
-        mainParamMenu.SetActive(true);
-        // all sub-settings
-        overlayMenu.SetActive(false);
-        controlsMenu.SetActive(false);
-        // also called by the settings button in the pause menu, so we need to hide it
-        pauseMenu.SetActive(false);
-        // show the settings buttons
-        mainParamMenuButtons.SetActive(true);
-    }
+        if (menu == "None") // close menus
+        {
+            Settings.IsPaused = false;
+            pauseMenu.SetActive(false);
+            SaveSettings();
+            return;
+        }
+        bool pause = menu == "Pause";
+        pauseMenu.SetActive(pause);
+        settingsMenu.SetActive(!pause);
 
-    public void BackToPauseMenu()
-    {
-        // go back to main settings
-        mainParamMenu.SetActive(false);
-        pauseMenu.SetActive(true);
-        mainParamMenuButtons.SetActive(false);
+        settingsMenuButtons.SetActive(menu == "Settings");
+        overlayMenu.SetActive(menu == "Overlay");
+        controlsMenu.SetActive(menu == "Controls");
+        pressKeyText.SetActive(false);
     }
 
     private void SaveSettings()
@@ -101,10 +82,17 @@ public class SettingsUI : MonoBehaviour
 
     private void UpdateSceneSettings()
     {
-        GameObject go = GameObject.Find("AssignContent");
+        // overlay
+        Transform overlay = overlayMenu.transform;
+        overlay.GetChild(0).GetChild(0).gameObject.GetComponent<Toggle>().isOn = Settings.Overlay.DisplayFps;
+        overlay.GetChild(1).GetChild(0).gameObject.GetComponent<Toggle>().isOn = Settings.Overlay.DisplayMs;
+        overlay.GetChild(2).GetChild(0).gameObject.GetComponent<Toggle>().isOn = Settings.Overlay.DisplayCoords;
+
+        // keys
+        Transform t = scrollParent.transform;
         for (int i = 0; i < Settings.KeyMap.Count; i++)
         {
-            Transform child = go.transform.GetChild(i);
+            Transform child = t.GetChild(i);
             child.GetChild(1).GetComponentInChildren<TMP_Text>().text = Settings.KeyMap[child.gameObject.name].ToString();
         }
     }
@@ -165,14 +153,9 @@ public class SettingsUI : MonoBehaviour
     private void Start()
     {
         _path = Application.persistentDataPath + "/options.txt";
-        // set all settings to hidden
-        pauseMenu.SetActive(false);
-        mainParamMenu.SetActive(false);
-        controlsMenu.SetActive(false);
-        mainParamMenuButtons.SetActive(false);
-        pressKeyText.SetActive(false);
-        overlayMenu.SetActive(false);
         LoadSettings();
+        // close all menus
+        GoToMenu("None");
     }
 
     private void Update()
@@ -183,13 +166,13 @@ public class SettingsUI : MonoBehaviour
                 Settings.IsPaused = !Settings.IsPaused;
                 pauseMenu.SetActive(Settings.IsPaused);
                 if (Settings.IsPaused == false) SaveSettings(); // save the settings
-            } else if (mainParamMenuButtons.activeSelf) BackToPauseMenu();
+            } else if (settingsMenuButtons.activeSelf) GoToMenu("Pause");
             else if (
                 overlayMenu.activeSelf 
                 || controlsMenu.activeSelf
                 // otherMenu parameters
                 // ...
-            ) BackToMainSettings(); // get back of one setting window
+            ) GoToMenu("Settings"); // get back of one setting window
         
         if (!_isReadingKey) return; // if is not in key assign mode, the update is done
 

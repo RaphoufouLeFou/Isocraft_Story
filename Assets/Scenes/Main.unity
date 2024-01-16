@@ -1077,14 +1077,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 124641306}
         m_TargetAssemblyTypeName: SettingsUI, Assembly-CSharp
-        m_MethodName: EnterOverlaySettings
-        m_Mode: 1
+        m_MethodName: GoToMenu
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Overlay
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &71718547
@@ -1157,11 +1157,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1411642659}
-  m_Father: {fileID: 1054336954}
+  m_Father: {fileID: 1584630611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 275, y: 61.342102}
+  m_AnchoredPosition: {x: 50, y: -38.657898}
   m_SizeDelta: {x: 224.4062, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &75412768
@@ -1210,14 +1210,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 124641306}
         m_TargetAssemblyTypeName: SettingsUI, Assembly-CSharp
-        m_MethodName: BackToPauseMenu
-        m_Mode: 1
+        m_MethodName: GoToMenu
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Pause
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &75412769
@@ -1747,7 +1747,8 @@ Transform:
   m_LocalPosition: {x: 590.4628, y: 123.29233, z: 21.732162}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1070619968}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &124641305
@@ -1776,24 +1777,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5bf6cdc567741aba04bf7f34e209289, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainParamMenu: {fileID: 1054336953}
-  mainParamMenuButtons: {fileID: 1584630610}
+  settingsMenu: {fileID: 1054336953}
+  settingsMenuButtons: {fileID: 1584630610}
   overlayMenu: {fileID: 1307468610}
   controlsMenu: {fileID: 1553792507}
   inventoryMenu: {fileID: 457259301}
   pauseMenu: {fileID: 1931216963}
   pressKeyText: {fileID: 2012243992}
-  keysFields:
-  - {fileID: 506174223}
-  - {fileID: 1462010604}
-  - {fileID: 168691364}
-  - {fileID: 935137065}
-  - {fileID: 1750732466}
-  - {fileID: 225381296}
-  - {fileID: 9739250}
-  - {fileID: 1823724358}
-  - {fileID: 1873415638}
-  - {fileID: 576068644}
+  scrollParent: {fileID: 1410844786}
 --- !u!1 &142763497
 GameObject:
   m_ObjectHideFlags: 0
@@ -5783,14 +5774,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 124641306}
         m_TargetAssemblyTypeName: SettingsUI, Assembly-CSharp
-        m_MethodName: EnterControlsSettings
-        m_Mode: 1
+        m_MethodName: GoToMenu
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Controls
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &497501195
@@ -6597,14 +6588,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 124641306}
         m_TargetAssemblyTypeName: SettingsUI, Assembly-CSharp
-        m_MethodName: BackToMainSettings
-        m_Mode: 1
+        m_MethodName: GoToMenu
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Settings
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &547523677
@@ -7346,7 +7337,7 @@ GameObject:
   - component: {fileID: 624501276}
   - component: {fileID: 624501275}
   m_Layer: 5
-  m_Name: Coordinates
+  m_Name: Coords
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7392,7 +7383,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Display Cordonates : '
+  m_text: 'Display Cordinates:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -11392,7 +11383,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Display MSPF : '
+  m_text: 'Display ms per frame:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -12204,7 +12195,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1977576788}
-  - {fileID: 75412767}
   - {fileID: 1307468611}
   - {fileID: 1553792508}
   - {fileID: 1584630611}
@@ -12338,14 +12328,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 124641306}
         m_TargetAssemblyTypeName: SettingsUI, Assembly-CSharp
-        m_MethodName: BackToMainSettings
-        m_Mode: 1
+        m_MethodName: GoToMenu
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Settings
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1061077466
@@ -12430,12 +12420,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1070619966}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -590.4628, y: -123.29233, z: -21.732162}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 124641303}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1070619969
 MonoBehaviour:
@@ -12721,7 +12711,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Display Fps : '
+  m_text: 'Display FPS:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -13415,14 +13405,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 124641306}
         m_TargetAssemblyTypeName: SettingsUI, Assembly-CSharp
-        m_MethodName: ButtonResumeClick
-        m_Mode: 1
+        m_MethodName: GoToMenu
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: None
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1132731492
@@ -13682,14 +13672,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 124641306}
         m_TargetAssemblyTypeName: SettingsUI, Assembly-CSharp
-        m_MethodName: BackToMainSettings
-        m_Mode: 1
+        m_MethodName: GoToMenu
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Settings
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1134602813
@@ -16261,7 +16251,7 @@ GameObject:
   - component: {fileID: 1410844787}
   - component: {fileID: 1410844788}
   m_Layer: 5
-  m_Name: Content
+  m_Name: ScrollParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18769,7 +18759,7 @@ GameObject:
   - component: {fileID: 1584630611}
   - component: {fileID: 1584630612}
   m_Layer: 5
-  m_Name: Main
+  m_Name: Buttons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18789,6 +18779,7 @@ RectTransform:
   m_Children:
   - {fileID: 71718545}
   - {fileID: 497501193}
+  - {fileID: 75412767}
   m_Father: {fileID: 1054336954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -24270,7 +24261,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 705507995}
-  - {fileID: 1070619968}
   - {fileID: 851175656}
   - {fileID: 551226335}
   - {fileID: 520568133}
