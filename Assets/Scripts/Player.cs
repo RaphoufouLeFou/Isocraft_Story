@@ -40,7 +40,6 @@ public class Player : NetworkBehaviour
         health = 1.0f;
         for (int i = 0; i < 9; i++) Hotbar.ItemImages[i] = items.transform.GetChild(i).gameObject;
         Inventory = new Inventory();
-        Debug.Log("Transform Tag is: " + camera.gameObject.tag);
 
         // body settings
         Transform tr = transform;

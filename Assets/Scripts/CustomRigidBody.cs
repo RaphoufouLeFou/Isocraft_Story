@@ -55,11 +55,8 @@ public class CustomRigidBody
         for (int i = chunkX - 1; i < chunkX + 2; i++)
         for (int j = chunkZ - 1; j < chunkZ + 2; j++)
         {
-            if (!MapHandler.Chunks.ContainsKey(i + "." + j)) // in an unloaded chunk: do not move
-            {
-                Movement = Vector3.zero;
-                return;
-            }
+            // no collissons for unloaded chunks
+            if (!MapHandler.Chunks.ContainsKey(i + "." + j)) continue;
 
             Chunk chunk = MapHandler.Chunks[i + "." + j];
             
@@ -124,7 +121,7 @@ public class CustomRigidBody
                     if (MathF.Abs(corr.z) > MathF.Abs(correction.z))
                         correction.z = corr.z;
                 }
-                else throw new ArgumentException("Collision too big, gotta be an error somewhere");
+                else throw new Exception("Way too much correction, gotta be an error somewhere");
             }
 
             // move by final collision
