@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public class NetworkManagement : MonoBehaviour
 {
@@ -12,16 +11,11 @@ public class NetworkManagement : MonoBehaviour
 
     public string mainMenuSceneName = "MainMenu";
 
-    
-
-
-
     [NonSerialized] public bool AreChunksReady;
     //private Dictionary<string, Chunk> _chunks;
 
     void Start()
     {
-        
         _manager = GetComponent<NetworkManager>();
 
         if (!NetworkInfos.StartedFromMainMenu)
@@ -40,10 +34,8 @@ public class NetworkManagement : MonoBehaviour
     }
     public void LeaveGameButtonClick()
     {
-        if (_isHost)
-            _manager.StopHost();
-        else
-            _manager.StopClient();
+        if (_isHost) _manager.StopHost();
+        else _manager.StopClient();
 
         SceneManager.LoadScene(mainMenuSceneName);
     }

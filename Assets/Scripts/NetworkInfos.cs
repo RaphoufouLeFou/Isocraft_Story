@@ -7,5 +7,3 @@ public static class NetworkInfos
     public static bool StartedFromMainMenu = false;
     public static Vector3 PlayerPos { get; set; }
 }
-
-

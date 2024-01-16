@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -7,7 +6,7 @@ public class Inventory
 {
     /*
      *   Inventory format : x(0) = item, v(1) = quantity
-     *   hided:
+     *   hidden:
      *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
      *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
      *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
@@ -18,7 +17,7 @@ public class Inventory
     private Image[] _images = new Image[9]; // cells images
     private TMP_Text[] _tmpText = new TMP_Text[9]; // cells numbers
     public Inventory() {
-        //Set all cells images and numbers in the hotbar
+        // set all cells images and numbers in the hotbar
         for (int i = 0; i < 9; i++)
         {
             _images[i] = Hotbar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();   
@@ -27,70 +26,62 @@ public class Inventory
         }
     }
     
-    //Add one block to the inventory where it can
+    // add one block in the inventory where possible
     public int AddBlock(int block, Sprite texture)
     {
-        for (int j = 3; j >= 0; j--) 
-        {
-            for (int i = 0; i < 9; i++)
+        for (int j = 3; j >= 0; j--) for (int i = 0; i < 9; i++)
+            if ((Inv[i, j, 0] == block && Inv[i, j, 1] < 64) || Inv[i, j, 1] == 0)
             {
-                if ((Inv[i, j, 0] == block && Inv[i, j, 1] < 64) || Inv[i, j, 1] == 0)
-                {
-                    Inv[i, j, 0] = block;   //set the inventory cell block id to the given id
-                    Inv[i, j, 1]++;         //increment the inventory cell block count by 1
-                    if(j == 3) {
-                        _images[i].sprite = texture;        //set the hotbar texture to the sprite if the block is in the hotbar
-                        _tmpText[i].text = $"{Inv[i, j, 1]}";//update the hotbar number
-                    }
-                    return Inv[i, j, 1];    //return the updated block count
+                Inv[i, j, 0] = block; // set the inventory cell block id to the given id
+                Inv[i, j, 1]++; // increment the inventory cell block count by 1
+                if(j == 3) {
+                    _images[i].sprite = texture; // set the hotbar texture to the sprite if the block is in the hotbar
+                    _tmpText[i].text = $"{Inv[i, j, 1]}"; // update the hotbar number
                 }
+                return Inv[i, j, 1]; // return the updated block count
             }
-        }
         return -1;
     }
-    //Add multiple block to the inventory where it can
+
+    // add multiple blocks
     public int AddBlock(int block, Sprite texture, int count)
     {
-        for (int j = 3; j >= 0; j--) 
-        {
-            for (int i = 0; i < 9; i++)
+        for (int j = 3; j >= 0; j--) for (int i = 0; i < 9; i++)
+            if ((Inv[i, j, 0] == block && Inv[i, j, 1] + count <= 64) || Inv[i, j, 1] == 0) 
             {
-                if ((Inv[i, j, 0] == block && Inv[i, j, 1] + count <= 64) || Inv[i, j, 1] == 0)
-                {
-                    Inv[i, j, 0] = block;   //set the inventory cell block id to the given id
-                    Inv[i, j, 1]+= count;   //increment the inventory cell block count by the given count
-                    if(j == 3) {
-                        _images[i].sprite = texture;        //set the hotbar texture to the sprite if the block is in the hotbar
-                        _tmpText[i].text = $"{Inv[i, j, 1]}";//update the hotbar number
-                    }
-                    return Inv[i, j, 1];    //return the updated block count
+                Inv[i, j, 0] = block; // set the inventory cell block id to the given id
+                Inv[i, j, 1]+= count; // increment the inventory cell block count by the given count
+                if(j == 3) {
+                    _images[i].sprite = texture; // set the hotbar texture to the sprite if the block is in the hotbar
+                    _tmpText[i].text = $"{Inv[i, j, 1]}"; // update the hotbar number
                 }
+                return Inv[i, j, 1]; //return the updated block count
             }
-        }
         return -1;
     }
 
     // Remove 1 block from a slot
     public void RemoveBlock(int x, int y, Sprite texture)
     {
-        if (Inv[x, y, 1] == 0) return; // if the inventory don't have a block at the given x and y, return;
-        Inv[x, y, 1]--;             // remove one block from the cell
-        if (Inv[x, y, 1] == 0)      // update the hotbar
+        if (Inv[x, y, 1] == 0) return; // if the inventory doesn't have a block at the given x and y, return;
+        Inv[x, y, 1]--; // remove one block from the cell
+        if (Inv[x, y, 1] == 0) // update the hotbar
         {
-            _images[Hotbar.SelectedIndex].sprite = texture; 
+            _images[Hotbar.SelectedIndex].sprite = texture;
             _tmpText[Hotbar.SelectedIndex].text = "";
         }
-        else
-            _tmpText[Hotbar.SelectedIndex].text = $"{Inv[x, y, 1]}";
+        else _tmpText[Hotbar.SelectedIndex].text = $"{Inv[x, y, 1]}";
     }
 
     public int GetCurrentBlockCount(int x, int y)
     {
-        return Inv[x, y, 1];  //return the block count at a given cell
+        // returns the block count at a given cell
+        return Inv[x, y, 1];
     }
 
     public int GetCurrentBlock(int x, int y)
     {
-        return Inv[x, y, 0];    //return the block id at a given cell
+        // returns the block id at a given cell
+        return Inv[x, y, 0];
     }
 }

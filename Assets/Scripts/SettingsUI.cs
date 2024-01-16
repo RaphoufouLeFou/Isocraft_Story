@@ -64,7 +64,7 @@ public class SaveSettings
     }
 }
 
-public class ParamUI : MonoBehaviour
+public class SettingsUI : MonoBehaviour
 {
     //menus gameobjects
     public GameObject mainParamMenu;
