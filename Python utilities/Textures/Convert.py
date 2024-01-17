@@ -48,4 +48,4 @@ code = '\nprivate readonly int _texWidth = %s, _texHeight = %s;' %(w, h)
 code += '\n\npublic static readonly Tile'
 for i, name in zip(range(l), images):
     code += '\n    %s = new(new Vector2(%d, %d)),' %(name, i%w, h-1-i//w)
-input(code[:-1]+';')
+input(code[:-1]+';\n\n/!\\ Don\'t forget to move the texmap.png file into the Assets folder!\n')
