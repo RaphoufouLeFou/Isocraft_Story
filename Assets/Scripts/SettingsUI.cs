@@ -35,12 +35,17 @@ public class SettingsUI : MonoBehaviour
     public GameObject settingsMenuButtons;
     public GameObject overlayMenu;
     public GameObject controlsMenu;
+    public GameObject multiplayerMenu;
     public GameObject inventoryMenu;
     public GameObject pauseMenu;
     public GameObject pressKeyText;
     public GameObject scrollParent;
 
+    public NetworkManagement management;
+
     private string _path;
+
+    private int _maxPlayerConnections = 10;
 
     // variables when assigning a key
     private bool _isReadingKey; 
@@ -75,6 +80,7 @@ public class SettingsUI : MonoBehaviour
         settingsMenuButtons.SetActive(menu == "Settings");
         overlayMenu.SetActive(menu == "Overlay");
         controlsMenu.SetActive(menu == "Controls");
+        multiplayerMenu.SetActive(menu == "Multiplayer");
         pressKeyText.SetActive(false);
     }
 
@@ -125,13 +131,14 @@ public class SettingsUI : MonoBehaviour
             { "Inventory", KeyCode.Tab },
             { "Respawn", KeyCode.R },
             { "Sprint", KeyCode.LeftControl },
-            { "Jump", KeyCode.Space }
+            { "Jump", KeyCode.Space },
+            { "Chat", KeyCode.R }
         };
 
         string[] keys =
         {
             "Ms", "Fps", "Coords", "Forwards", "Backwards", "Left", "Right", "CamLeft", "CamRight", "Kill", "TopView",
-            "Inventory", "Respawn", "Sprint", "Jump"
+            "Inventory", "Respawn", "Sprint", "Jump", "Chat"
         }; // correct keys in save file
 
         // replace by existing settings in file
@@ -160,6 +167,24 @@ public class SettingsUI : MonoBehaviour
         SaveSettings();
     }
 
+
+    public void MultiplayerMenuListener(GameObject self)
+    {
+        if (self.name == "IsMulti")
+        {
+            NetworkInfos.IsMultiplayerGame = self.GetComponent<Toggle>().isOn;
+            management.ChangeMaxConnection(NetworkInfos.IsMultiplayerGame ? _maxPlayerConnections : 1);
+        }
+        else if (self.name == "Port")
+        {
+            management.ChangePort((ushort)Int32.Parse(self.GetComponent<TMP_InputField>().text));
+        }
+        else if (self.name == "Players")
+        {
+            _maxPlayerConnections = Int32.Parse(self.GetComponent<TMP_InputField>().text);
+            management.ChangeMaxConnection(_maxPlayerConnections);
+        }
+    }
     private void Update()
     {
         if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape)) // if the escape key is pressed but not while assigning a key
@@ -172,6 +197,7 @@ public class SettingsUI : MonoBehaviour
             else if (
                 overlayMenu.activeSelf 
                 || controlsMenu.activeSelf
+                || multiplayerMenu.activeSelf
                 // otherMenu parameters
                 // ...
             ) GoToMenu("Settings"); // get back of one setting window

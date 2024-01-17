@@ -48,4 +48,13 @@ public class NetworkManagement : MonoBehaviour
 
         SceneManager.LoadScene(mainMenuSceneName);
     }
+
+    public void ChangeMaxConnection(int max)
+    {
+        _manager.maxConnections = max;
+    }
+    public void ChangePort(ushort port)
+    {
+        _manager.GetComponent<KcpTransport>().Port = port;
+    }
 }
