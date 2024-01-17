@@ -56,17 +56,14 @@ public class Structure
     public int GetBlock(int x, int y, int z, int dx, int dy, int dz)
     {
         // used to add additional generation conditions to structures
+        int b = _blocks[dx, dy, dz];
         if (_type == "Tree")
         {
             if ((dx, dy, dz) == (1, 0, 1)) return Game.Blocks.RedSand;
-            if (dy == 5)
-            {
-                int d = Math.Abs(dx - 1) + Math.Abs(dz - 1);
-                float p = d == 1 ? 0.8f : d == 2 ? 0.4f : 1;
-                return NoiseGen.PrngPos(x + dx, y + dy, z + dz) < p ? Game.Blocks.OakLeaves : Game.Blocks.Air;
-            }
+            if (dx != 1 && dy == 5 && dz != 1 && b == -1)
+                return NoiseGen.PrngPos(x + dx, y + dy, z + dz) < 0.5f ? Game.Blocks.OakLeaves : Game.Blocks.None;
         }
-        return _blocks[dx, dy, dz];
+        return b;
     }
 }
 

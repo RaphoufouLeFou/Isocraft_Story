@@ -27,7 +27,7 @@ public static class NoiseGen
                 if (y == 0) yield return Game.Blocks.Bedrock;
                 else if (y > height) yield return Game.Blocks.Air;
                 else if (y + 1 > height) yield return Game.Blocks.Sand;
-                else if (y + 2 < height) yield return Game.Blocks.Sandstone;
+                else if (y + 3 < height) yield return Game.Blocks.Sandstone;
                 else yield return Game.Blocks.RedSand;
             }
 
@@ -59,7 +59,7 @@ public static class NoiseGen
 
         float p = _noise.GetNoise((long)x << 10, (long)z << 10) / 2 + 0.5f;
 
-        if (p < 0.01)
+        if (p < 0.05)
         {
             Structure s = Structures.Structs["Tree"];
             int y = (int)GetHeight(x + s.Offset.x, z + s.Offset.z);

@@ -31,7 +31,7 @@ public class Block
     {
         Id = 0;
     }
-    
+
     public Block(int id, Tile allFaces)
     {
         Id = id;
@@ -81,6 +81,7 @@ public class Game : MonoBehaviour
     public static class Blocks
     {
         public static readonly int
+            None = -1,
             Air = 0,
             Sand = 1,
             RedSand = 2,
@@ -89,7 +90,7 @@ public class Game : MonoBehaviour
             Cobblestone = 5,
             OakLog = 6,
             OakLeaves = 7;
-        
+
         public static readonly Dictionary<int, Block> FromId = new()
         {
             {Air, new Block()},
