@@ -37,10 +37,21 @@ public static class NoiseGen
         throw new ArgumentException("Incorrect level: " + Game.Level);
     }
 
-    /* private static int Mod(int a, int b) { return (a % b + b) % b; }
+    private static int Mod(int a, int b)
+    {
+        return (a % b + b) % b;
+    }
+
     private const int A = 8765179, B = 3579547, C = 2468273;
-    private static int Prng(int seed) { return Mod(A + B * seed, C); }
-    private static float PrngPos(int x, int z) { return Prng(Game.Seed + Prng(31 * x ^ 37 * z)) / (float)C; } */
+    private static int Prng(int seed)
+    {
+        return Mod(A + B * seed, C); 
+    }
+
+    public static float PrngPos(int x, int y, int z)
+    {
+        return Prng(Game.Seed + Prng(29 * x ^ 31 * y ^ 37 * z)) / (float)C;
+    }
 
     public static (int, Structure) GetStruct(int x, int z)
     {
@@ -48,7 +59,7 @@ public static class NoiseGen
 
         float p = _noise.GetNoise((long)x << 10, (long)z << 10) / 2 + 0.5f;
 
-        if (p < 0.1)
+        if (p < 0.01)
         {
             Structure s = Structures.Structs["Tree"];
             int y = (int)GetHeight(x + s.Offset.x, z + s.Offset.z);
