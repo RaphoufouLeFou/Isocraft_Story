@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 
 public class Structure
 {
     public readonly int X, Y, Z;
     public readonly int[,,] Blocks;
-    public readonly Vector3 Origin;
-    public readonly int YOffset;
+    public readonly (int x, int y, int z) Offset;
 
     private string[] GetDataLine(StreamReader file)
     {
@@ -34,14 +32,11 @@ public class Structure
             Z = int.Parse(coords[2]);
             Blocks = new int[X, Y, Z];
 
-            // second line: origin (x.y.z)
+            // second line: origin for height offset: x/z=origin, y=offset (x.y.z)
             string[] origin = GetDataLine(file);
-            Origin = new Vector3(int.Parse(origin[0]), int.Parse(origin[1]), int.Parse(origin[2]));
-
-            // third line: Y offset from the ground level at origin
-            YOffset = int.Parse(GetDataLine(file)[0]);
+            Offset = (int.Parse(origin[0]), int.Parse(origin[1]), int.Parse(origin[2]));
             
-            // fourth line: blocks (x, then z, then y, separated by .)
+            // third line: blocks (x, then z, then y, separated by .)
             string[] data = GetDataLine(file);
             if (data.Length != X * Y * Z) throw new Exception();
             for (int i = 0; i < data.Length; i++)

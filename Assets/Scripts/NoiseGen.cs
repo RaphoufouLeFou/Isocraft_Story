@@ -48,10 +48,11 @@ public static class NoiseGen
 
         float p = _noise.GetNoise((long)x << 10, (long)z << 10) / 2 + 0.5f;
 
-        if (p < 0.01)
+        if (p < 0.1)
         {
-            int y = (int)GetHeight(x, z);
-            return (y, Structures.Structs["Tree"]);
+            Structure s = Structures.Structs["Tree"];
+            int y = (int)GetHeight(x + s.Offset.x, z + s.Offset.z);
+            return (y + s.Offset.y, s);
         }
         
         return (-1, new Structure());
