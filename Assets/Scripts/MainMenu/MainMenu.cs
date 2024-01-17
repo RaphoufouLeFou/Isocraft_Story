@@ -12,7 +12,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject joinGameParent;
     [SerializeField] private GameObject backButton;
 
-    private string _iPaddress = "localhost";
+    private string _IPAddress = "localhost";
     private string _port = "7777";
 
     void Start()
@@ -54,8 +54,8 @@ public class MainMenu : MonoBehaviour
     }
     public void ConnectGameButtonClick()
     {
-        NetworkInfos.IsLocalHost = _iPaddress.ToLower() == "localhost";
-        NetworkInfos.uri = new Uri($"https://{_iPaddress}:{_port}");
+        NetworkInfos.IsLocalHost = _IPAddress.ToLower() == "localhost";
+        NetworkInfos.uri = new Uri($"https://{_IPAddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = false;
         NetworkInfos.StartedFromMainMenu = true;
@@ -78,7 +78,7 @@ public class MainMenu : MonoBehaviour
 
     public void OnChangedAddress(TMP_Text newAddress)
     {
-        _iPaddress = newAddress.text;
+        _IPAddress = newAddress.text;
     }
     public void OnChangedPort(TMP_Text newPort)
     {

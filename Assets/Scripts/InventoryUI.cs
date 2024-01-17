@@ -1,5 +1,4 @@
 using System;
-using System.Net.Mime;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -119,8 +118,9 @@ public class InventoryUI : MonoBehaviour, IPointerClickHandler
             }
             else if (mouse == "Right")
             {
-                if((inv.GetCurrentBlockCount(x, y) & 1) == 0) _movingItem = (inv.GetCurrentBlock(x, y), inv.GetCurrentBlockCount(x, y)/2);
-                else _movingItem = (inv.GetCurrentBlock(x, y), (int)Math.Floor(inv.GetCurrentBlockCount(x, y)/2.0f+1));
+                _movingItem = (inv.GetCurrentBlockCount(x, y) & 1) == 0
+                    ? (inv.GetCurrentBlock(x, y), inv.GetCurrentBlockCount(x, y) / 2)
+                    : (inv.GetCurrentBlock(x, y), (int)Math.Floor(inv.GetCurrentBlockCount(x, y) / 2.0f + 1));
                 inv.RemoveHalfBlocks(x, y, _sprites[0]);
             }
             else if (mouse == "Middle")

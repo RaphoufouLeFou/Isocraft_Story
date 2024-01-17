@@ -58,8 +58,8 @@ public class MapHandler : NetworkBehaviour
             /*
             foreach (var chunk in Chunks)
             {
-                GameObject InstanciedChunk = Instantiate(chunk.Value.gameObject, parent);
-                InstanciedChunk.name = chunk.Key;
+                GameObject InstanceChunk = Instantiate(chunk.Value.gameObject, parent);
+                InstanceChunk.name = chunk.Key;
             }*/
         //}
     }

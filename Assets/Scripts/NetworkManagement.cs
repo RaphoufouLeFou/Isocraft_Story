@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using Mirror;
 using UnityEngine.SceneManagement;
