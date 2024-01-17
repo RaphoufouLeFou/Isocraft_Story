@@ -61,7 +61,7 @@ public class Chunk : MonoBehaviour
         }
 
         // get intersecting structures
-        int size = Structures.MaxSize;
+        int size = Game.MaxStructSize;
         for (int x = -size; x < Size; x++) for(int z = -size; z < Size; z++)
         {
             (int y, Structure s) = NoiseGen.GetStruct((int)_pos.x * Size + x, (int)_pos.y * Size + z);

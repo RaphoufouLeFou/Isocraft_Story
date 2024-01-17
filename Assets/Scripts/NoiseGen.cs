@@ -56,7 +56,7 @@ public static class NoiseGen
 
         if (p < 0.05)
         {
-            Structure s = Structures.Structs["Tree"];
+            Structure s = Game.Structs["Tree"];
             int y = (int)GetHeight(x + s.Offset.x, z + s.Offset.z);
             return (y + s.Offset.y, s);
         }
