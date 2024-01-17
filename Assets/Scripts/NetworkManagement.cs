@@ -19,21 +19,23 @@ public class NetworkManagement : MonoBehaviour
         {
             NetworkInfos.IsHost = true;
             NetworkInfos.IsMultiplayerGame = true;
+            NetworkInfos.uri = new Uri($"kcp://127.0.0.1:1234");
         }
-
         bool isOnline = NetworkInfos.IsMultiplayerGame;
         _isHost = NetworkInfos.IsHost;
         _manager.maxConnections = isOnline ? 2 : 1;
         if (_isHost)
         {
-            _manager.StartHost();
             _manager.GetComponent<KcpTransport>().Port = (ushort)NetworkInfos.uri.Port;
+            _manager.StartHost();
         }
         else
         {
             if(NetworkInfos.IsLocalHost) _manager.StartClient();
             else
             {
+                _manager.GetComponent<KcpTransport>().Port = (ushort)NetworkInfos.uri.Port;
+                _manager.networkAddress = NetworkInfos.uri.Host;
                 _manager.StartClient(NetworkInfos.uri);
             }
         }
