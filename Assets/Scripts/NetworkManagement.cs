@@ -23,10 +23,10 @@ public class NetworkManagement : MonoBehaviour
         }
         bool isOnline = NetworkInfos.IsMultiplayerGame;
         _isHost = NetworkInfos.IsHost;
-        _manager.maxConnections = isOnline ? 2 : 1;
+        _manager.maxConnections = isOnline ? 10 : 1;
         if (_isHost)
         {
-            _manager.GetComponent<KcpTransport>().Port = (ushort)NetworkInfos.uri.Port;
+            if(isOnline) _manager.GetComponent<KcpTransport>().Port = (ushort)NetworkInfos.uri.Port;
             _manager.StartHost();
         }
         else
