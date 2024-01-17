@@ -62,11 +62,11 @@ class Input:
         screen.blit(text, (self.x + 20, 12))
 
     def refresh_ip(self):
-        # refresh its value according to size
+        # refresh the input's value according to size
         self.n = size[self.i]
 
     def refresh_size(self):
-        # resize map according to its value
+        # resize map according to the input's value
         global blocks
 
         if self.n < 1: return
@@ -81,8 +81,8 @@ class Input:
 
 class Ui:
     def __init__(self):
-        self.buttons = (Button(0, 'Load file', load_file),
-                        Button(102, 'Save', save_file))
+        self.buttons = (Button(0, 'Load file', struct.load),
+                        Button(102, 'Save', struct.save))
         self.inputs = (Input(254, 'x=', 0), Input(306, 'y=', 1),
                        Input(358, 'z=', 2))
 
@@ -107,38 +107,60 @@ def mkwin():
     tk.wm_attributes('-alpha', 0)
     return tk
 
-txt = [('isocraft schematics', '.txt')]
-def load_file():
-    global size, data
-    tk = mkwin()
-    name = askopenfilename(filetypes=txt)
-    if name:
-        with open(name) as f:
-            lines = f.read().split('\n')
-        x, y, z = lines[0].split('.')
-        size = x, y, z = int(x), int(y), int(z)
-        data = [-1 if x == '' else int(x) for x in lines[2].split('.')]
-        for i in ui.inputs:
-            ui.refresh_ip()
-    tk.destroy()
+class Structure:
+    def __init__(self, s=[5, 5, 5]):
+        self.size = s
+        self.init_data()
 
-def save_file():
-    tk = mkwin()
-    name = asksaveasfilename(filetypes=txt)
-    if name:
-        if not name.endswith('.txt'): name += '.txt'
-        with open(name, 'w') as f:
-            d = '.'.join(str(d) for d in data)
-            f.write('%d.%d.%d\n0.0.0\n%s' %(*size, d))
-    tk.destroy()
+        self.txt = [('isocraft schematics', '.txt')]
 
-def display():
-    pass
+    def init_data(self):
+        self.data = [[[0]*s[2] for _ in s[1]] for _ in s[0]]
+        self.layer = 0
 
-blocks = []
-blocks.insert(0, None)
-size = [5, 5, 5]
-data = [0]*125
+    def load():
+        tk = mkwin()
+        name = askopenfilename(filetypes=txt)
+        if name:
+            with open(name) as f:
+                lines = f.read().split('\n')
+
+            X, Y, Z = lines[0].split('.')
+            self.size = X, Y, Z = int(X), int(Y), int(Z)
+            data = [-1 if x == '' else int(x) for x in lines[2].split('.')]
+
+            # put data into 3D array
+            self.init_data()
+            x = y = z = 0
+            for d in data:
+                z += 1
+                if z == Z: y, z = y+1, 0
+                if y == Y: x, y = x+1, 0
+                self.data[x][y][z] = d
+
+            # refresh inputs
+            for i in ui.inputs:
+                ui.refresh_ip()
+        tk.destroy()
+
+    def save():
+        tk = mkwin()
+        name = asksaveasfilename(filetypes=txt)
+        if name:
+            if not name.endswith('.txt'): name += '.txt'
+            data = ''
+            for x in range(self.size[0]):
+                for y in range(self.size[1]):
+                    for z in range(self.size[2]):
+                        if data: data += '.'
+                        data += str(self.data[x][y][z])
+
+            with open(name, 'w') as f:
+                f.write('%d.%d.%d\n0.0.0\n%s' %(*size, data))
+        tk.destroy()
+
+    def display(self):
+        pass
 
 BLACK, DGRAY, LGRAY, WHITE, CYAN = (0,   0,   0  ), \
                                    (100, 100, 100), (200, 200, 200), \
@@ -151,6 +173,7 @@ font = pygame.font.SysFont('consolas', 16)
 clock = pygame.time.Clock()
 
 ui = Ui()
+struct = Structure()
 
 running = True
 while running:
