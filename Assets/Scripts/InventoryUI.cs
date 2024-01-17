@@ -20,10 +20,7 @@ public class InventoryUI : MonoBehaviour, IPointerClickHandler
     private GameObject _movingItemImage;
 
     private bool _isMovingItem;
-/*
-    private bool _mouseLeft;
-    private bool _mouseRight;
-*/
+
     private readonly Transform[] _cells = new Transform[4 * 9];
     void Start()
     {
@@ -114,40 +111,27 @@ public class InventoryUI : MonoBehaviour, IPointerClickHandler
         }
         else
         {
-            
+            if(inv.GetCurrentBlockCount(x, y) == 0) return 0;
             if (mouse == "Left")
             {
-                if(inv.GetCurrentBlockCount(x, y) == 0) return 0;
                 _movingItem = (inv.GetCurrentBlock(x, y), inv.GetCurrentBlockCount(x, y));
                 inv.RemoveAllBlocks(x, y, _sprites[0]);
-                _movingItemImage = Instantiate(movingItemImagePrefab, Input.mousePosition, Quaternion.identity, GameObject.Find("Canvas").transform);
-                _movingItemImage.GetComponent<Image>().sprite = _sprites[_movingItem.Item1];
-                _movingItemImage.GetComponentInChildren<TMP_Text>().text = $"{_movingItem.Item2}";
-                UpdateInventory(inv);
-                _isMovingItem = !_isMovingItem;
             }
             else if (mouse == "Right")
             {
-                if(inv.GetCurrentBlockCount(x, y) == 0) return 0;
                 if((inv.GetCurrentBlockCount(x, y) & 1) == 0) _movingItem = (inv.GetCurrentBlock(x, y), inv.GetCurrentBlockCount(x, y)/2);
                 else _movingItem = (inv.GetCurrentBlock(x, y), (int)Math.Floor(inv.GetCurrentBlockCount(x, y)/2.0f+1));
                 inv.RemoveHalfBlocks(x, y, _sprites[0]);
-                _movingItemImage = Instantiate(movingItemImagePrefab, Input.mousePosition, Quaternion.identity, GameObject.Find("Canvas").transform);
-                _movingItemImage.GetComponent<Image>().sprite = _sprites[_movingItem.Item1];
-                _movingItemImage.GetComponentInChildren<TMP_Text>().text = $"{_movingItem.Item2}";
-                UpdateInventory(inv);
-                _isMovingItem = !_isMovingItem;
             }
             else if (mouse == "Middle")
             {
-                if(inv.GetCurrentBlockCount(x, y) == 0) return 0;
                 _movingItem = (inv.GetCurrentBlock(x, y), 64);
-                _movingItemImage = Instantiate(movingItemImagePrefab, Input.mousePosition, Quaternion.identity, GameObject.Find("Canvas").transform);
-                _movingItemImage.GetComponent<Image>().sprite = _sprites[_movingItem.Item1];
-                _movingItemImage.GetComponentInChildren<TMP_Text>().text = $"{_movingItem.Item2}";
-                UpdateInventory(inv);
-                _isMovingItem = !_isMovingItem;
             }
+            _movingItemImage = Instantiate(movingItemImagePrefab, Input.mousePosition, Quaternion.identity, GameObject.Find("Canvas").transform);
+            _movingItemImage.GetComponent<Image>().sprite = _sprites[_movingItem.Item1];
+            _movingItemImage.GetComponentInChildren<TMP_Text>().text = $"{_movingItem.Item2}";
+            UpdateInventory(inv);
+            _isMovingItem = !_isMovingItem;
         }
 
         return 0;
@@ -164,12 +148,6 @@ public class InventoryUI : MonoBehaviour, IPointerClickHandler
     }
      void Update()
     {
-        /*
-        if (inventoryMenu.activeSelf)
-        {
-            _mouseLeft = Input.GetMouseButton(0);
-            _mouseRight = Input.GetMouseButton(1);
-        }*/
         if (_isMovingItem)
         {
             _movingItemImage.transform.position = Input.mousePosition;
