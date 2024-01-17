@@ -3,6 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = System.Random;
 
+public static class Utils
+{
+    public static int Mod(int a, int b)
+    {
+        return (a % b + b) % b;
+    }
+    
+    public static int Floor(float x)
+    {
+        if (x < 0)
+        {
+            int offset = 1 - (int)x;
+            return (int)(x + offset) - offset;
+        }
+
+        return (int)x;
+    }
+}
+
 public class Tile
 {
     public readonly Vector2[] UVs;

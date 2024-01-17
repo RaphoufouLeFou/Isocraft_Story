@@ -41,36 +41,35 @@ public class Player : NetworkBehaviour
         // body settings
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
-        SetSpawn(0, 0);
+        SetSpawn(new Vector3(0, Chunk.Size, 0));
         tr.position = Spawn;
     }
 
-    void SetSpawn(int x, int z)
+    void SetSpawn(Vector3 pos)
     {
-        Spawn = new Vector3(x + 0.5f, Chunk.Size1, z + 0.5f);
-        int chunkX = Floor((float)x / Chunk.Size), chunkZ = Floor((float)z / Chunk.Size);
+        int y = pos.y < 0 ? 0 : pos.y >= Chunk.Size ? Chunk.Size1 : (int)pos.y;
+
+        int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
+        Spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
         if (MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
         {
-            int modX = x - chunkX * Chunk.Size,
-                modZ = z - chunkZ * Chunk.Size;
-            while (chunk.Blocks[modX, (int)Spawn.y, modZ] == 0) Spawn.y--;
+            int modX = (int)(pos.x - chunkX * Chunk.Size),
+                modZ = (int)(pos.z - chunkZ * Chunk.Size);
+            // try to find a height near Spawn.y
+            for (int offset = 0; offset < Chunk.Size << 1; offset++)
+            {
+                float searchY = Spawn.y + (offset >> 1) * ((offset & 1) == 1 ? -1 : 1);
+                if (chunk.Blocks[modX, (int)searchY, modZ] == 0)
+                {
+                    Spawn.y = searchY;
+                    break;
+                }
+            }
         }
         else throw new ArgumentException("Cannot set spawn in unloaded chunk");
 
-        Spawn.y++;
+        Spawn.y++; // player needs to be one block above
     }
-    
-    int Floor(float x)
-    {
-        if (x < 0)
-        {
-            int offset = 1 - (int)x;
-            return (int)(x + offset) - offset;
-        }
-
-        return (int)x;
-    }
-
 
     [ClientRpc]
     void ServerPlaceBreak(Vector3 pos, int type, bool isPlacing)
@@ -86,13 +85,13 @@ public class Player : NetworkBehaviour
 
     int PlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
-        int chunkX = Floor(pos.x / Chunk.Size),
-            chunkZ = Floor(pos.z / Chunk.Size);
+        int chunkX = Utils.Floor(pos.x / Chunk.Size),
+            chunkZ = Utils.Floor(pos.z / Chunk.Size);
         Chunk chunk = MapHandler.Chunks[chunkX + "." + chunkZ];
 
-        int x = Floor(pos.x) - chunkX * Chunk.Size,
-            y = Floor(pos.y),
-            z = Floor(pos.z) - chunkZ * Chunk.Size;
+        int x = Utils.Floor(pos.x) - chunkX * Chunk.Size,
+            y = Utils.Floor(pos.y),
+            z = Utils.Floor(pos.z) - chunkZ * Chunk.Size;
 
         int result = type; // for inventory management
         if (y < 0 || y >= Chunk.Size) return -1; // outside of world height
@@ -178,7 +177,7 @@ public class Player : NetworkBehaviour
 
         Vector3 pos = transform.position;
         // set spawn
-        if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn((int)pos.x, (int)pos.z);
+        if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn(pos);
     }
     
     void Update()

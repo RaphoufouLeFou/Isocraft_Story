@@ -31,9 +31,13 @@ public class Overlay : MonoBehaviour
     string Round(float n, int digits)
     {
         if (digits == 0) return (int)n + "";
-        string s = (int)n + ".";
+        string s = Utils.Floor(n) + ".";
 
-        if (n < 0) n = -n;
+        if (n < 0)
+        {
+            s = "-" + s;
+            n = -n;
+        }
         for (int i = 0; i < digits; i++)
         {
             n -= (int)n;

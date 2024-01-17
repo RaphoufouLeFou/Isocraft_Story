@@ -37,15 +37,10 @@ public static class NoiseGen
         throw new ArgumentException("Incorrect level: " + Game.Level);
     }
 
-    private static int Mod(int a, int b)
-    {
-        return (a % b + b) % b;
-    }
-
     private const int A = 8765179, B = 3579547, C = 2468273;
     private static int Prng(int seed)
     {
-        return Mod(A + B * seed, C); 
+        return Utils.Mod(A + B * seed, C); 
     }
 
     public static float PrngPos(int x, int y, int z)
