@@ -90,12 +90,24 @@ public class Inventory
         else _tmpText[x].text = $"{Inv[x, y, 1]}";
     }
     
+    public void RemoveHalfBlocks(int x, int y, Sprite texture)
+    {
+        if (Inv[x, y, 1] == 1) RemoveAllBlocks(x, y, texture);
+        if (Inv[x, y, 1] == 0) return;  // if the inventory doesn't have a block at the given x and y, return;
+        Inv[x, y, 1] /= 2;               // remove one block from the cell
+        if (y == 3)
+            _tmpText[x].text = $"{Inv[x, y, 1]}";
+    }
+    
     public void RemoveAllBlocks(int x, int y, Sprite texture)
     {
         if (Inv[x, y, 1] == 0) return;  // if the inventory doesn't have a block at the given x and y, return;
         Inv[x, y, 1] = 0;               // remove one block from the cell
-        _images[x].sprite = texture;
-        _tmpText[x].text = "";
+        if (y == 3)
+        {
+            _images[x].sprite = texture;
+            _tmpText[x].text = "";
+        }
     }
 
     public int GetCurrentBlockCount(int x, int y)

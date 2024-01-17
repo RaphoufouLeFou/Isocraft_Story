@@ -2,9 +2,10 @@ using System;
 using System.Net.Mime;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
-public class InventoryUI : MonoBehaviour
+public class InventoryUI : MonoBehaviour, IPointerClickHandler
 {
     public GameObject content;
     public GameObject inventoryMenu;
@@ -89,14 +90,14 @@ public class InventoryUI : MonoBehaviour
         inventoryMenu.SetActive(false);
     }
 
-    public void UICellButtonListener(GameObject self)
+    public int UICellButtonListener(GameObject self, string mouse)
     {
         int x = self.transform.GetSiblingIndex();
         int y = self.transform.parent.GetSiblingIndex();
         Inventory inv = _player.GetComponent<Player>().Inventory;
         if (_isMovingItem)
         {
-            if (_movingItem.Item1 != inv.GetCurrentBlock(x, y) && inv.GetCurrentBlock(x, y) != 0) return;
+            if (_movingItem.Item1 != inv.GetCurrentBlock(x, y) && inv.GetCurrentBlockCount(x, y) != 0) return 0;
             int diff = inv.AddBlockAt(x, y, _movingItem.Item1, _movingItem.Item2, _sprites[_movingItem.Item1]);
             if (diff != 0)
             {
@@ -114,20 +115,9 @@ public class InventoryUI : MonoBehaviour
         else
         {
             
-            //if (_mouseLeft)
-            //{
-                if(inv.GetCurrentBlockCount(x, y) == 0) return;
-                _movingItem = (inv.GetCurrentBlock(x, y), inv.GetCurrentBlockCount(x, y));
-                inv.RemoveAllBlocks(x, y, _sprites[0]);
-                _movingItemImage = Instantiate(movingItemImagePrefab, Input.mousePosition, Quaternion.identity, GameObject.Find("Canvas").transform);
-                _movingItemImage.GetComponent<Image>().sprite = _sprites[_movingItem.Item1];
-                _movingItemImage.GetComponentInChildren<TMP_Text>().text = $"{_movingItem.Item2}";
-                UpdateInventory(inv);
-                _isMovingItem = !_isMovingItem;
-            /*}
-            ///else if (_mouseRight)
+            if (mouse == "Left")
             {
-                if(inv.GetCurrentBlockCount(x, y) == 0) return;
+                if(inv.GetCurrentBlockCount(x, y) == 0) return 0;
                 _movingItem = (inv.GetCurrentBlock(x, y), inv.GetCurrentBlockCount(x, y));
                 inv.RemoveAllBlocks(x, y, _sprites[0]);
                 _movingItemImage = Instantiate(movingItemImagePrefab, Input.mousePosition, Quaternion.identity, GameObject.Find("Canvas").transform);
@@ -135,11 +125,43 @@ public class InventoryUI : MonoBehaviour
                 _movingItemImage.GetComponentInChildren<TMP_Text>().text = $"{_movingItem.Item2}";
                 UpdateInventory(inv);
                 _isMovingItem = !_isMovingItem;
-            }*/
+            }
+            else if (mouse == "Right")
+            {
+                if(inv.GetCurrentBlockCount(x, y) == 0) return 0;
+                if((inv.GetCurrentBlockCount(x, y) & 1) == 0) _movingItem = (inv.GetCurrentBlock(x, y), inv.GetCurrentBlockCount(x, y)/2);
+                else _movingItem = (inv.GetCurrentBlock(x, y), (int)Math.Floor(inv.GetCurrentBlockCount(x, y)/2.0f+1));
+                inv.RemoveHalfBlocks(x, y, _sprites[0]);
+                _movingItemImage = Instantiate(movingItemImagePrefab, Input.mousePosition, Quaternion.identity, GameObject.Find("Canvas").transform);
+                _movingItemImage.GetComponent<Image>().sprite = _sprites[_movingItem.Item1];
+                _movingItemImage.GetComponentInChildren<TMP_Text>().text = $"{_movingItem.Item2}";
+                UpdateInventory(inv);
+                _isMovingItem = !_isMovingItem;
+            }
+            else if (mouse == "Middle")
+            {
+                if(inv.GetCurrentBlockCount(x, y) == 0) return 0;
+                _movingItem = (inv.GetCurrentBlock(x, y), 64);
+                _movingItemImage = Instantiate(movingItemImagePrefab, Input.mousePosition, Quaternion.identity, GameObject.Find("Canvas").transform);
+                _movingItemImage.GetComponent<Image>().sprite = _sprites[_movingItem.Item1];
+                _movingItemImage.GetComponentInChildren<TMP_Text>().text = $"{_movingItem.Item2}";
+                UpdateInventory(inv);
+                _isMovingItem = !_isMovingItem;
+            }
         }
-        
+
+        return 0;
     }
 
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+            Debug.Log("Left click");
+        else if (eventData.button == PointerEventData.InputButton.Middle)
+            Debug.Log("Middle click");
+        else if (eventData.button == PointerEventData.InputButton.Right)
+            Debug.Log("Right click");
+    }
      void Update()
     {
         /*
