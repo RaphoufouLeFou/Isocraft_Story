@@ -58,8 +58,12 @@ public static class Structures
     private static readonly string[] Names = { "Tree" };
     [NonSerialized] public static int MaxSize; // how many blocks out can structures be searched for
 
+    private static bool _init; // static init
+
     public static void Init()
     {
+        if (_init) return;
+        _init = true;
         foreach (string name in Names)
         {
             Structure s = new Structure("Assets/Structures/" + name + ".txt");

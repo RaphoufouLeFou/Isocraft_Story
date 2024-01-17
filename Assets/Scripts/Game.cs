@@ -63,8 +63,6 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Level = 0;
     [NonSerialized] public static int Seed;
 
-    private bool _init; // static init
-
     static class Tiles
     {
         public static readonly Tile
@@ -107,15 +105,11 @@ public class Game : MonoBehaviour
 
     void Start()
     {
-        if (!_init)
-        {
-            Random rand = new Random();
-            Seed = (int)rand.NextDouble();
+        Random rand = new Random();
+        Seed = (int)rand.NextDouble();
 
-            // initialize static classes
-            NoiseGen.Init();
-            Structures.Init();
-            _init = true;
-        }
+        // initialize static classes
+        NoiseGen.Init();
+        Structures.Init();
     }
 }
