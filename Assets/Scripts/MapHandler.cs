@@ -44,8 +44,8 @@ public class MapHandler : NetworkBehaviour
         Chunks = new Dictionary<string, Chunk>();
         transform.position = new Vector3(0, 0, 0);
 
-        for (int x = -14; x < 15; x++)
-        for (int z = -14; z < 15; z++)
+        for (int x = -4; x < 5; x++)
+        for (int z = -4; z < 5; z++)
             GenChunk(x, z);
         
         //else

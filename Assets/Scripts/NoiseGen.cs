@@ -9,7 +9,7 @@ public static class NoiseGen
     {
         _noise = new FastNoiseLite();
         _noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        _noise.SetSeed((int)Game.Seed);
+        _noise.SetSeed(Game.Seed);
     }
 
     private static float GetHeight(int x, int z)
@@ -19,7 +19,7 @@ public static class NoiseGen
 
     public static IEnumerable<int> GetColumn(int x, int z)
     {
-        if (Game.Level == 0) // overworld (temporary test)
+        if (Game.Level == 0)
         {
             for (int y = 0; y < Chunk.Size; y++)
             {
@@ -37,32 +37,21 @@ public static class NoiseGen
         throw new ArgumentException("Incorrect level: " + Game.Level);
     }
 
-    private static int Mod(int a, int b)
-    {
-        return (a % b + b) % b;
-    }
-
-    private static int _randA = 8765179, _randB = 3579547, _randC = 2468273;
-    private static int Prng(int seed)
-    {
-        return Mod(_randA + _randB * seed, _randC);
-    }
-
-    private static float PrngPos(int x, int z)
-    {
-        return Prng(Game.Seed + Prng(31 * x ^ 37 * z)) / (float)_randC;
-    }
+    /* private static int Mod(int a, int b) { return (a % b + b) % b; }
+    private const int A = 8765179, B = 3579547, C = 2468273;
+    private static int Prng(int seed) { return Mod(A + B * seed, C); }
+    private static float PrngPos(int x, int z) { return Prng(Game.Seed + Prng(31 * x ^ 37 * z)) / (float)C; } */
 
     public static (int, Structure) GetStruct(int x, int z)
     {
         // if structure in this column, return it, otherwise null
 
-        // get prng based on position, but not tileable
-        float p = PrngPos(x, z);
+        //float p = PrngPos(x, z);
+        float p = _noise.GetNoise((long)x << 15, (long)z << 15) / 2 + 0.5f;
 
-        if (p < 0.005)
+        if (p < 0.01)
         {
-            int y = (int)GetHeight(x, z) + 1;
+            int y = (int)GetHeight(x, z);
             return (y, Structures.Structs["Tree"]);
         }
         
