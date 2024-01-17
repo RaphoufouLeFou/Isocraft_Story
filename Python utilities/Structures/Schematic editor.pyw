@@ -63,7 +63,7 @@ class Input:
 
     def refresh_ip(self):
         # refresh the input's value according to size
-        self.n = size[self.i]
+        self.n = struct.size[self.i]
 
     def refresh_size(self):
         # resize map according to the input's value
@@ -76,8 +76,8 @@ class Input:
         self.col = DGRAY
         self.refreshed = True
 
-        size[self.i] = self.n
-        blocks = [0]*size[0]*size[1]*size[2]
+        struct.size[self.i] = self.n
+        struct.init_data()
 
 class Ui:
     def __init__(self):
@@ -108,15 +108,17 @@ def mkwin():
     return tk
 
 class Structure:
-    def __init__(self, s=[5, 5, 5]):
-        self.size = s
+    def __init__(self, size=[5, 5, 5]):
+        self.size = size
         self.init_data()
 
         self.txt = [('isocraft schematics', '.txt')]
 
     def init_data(self):
-        self.data = [[[0]*s[2] for _ in s[1]] for _ in s[0]]
-        self.layer = 0
+        self.data = [[[0]*self.size[2]
+                      for _ in range(self.size[1])]
+                      for _ in range(self.size[0])]
+        self.layer = self.size[1]-1
 
     def load():
         tk = mkwin()
@@ -159,6 +161,11 @@ class Structure:
                 f.write('%d.%d.%d\n0.0.0\n%s' %(*size, data))
         tk.destroy()
 
+    def update(self, events):
+        for event in pygame.event.get():
+            if event.type == MOUSEWHEEL:
+                self.layer = min(max(self.layer + event.y, 1), self.size[1]-1)
+
     def display(self):
         pass
 
@@ -172,8 +179,8 @@ screen = pygame.display.set_mode((640, 480))
 font = pygame.font.SysFont('consolas', 16)
 clock = pygame.time.Clock()
 
-ui = Ui()
 struct = Structure()
+ui = Ui()
 
 running = True
 while running:
@@ -186,7 +193,9 @@ while running:
     screen.fill(CYAN)
 
     ui.update(events)
-    display()
+    struct.update(events)
+    struct.display()
+
     pygame.display.flip()
     clock.tick(60)
 
