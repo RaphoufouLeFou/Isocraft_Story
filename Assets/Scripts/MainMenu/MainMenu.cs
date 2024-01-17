@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+
 public class MainMenu : MonoBehaviour
 {
 
@@ -11,6 +12,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject loadGameParent;
     [SerializeField] private GameObject joinGameParent;
     [SerializeField] private GameObject backButton;
+    [SerializeField] private TMP_InputField addressInput;
+    [SerializeField] private TMP_InputField portInput;
 
     private string _IPAddress = "localhost";
     private string _port = "7777";
@@ -55,7 +58,8 @@ public class MainMenu : MonoBehaviour
     public void ConnectGameButtonClick()
     {
         NetworkInfos.IsLocalHost = _IPAddress.ToLower() == "localhost";
-        NetworkInfos.uri = new Uri($"https://{_IPAddress}:{_port}");
+        Debug.Log($"Address = {_IPAddress}");
+        NetworkInfos.uri = new Uri($"kcp://{_IPAddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = false;
         NetworkInfos.StartedFromMainMenu = true;
@@ -76,12 +80,13 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(mainSceneName);
     }
 
-    public void OnChangedAddress(TMP_Text newAddress)
+    public void OnChangedAddress()
     {
-        _IPAddress = newAddress.text;
+        _IPAddress = addressInput.text;
+        Debug.Log($"Entered address = {_IPAddress}");
     }
-    public void OnChangedPort(TMP_Text newPort)
+    public void OnChangedPort()
     {
-        _port = newPort.text;
+        _port = portInput.text;
     }
 }
