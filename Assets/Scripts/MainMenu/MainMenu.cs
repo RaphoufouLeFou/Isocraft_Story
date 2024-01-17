@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 public class MainMenu : MonoBehaviour
 {
 
@@ -7,7 +9,11 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject mainParent;
     [SerializeField] private GameObject newGameParent;
     [SerializeField] private GameObject loadGameParent;
+    [SerializeField] private GameObject JoinGameParent;
     [SerializeField] private GameObject backButton;
+
+    private string _iPaddress = "localhost";
+    private string _port = "7777";
 
     void Start()
     {
@@ -15,6 +21,7 @@ public class MainMenu : MonoBehaviour
         mainParent.SetActive(true);
         newGameParent.SetActive(false);
         loadGameParent.SetActive(false);
+        JoinGameParent.SetActive(false);
     }
 
     public void NewGameButtonClick()
@@ -29,6 +36,7 @@ public class MainMenu : MonoBehaviour
         mainParent.SetActive(true);
         newGameParent.SetActive(false);
         loadGameParent.SetActive(false);
+        JoinGameParent.SetActive(false);
         backButton.SetActive(false);
     }
 
@@ -40,6 +48,15 @@ public class MainMenu : MonoBehaviour
     }
     public void JoinGameButtonClick()
     {
+        backButton.SetActive(true);
+        mainParent.SetActive(false);
+        JoinGameParent.SetActive(true);
+    }
+    public void ConnectGameButtonClick()
+    {
+        if (_iPaddress.ToLower() == "localhost") NetworkInfos.IsLocalHost = true;
+        else NetworkInfos.IsLocalHost = false;
+        NetworkInfos.uri = new Uri($"https://{_iPaddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = false;
         NetworkInfos.StartedFromMainMenu = true;
@@ -58,5 +75,14 @@ public class MainMenu : MonoBehaviour
         NetworkInfos.IsHost = true;
         NetworkInfos.StartedFromMainMenu = true;
         SceneManager.LoadScene(mainSceneName);
+    }
+
+    public void OnChangedAdress(TMP_Text newAdress)
+    {
+        _iPaddress = newAdress.text;
+    }
+    public void OnChangedPort(TMP_Text newPort)
+    {
+        _port = newPort.text;
     }
 }

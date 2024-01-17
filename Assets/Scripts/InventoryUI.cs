@@ -87,14 +87,14 @@ public class InventoryUI : MonoBehaviour, IPointerClickHandler
         inventoryMenu.SetActive(false);
     }
 
-    public int UICellButtonListener(GameObject self, string mouse)
+    public void UICellButtonListener(GameObject self, string mouse)
     {
         int x = self.transform.GetSiblingIndex();
         int y = self.transform.parent.GetSiblingIndex();
         Inventory inv = _player.GetComponent<Player>().Inventory;
         if (_isMovingItem)
         {
-            if (_movingItem.Item1 != inv.GetCurrentBlock(x, y) && inv.GetCurrentBlockCount(x, y) != 0) return 0;
+            if (_movingItem.Item1 != inv.GetCurrentBlock(x, y) && inv.GetCurrentBlockCount(x, y) != 0) return;
             int diff = inv.AddBlockAt(x, y, _movingItem.Item1, _movingItem.Item2, _sprites[_movingItem.Item1]);
             if (diff != 0)
             {
@@ -111,7 +111,7 @@ public class InventoryUI : MonoBehaviour, IPointerClickHandler
         }
         else
         {
-            if(inv.GetCurrentBlockCount(x, y) == 0) return 0;
+            if(inv.GetCurrentBlockCount(x, y) == 0) return;
             if (mouse == "Left")
             {
                 _movingItem = (inv.GetCurrentBlock(x, y), inv.GetCurrentBlockCount(x, y));
@@ -133,8 +133,6 @@ public class InventoryUI : MonoBehaviour, IPointerClickHandler
             UpdateInventory(inv);
             _isMovingItem = !_isMovingItem;
         }
-
-        return 0;
     }
 
     public void OnPointerClick(PointerEventData eventData)
