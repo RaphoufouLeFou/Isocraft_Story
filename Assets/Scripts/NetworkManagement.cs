@@ -1,3 +1,5 @@
+using System;
+using kcp2k;
 using UnityEngine;
 using Mirror;
 using UnityEngine.SceneManagement;
@@ -22,7 +24,11 @@ public class NetworkManagement : MonoBehaviour
         bool isOnline = NetworkInfos.IsMultiplayerGame;
         _isHost = NetworkInfos.IsHost;
         _manager.maxConnections = isOnline ? 2 : 1;
-        if (_isHost) _manager.StartHost();
+        if (_isHost)
+        {
+            _manager.StartHost();
+            _manager.GetComponent<KcpTransport>().Port = (ushort)NetworkInfos.uri.Port;
+        }
         else
         {
             if(NetworkInfos.IsLocalHost) _manager.StartClient();

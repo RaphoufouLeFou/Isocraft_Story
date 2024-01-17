@@ -14,6 +14,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject backButton;
     [SerializeField] private TMP_InputField addressInput;
     [SerializeField] private TMP_InputField portInput;
+    [SerializeField] private TMP_InputField portNewGameInput;
 
     private string _IPAddress = "localhost";
     private string _port = "7777";
@@ -67,6 +68,7 @@ public class MainMenu : MonoBehaviour
     }
     public void MultiPlayerButtonClick()
     {
+        NetworkInfos.uri = new Uri($"kcp://{_IPAddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = true;
         NetworkInfos.StartedFromMainMenu = true;
@@ -88,5 +90,10 @@ public class MainMenu : MonoBehaviour
     public void OnChangedPort()
     {
         _port = portInput.text;
+    }
+    
+    public void OnChangedPortNewGame()
+    {
+        _port = portNewGameInput.text;
     }
 }
