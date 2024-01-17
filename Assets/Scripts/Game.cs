@@ -3,6 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = System.Random;
 
+public static class Utils
+{
+    public static int Mod(int a, int b)
+    {
+        return (a % b + b) % b;
+    }
+    
+    public static int Floor(float x)
+    {
+        if (x < 0)
+        {
+            int offset = 1 - (int)x;
+            return (int)(x + offset) - offset;
+        }
+
+        return (int)x;
+    }
+}
+
 public class Tile
 {
     public readonly Vector2[] UVs;
@@ -31,7 +50,7 @@ public class Block
     {
         Id = 0;
     }
-    
+
     public Block(int id, Tile allFaces)
     {
         Id = id;
@@ -63,8 +82,6 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Level = 0;
     [NonSerialized] public static int Seed;
 
-    private bool _init; // static init
-
     static class Tiles
     {
         public static readonly Tile
@@ -83,6 +100,7 @@ public class Game : MonoBehaviour
     public static class Blocks
     {
         public static readonly int
+            None = -1,
             Air = 0,
             Sand = 1,
             RedSand = 2,
@@ -91,7 +109,7 @@ public class Game : MonoBehaviour
             Cobblestone = 5,
             OakLog = 6,
             OakLeaves = 7;
-        
+
         public static readonly Dictionary<int, Block> FromId = new()
         {
             {Air, new Block()},
@@ -107,15 +125,11 @@ public class Game : MonoBehaviour
 
     void Start()
     {
-        if (!_init)
-        {
-            Random rand = new Random();
-            Seed = (int)rand.NextDouble();
+        Random rand = new Random();
+        Seed = (int)rand.NextDouble();
 
-            // initialize static classes
-            NoiseGen.Init();
-            Structures.Init();
-            _init = true;
-        }
+        // initialize static classes
+        NoiseGen.Init();
+        Structures.Init();
     }
 }

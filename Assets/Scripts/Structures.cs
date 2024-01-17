@@ -5,8 +5,9 @@ using System.IO;
 public class Structure
 {
     public readonly int X, Y, Z;
-    public readonly int[,,] Blocks;
+    private readonly int[,,] _blocks;
     public readonly (int x, int y, int z) Offset;
+    private string _type;
 
     private string[] GetDataLine(StreamReader file)
     {
@@ -20,17 +21,18 @@ public class Structure
         // dummy constructor, no data
     }
 
-    public Structure(string path)
+    public Structure(string type)
     {
+        _type = type;
         try
         {
-            StreamReader file = new StreamReader(path);
+            StreamReader file = new StreamReader("Assets/Structures/" + type + ".txt");
             // first line: size (x.y.z)
             string[] coords = GetDataLine(file);
             X = int.Parse(coords[0]);
             Y = int.Parse(coords[1]);
             Z = int.Parse(coords[2]);
-            Blocks = new int[X, Y, Z];
+            _blocks = new int[X, Y, Z];
 
             // second line: origin for height offset: x/z=origin, y=offset (x.y.z)
             string[] origin = GetDataLine(file);
@@ -42,13 +44,26 @@ public class Structure
             for (int i = 0; i < data.Length; i++)
             {
                 int b = data[i] == "" ? -1 : int.Parse(data[i]); // empty value: -1 (ignore)
-                Blocks[i % X, i / X / Z, i / X % Z] = b;
+                _blocks[i % X, i / X / Z, i / X % Z] = b;
             }
         }
         catch
         {
-            throw new ArgumentException("Error loading structure file: " + path);
+            throw new ArgumentException("Error loading structure \"" + type + "\"");
         }
+    }
+    
+    public int GetBlock(int x, int y, int z, int dx, int dy, int dz)
+    {
+        // used to add additional generation conditions to structures
+        int b = _blocks[dx, dy, dz];
+        if (_type == "Tree")
+        {
+            if ((dx, dy, dz) == (1, 0, 1)) return Game.Blocks.RedSand;
+            if (dx != 1 && dy == 5 && dz != 1 && b == -1)
+                return NoiseGen.PrngPos(x + dx, y + dy, z + dz) < 0.5f ? Game.Blocks.OakLeaves : Game.Blocks.None;
+        }
+        return b;
     }
 }
 
@@ -58,13 +73,17 @@ public static class Structures
     private static readonly string[] Names = { "Tree" };
     [NonSerialized] public static int MaxSize; // how many blocks out can structures be searched for
 
+    private static bool _init; // static init
+
     public static void Init()
     {
-        foreach (string name in Names)
+        if (_init) return;
+        _init = true;
+        foreach (string type in Names)
         {
-            Structure s = new Structure("Assets/Structures/" + name + ".txt");
+            Structure s = new Structure(type);
             MaxSize = MaxSize > s.X ? MaxSize > s.Z ? MaxSize : s.Z : s.X > s.Z ? s.X : s.Z;
-            Structs.Add(name, s);
+            Structs.Add(type, s);
         }
     }
 }

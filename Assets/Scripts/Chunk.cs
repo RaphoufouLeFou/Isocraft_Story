@@ -70,8 +70,9 @@ public class Chunk : MonoBehaviour
                 for(int dx = 0; dx < s.X; dx++) for(int dy = 0; dy < s.Y; dy++)
                 for (int dz = 0; dz < s.Z; dz++)
                 {
-                    if (x+dx is >= 0 and < Size && y+dy is >= 0 and < Size && z+dz is >= 0 and < Size) {
-                        int b = s.Blocks[dx, dy, dz];
+                    if (x+dx is >= 0 and < Size && y+dy is >= 0 and < Size && z+dz is >= 0 and < Size)
+                    {
+                        int b = s.GetBlock(x, y, z, dx, dy, dz);
                         if (b != -1) Blocks[x + dx, y + dy, z + dz] = b;
                     }
                 }
