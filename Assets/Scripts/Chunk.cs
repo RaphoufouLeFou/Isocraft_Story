@@ -42,6 +42,9 @@ public class Chunk : MonoBehaviour
         _meshCollider = GetComponent<MeshCollider>();
         _pos = new Vector2(pos.x, pos.z);
         transform.position = pos * Size;
+        
+
+        
         GenerateBlocks();
         BuildMesh(true);
     }

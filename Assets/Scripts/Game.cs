@@ -194,11 +194,11 @@ public class Game : MonoBehaviour
         };
     }
 
-    void Start()
+    void Awake()
     {
         Random rand = new Random();
         Seed = (int)rand.NextDouble();
-
+        
         // initialize static classes
         NoiseGen.Init();
         
