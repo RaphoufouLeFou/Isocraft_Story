@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 public class Structure
 {
     public readonly int X, Y, Z;
     public readonly int[,,] Blocks;
+    public readonly Vector3 Origin;
+    public readonly int YOffset;
 
     private string[] GetDataLine(StreamReader file)
     {
@@ -24,12 +27,21 @@ public class Structure
         try
         {
             StreamReader file = new StreamReader(path);
+            // first line: size (x.y.z)
             string[] coords = GetDataLine(file);
             X = int.Parse(coords[0]);
             Y = int.Parse(coords[1]);
             Z = int.Parse(coords[2]);
             Blocks = new int[X, Y, Z];
 
+            // second line: origin (x.y.z)
+            string[] origin = GetDataLine(file);
+            Origin = new Vector3(int.Parse(origin[0]), int.Parse(origin[1]), int.Parse(origin[2]));
+
+            // third line: Y offset from the ground level at origin
+            YOffset = int.Parse(GetDataLine(file)[0]);
+            
+            // fourth line: blocks (x, then z, then y, separated by .)
             string[] data = GetDataLine(file);
             if (data.Length != X * Y * Z) throw new Exception();
             for (int i = 0; i < data.Length; i++)
@@ -47,8 +59,8 @@ public class Structure
 
 public static class Structures
 {
-    public static Dictionary<string, Structure> Structs = new();
-    private static readonly string[] Names = { "Trunk", "Tree" };
+    public static readonly Dictionary<string, Structure> Structs = new();
+    private static readonly string[] Names = { "Tree" };
     [NonSerialized] public static int MaxSize; // how many blocks out can structures be searched for
 
     public static void Init()

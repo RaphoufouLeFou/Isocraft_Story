@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -885,7 +885,7 @@ MonoBehaviour:
   mainParent: {fileID: 17497782}
   newGameParent: {fileID: 671925053}
   loadGameParent: {fileID: 1609900254}
-  JoinGameParent: {fileID: 1728233441}
+  joinGameParent: {fileID: 0}
   backButton: {fileID: 184182221}
 --- !u!1 &294114615
 GameObject:
@@ -1861,7 +1861,7 @@ GameObject:
   - component: {fileID: 552509325}
   - component: {fileID: 552509324}
   m_Layer: 5
-  m_Name: Adress
+  m_Name: Address
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1969,7 +1969,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 271196908}
         m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
-        m_MethodName: OnChangedAdress
+        m_MethodName: OnChangedAddress
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1819435222}

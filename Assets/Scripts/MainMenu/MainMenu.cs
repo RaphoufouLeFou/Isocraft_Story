@@ -9,7 +9,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject mainParent;
     [SerializeField] private GameObject newGameParent;
     [SerializeField] private GameObject loadGameParent;
-    [SerializeField] private GameObject JoinGameParent;
+    [SerializeField] private GameObject joinGameParent;
     [SerializeField] private GameObject backButton;
 
     private string _iPaddress = "localhost";
@@ -21,7 +21,7 @@ public class MainMenu : MonoBehaviour
         mainParent.SetActive(true);
         newGameParent.SetActive(false);
         loadGameParent.SetActive(false);
-        JoinGameParent.SetActive(false);
+        joinGameParent.SetActive(false);
     }
 
     public void NewGameButtonClick()
@@ -36,7 +36,7 @@ public class MainMenu : MonoBehaviour
         mainParent.SetActive(true);
         newGameParent.SetActive(false);
         loadGameParent.SetActive(false);
-        JoinGameParent.SetActive(false);
+        joinGameParent.SetActive(false);
         backButton.SetActive(false);
     }
 
@@ -50,12 +50,11 @@ public class MainMenu : MonoBehaviour
     {
         backButton.SetActive(true);
         mainParent.SetActive(false);
-        JoinGameParent.SetActive(true);
+        joinGameParent.SetActive(true);
     }
     public void ConnectGameButtonClick()
     {
-        if (_iPaddress.ToLower() == "localhost") NetworkInfos.IsLocalHost = true;
-        else NetworkInfos.IsLocalHost = false;
+        NetworkInfos.IsLocalHost = _iPaddress.ToLower() == "localhost";
         NetworkInfos.uri = new Uri($"https://{_iPaddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = false;
@@ -77,9 +76,9 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(mainSceneName);
     }
 
-    public void OnChangedAdress(TMP_Text newAdress)
+    public void OnChangedAddress(TMP_Text newAddress)
     {
-        _iPaddress = newAdress.text;
+        _iPaddress = newAddress.text;
     }
     public void OnChangedPort(TMP_Text newPort)
     {

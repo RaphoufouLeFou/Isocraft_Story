@@ -46,8 +46,7 @@ public static class NoiseGen
     {
         // if structure in this column, return it, otherwise null
 
-        //float p = PrngPos(x, z);
-        float p = _noise.GetNoise((long)x << 15, (long)z << 15) / 2 + 0.5f;
+        float p = _noise.GetNoise((long)x << 10, (long)z << 10) / 2 + 0.5f;
 
         if (p < 0.01)
         {
