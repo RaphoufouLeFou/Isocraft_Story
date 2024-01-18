@@ -47,7 +47,7 @@ public class Structure
             for (int i = 0; i < data.Length; i++)
             {
                 int b = data[i] == "" ? -1 : int.Parse(data[i]); // empty value: -1 (ignore)
-                _blocks[i % X, i / X % Y, i / (X * Y)] = b;
+                _blocks[i / (Y * Z), i / Z % Y, i % Z] = b;
             }
         }
         catch

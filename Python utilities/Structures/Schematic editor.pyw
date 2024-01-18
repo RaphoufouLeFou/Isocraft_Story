@@ -4,9 +4,6 @@ from tkinter import *
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from pygame.locals import *
 
-# TODO: set offset
-# TODO: keep blocks when resizing
-
 class Button:
     def __init__(self, x, text, f):
         self.x, self.f = x, f
@@ -25,9 +22,10 @@ class Button:
         screen.blit(self.text, (self.x + 50 - self.textw, 12))
 
 class Input:
-    def __init__(self, x, text, i, min, max):
+    def __init__(self, x, text, i, min, max, neg=False):
         self.x, self.i = x, i
         self.min, self.max = min, max
+        self.neg = neg
 
         self.n = 0
         self.active = False
@@ -41,7 +39,7 @@ class Input:
         # edit content
         for event in events:
             if event.type == MOUSEBUTTONDOWN:
-                self.active = (self.x <= event.pos[0] < self.x+52
+                self.active = (self.x <= event.pos[0] < self.x+62
                                and event.pos[1] < 40)
 
                 if self.active: self.col = BLACK
@@ -51,6 +49,10 @@ class Input:
                 if event.unicode.isnumeric() and self.n < self.max/10:
                     self.n = self.n*10 + int(event.unicode)
                     self.refreshed = False
+                elif event.key == K_MINUS or event.key == K_KP_MINUS:
+                    if self.neg:
+                        self.n *= -1
+                        self.refreshed = False
                 elif event.key == K_BACKSPACE:
                     self.n = int(self.n/10)
                     self.refreshed = False
@@ -59,44 +61,49 @@ class Input:
 
         # display
         screen.blit(self.text, (self.x, 12))
-        pygame.draw.rect(screen, WHITE, Rect(self.x + 20, 12, 30, 16))
+        pygame.draw.rect(screen, WHITE, Rect(self.x + 30, 12, 30, 16))
         text = font.render(str(self.n) + '_'*self.active, 1, self.col)
-        screen.blit(text, (self.x + 20, 12))
+        screen.blit(text, (self.x + 30, 12))
 
     def refresh_ip(self):
-        if self.i == -1: return # not a size input
+        if self.i == -1: return # not concerned
 
-        # refresh the input's value according to size
-        self.n = struct.size[self.i]
+        # refresh the input's value
+        if self.i < 0: self.n = struct.origin[-2-self.i] # origin input
+        else: self.n = struct.size[self.i] # size input
 
     def refresh_size(self):
-        self.n = min(max(self.n, self.min), self.max)
-
-        if self.i == -1: return
-
-        # resize map according to the input's value
         global blocks
 
-        if self.n < 1: return
+        self.n = min(max(self.n, self.min), self.max)
 
-        if self.refreshed: return
         self.active = False
         self.col = DGRAY
+        if self.refreshed: return # just unfocusing
         self.refreshed = True
 
-        struct.size[self.i] = self.n
-        struct.init_data()
+        if self.i == -1: return
+        if self.i > 0:
+            # resize map according to the input's value
+            struct.size[self.i] = self.n
+            struct.init_data()
+        else:
+            # change origin according to the input's value
+            struct.origin[-2-self.i] = self.n
 
 class Ui:
     def __init__(self):
         self.buttons = (Button(0, 'Load file', struct.load),
                         Button(102, 'Save', struct.save))
-        self.inputs = (Input(254, 'x=', 0, 1, 100),
-                       Input(306, 'y=', 1, 1, 100),
-                       Input(358, 'z=', 2, 1, 100),
-                       Input(410, 'ID', -1, 0, len(colors)))
+        self.inputs = (Input(254, ' x=', 0, 1, 100),
+                       Input(316, ' y=', 1, 1, 100),
+                       Input(378, ' z=', 2, 1, 100),
+                       Input(440, 'ID:', -1, 0, len(colors)),
+                       Input(602, 'x0=', -2, 0, 100),
+                       Input(664, 'dy=', -3, -16, 100, True),
+                       Input(726, 'z0=', -4, 0, 100))
 
-        self.back = pygame.Surface((640, 40))
+        self.back = pygame.Surface((900, 40))
         self.back.fill(LGRAY)
         self.back.blit(font.render('Size:', 1, BLACK), (204, 12))
 
@@ -119,21 +126,22 @@ class Ui:
         # show current block name
         if self.inputs[3].n: name = blocks_names[self.inputs[3].n-1]
         else: name = 'Air'
-        screen.blit(font.render(name, 1, BLACK), (462, 12))
+        screen.blit(font.render('(%s)' %name, 1, BLACK), (512, 12))
 
 class Structure:
     # right, top, front
     face_indices = [(5, 7, 6, 4), (3, 2, 6, 7), (1, 3, 7, 5)]
     txt = [('IsoCraft Story schematics', '.txt')]
 
-    def __init__(self, size=[5, 5, 5]):
-        self.size = size
+    def __init__(self):
+        self.size = [5, 5, 5]
         self.init_data()
 
-    def init_data(self):
+    def init_data(self, origin=[0, 1, 0]):
         self.data = [[[-1]*self.size[2]
                       for _ in range(self.size[1])]
                       for _ in range(self.size[0])]
+        self.origin = origin
         self.zoom = 1
         self.layer = 0
 
@@ -144,12 +152,14 @@ class Structure:
             with open(name) as f:
                 lines = f.read().split('\n')
 
+            X, Y, Z = lines[1].split('.')
+            origin = [int(X), int(Y), int(Z)]
             X, Y, Z = lines[0].split('.')
             self.size = X, Y, Z = [int(X), int(Y), int(Z)]
             data = [-1 if x == '' else int(x) for x in lines[2].split('.')]
 
             # put data into 3D array
-            self.init_data()
+            self.init_data(origin)
             x = y = z = 0
             for d in data:
                 if z == Z: y, z = y+1, 0
@@ -176,7 +186,8 @@ class Structure:
                         if b != -1: data += str(b)
 
             with open(name, 'w') as f:
-                f.write('%d.%d.%d\n0.0.0\n%s' %(*self.size, data[1:]))
+                f.write('%d.%d.%d\n%d.%d.%d\n%s' %(
+                    *self.size, *self.origin, data[1:]))
         tk.destroy()
 
     def update(self, events):
@@ -218,9 +229,9 @@ class Structure:
 
     def get2d(self, x, y, z):
         x, z = x*self.zoom, z*self.zoom
-        return int(20 + 500*x/self.size[0] + 100*(1-z/self.size[2])), \
-               int(60 + 400*z/self.size[2] +
-                   300/self.size[0]*(self.layer-y+1)*self.zoom)
+        m = 1/self.size[2] if self.size[0] < self.size[2] else 1/self.size[0]
+        return int(20 + 710*x*m + 150*(1-z*m)), \
+               int(60 + 420*z*m + 300*m*(self.layer-y+1)*self.zoom)
 
     def draw_cube(self, x, y, z, col, alpha):
         R, G, B = col
@@ -272,10 +283,11 @@ class Structure:
 
         # selection grid
         y = self.layer+1
-        for i in range(self.size[0]+1 << 1):
-            i, j = i>>1, i&1
-            if j: a, b = self.get2d(i, y, 0), self.get2d(i, y, self.size[2])
-            else: a, b = self.get2d(0, y, i), self.get2d(self.size[0], y, i)
+        for i in range(self.size[0]+1):
+            a, b = self.get2d(i, y, 0), self.get2d(i, y, self.size[2])
+            pygame.draw.line(screen, GRID2, a, b)
+        for i in range(self.size[2]+1):
+            a, b = self.get2d(0, y, i), self.get2d(self.size[0], y, i)
             pygame.draw.line(screen, GRID2, a, b)
 
         # front part of outlines
@@ -324,7 +336,7 @@ BLACK, DGRAY, LGRAY, WHITE, CYAN, GRID1, GRID2 = \
 
 pygame.init()
 pygame.display.set_caption('Schematic editor')
-screen = pygame.display.set_mode((640, 480))
+screen = pygame.display.set_mode((900, 500))
 font = pygame.font.SysFont('consolas', 16)
 clock = pygame.time.Clock()
 
