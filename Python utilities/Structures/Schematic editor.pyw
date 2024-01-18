@@ -186,13 +186,32 @@ class Structure:
         return int(20 + 500*x/self.size[0] + 100*(1-z/self.size[2])), \
                int(60 + 400*z/self.size[2] + 300/self.size[0]*(self.layer-y))
 
-    def colorize(self, col, i):
-        r, g, b = col
-        m = (0.7, 1, 0.9)[i]
-        return int(r*m), int(g*m), int(b*m)
-
     # right, top, front
-    face_indices = [(5, 4, 6, 7), (3, 7, 6, 2), (1, 5, 7, 3)]
+    face_indices = [(5, 7, 6, 4), (3, 2, 6, 7), (1, 3, 7, 5)]
+    def draw_cube(self, x, y, z, col, alpha):
+        R, G, B = col
+
+        p = [self.get2d(_x, _y, _z) for _x in (x, x+1)
+             for _y in (y, y+1) for _z in (z, z+1)]
+        x0, y0 = p[1][0], p[2][1]
+        p = [(p[0]-x0, p[1]-y0) for p in p]
+
+        surf = pygame.Surface((p[4][0], p[1][1]), SRCALPHA)
+        i = 0
+        alpha = 127
+        for a, b, c, d in self.face_indices:
+            if (i == 0 and x < self.size[0]-1 and self.data[x+1][y][z]): \
+                #or (i == 1 and y < self.size[1]-1 and self.data[x][y+1][z]) \
+                #or (i == 2 and z < self.size[2]-1 and self.data[x][y][z+1]):
+                continue
+            m = (0.7, 1, 0.9)[i]
+            col = int(R*m), int(G*m), int(B*m)
+            pygame.draw.polygon(surf, col, (p[a], p[b], p[c], p[d]))
+            i += 1
+
+        surf.set_alpha(alpha)
+        screen.blit(surf, (x0, y0))
+
     def display(self):
         # outlines
         p = [self.get2d(x, y, z) for x in (0, self.size[0])
@@ -205,16 +224,13 @@ class Structure:
 
         # blocks
         for x in range(self.size[0]):
-            for y in range(self.layer):
+            for y in range(self.size[1]):
                 for z in range(self.size[2]):
                     if self.data[x][y][z]:
-                        p = [self.get2d(_x, _y, _z) for _x in (x, x+1)
-                             for _y in (y, y+1) for _z in (z, z+1)]
-                        i = 0
-                        for a, b, c, d in self.face_indices:
-                            pygame.draw.polygon(screen, self.colorize(DGRAY, i),
-                                                (p[a], p[b], p[c], p[d]))
-                            i += 1
+                        if y == self.layer: alpha = 255
+                        elif y < self.layer: alpha = 200
+                        else: alpha = 20
+                        self.draw_cube(x, y, z, DGRAY, alpha)
 
         # selection grid
         #for x in range(self.size[0]):
@@ -234,12 +250,13 @@ struct = Structure()
 ui = Ui()
 
 running = True
-while running:
+while True:
     events = pygame.event.get()
     for event in events:
         if event.type == QUIT:
             pygame.quit()
             running = False
+    if not running break
 
     screen.fill(CYAN)
 
