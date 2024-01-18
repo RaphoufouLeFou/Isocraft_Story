@@ -216,7 +216,7 @@ class Structure:
         p = [self.get2d(x, y, z) for x in (0, self.size[0])
                                  for y in (0, self.size[1])
                                  for z in (0, self.size[2])]
-        for i in range(7):
+        for i in range(3):
             if not i&1: pygame.draw.line(screen, GRID1, p[i], p[i+1])
             if i < 6 and not i&2: pygame.draw.line(screen, GRID1, p[i], p[i+2])
             if i < 4: pygame.draw.line(screen, GRID1, p[i], p[i+4])
@@ -232,21 +232,23 @@ class Structure:
                         self.draw_cube(x, y, z, DGRAY, alpha)
 
         # selection grid
-        """for i in range(2, self.size[0]<<1):
+        y = self.layer+1
+        for i in range(self.size[0]+1 << 1):
             i, j = i>>1, i&1
-            if j:
-                a = self.get2d(i, self.layer, 0)
-                b = self.get2d(i, self.layer, self.size[2])
-            else:
-                a = self.get2d(0, self.layer, i)
-                b = self.get2d(self.size[0], self.layer, i)
-            pygame.draw.line(screen, GRID2, a, b)"""
+            if j: a, b = self.get2d(i, y, 0), self.get2d(i, y, self.size[2])
+            else: a, b = self.get2d(0, y, i), self.get2d(self.size[0], y, i)
+            pygame.draw.line(screen, GRID2, a, b)
+
+        for i in range(3, 7):
+            if not i&1: pygame.draw.line(screen, GRID1, p[i], p[i+1])
+            if i < 6 and not i&2: pygame.draw.line(screen, GRID1, p[i], p[i+2])
+            if i < 4: pygame.draw.line(screen, GRID1, p[i], p[i+4])
 
 BLACK, DGRAY, LGRAY, WHITE, CYAN, GRID1, GRID2 = \
                              (0,   0,   0  ), (100, 100, 100), \
                              (200, 200, 200), (255, 255, 255), \
-                             (230, 250, 255), \
-                             (255, 255, 127), (230, 230, 230)
+                             (200, 230, 255), \
+                             (120, 150, 180), (50, 50, 50)
 
 pygame.init()
 pygame.display.set_caption('Schematic editor')
