@@ -73,7 +73,7 @@ public class MainMenu : MonoBehaviour
     public void MultiPlayerButtonClick(GameObject saveName)
     {
         string nm = saveName.GetComponent<TMP_InputField>().text;
-        if(nm == "") return;
+        if(nm == "" || DoesSaveExist(nm)) return;
         SaveInfos.SaveName = nm;
         NetworkInfos.uri = new Uri($"kcp://{_IPAddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
@@ -92,11 +92,17 @@ public class MainMenu : MonoBehaviour
         NetworkInfos.StartedFromMainMenu = true;
         SceneManager.LoadScene(mainSceneName);
     }
+
+    private bool DoesSaveExist(string saveName)
+    {
+        string path = Application.persistentDataPath + "/Saves/";
+        return File.Exists(path + saveName + ".IsoSave");
+    }
     
     public void SinglePlayerButtonClick(GameObject saveName)
     {
         string nm = saveName.GetComponent<TMP_InputField>().text;
-        if(nm == "") return;
+        if(nm == "" || DoesSaveExist(nm)) return;
         SaveInfos.SaveName = nm;
         NetworkInfos.IsMultiplayerGame = false;
         NetworkInfos.IsHost = true;

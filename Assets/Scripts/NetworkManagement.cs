@@ -19,7 +19,8 @@ public class NetworkManagement : MonoBehaviour
         {
             NetworkInfos.IsHost = true;
             NetworkInfos.IsMultiplayerGame = true;
-            NetworkInfos.uri = new Uri($"kcp://127.0.0.1:1234");
+            NetworkInfos.uri = new Uri("kcp://127.0.0.1:1234");
+            SaveInfos.SaveName = "";
         }
         bool isOnline = NetworkInfos.IsMultiplayerGame;
         _isHost = NetworkInfos.IsHost;
@@ -43,6 +44,7 @@ public class NetworkManagement : MonoBehaviour
     }
     public void LeaveGameButtonClick()
     {
+        GameObject.Find("Scripts").GetComponent<Game>().SaveGame();
         if (_isHost) _manager.StopHost();
         else _manager.StopClient();
         NetworkInfos.PlayerPos = new Vector3();
@@ -50,7 +52,6 @@ public class NetworkManagement : MonoBehaviour
         NetworkInfos.IsMultiplayerGame = false;
         NetworkInfos.StartedFromMainMenu = false;
         NetworkInfos.IsHost = false;
-        SaveInfos.SaveName = "UnNamedSave1";
         _manager.StopAllCoroutines();
         SceneManager.LoadScene(mainMenuSceneName, LoadSceneMode.Single);
     }

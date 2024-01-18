@@ -16,6 +16,7 @@ public static class Settings
         public bool DisplayFps; // displayed FPS
         public bool DisplayMs; // displayed ms per frame
         public bool DisplayCoords; //player coordinates
+        public bool DisplaySaveName; //displayed save name
     }
     public static OverlayStruct Overlay; // overlay infos to be displayed
 }
@@ -57,6 +58,7 @@ public class SettingsUI : MonoBehaviour
     public void ToggleFps() { Settings.Overlay.DisplayFps = !Settings.Overlay.DisplayFps; }
     public void ToggleMs() { Settings.Overlay.DisplayMs = !Settings.Overlay.DisplayMs; }
     public void ToggleCoordinates() { Settings.Overlay.DisplayCoords = !Settings.Overlay.DisplayCoords; }
+    public void ToggleSaveName() { Settings.Overlay.DisplaySaveName = !Settings.Overlay.DisplaySaveName; }
     public void AssignKey(GameObject obj)
     {
         _isReadingKey = true;
@@ -90,6 +92,7 @@ public class SettingsUI : MonoBehaviour
         string s = "Ms:" + Settings.Overlay.DisplayMs + "\n";
         s += "Fps:" + Settings.Overlay.DisplayFps + "\n";
         s += "Coords:" + Settings.Overlay.DisplayCoords + "\n";
+        s += "SaveName:" + Settings.Overlay.DisplaySaveName + "\n";
         foreach (KeyValuePair<string, KeyCode> key in Settings.KeyMap) s += key.Key + ":" + (int)key.Value + "\n";
         if (File.Exists(_path)) File.Delete(_path);
         File.WriteAllText(_path, s);
@@ -102,6 +105,7 @@ public class SettingsUI : MonoBehaviour
         overlay.GetChild(0).GetChild(0).gameObject.GetComponent<Toggle>().isOn = Settings.Overlay.DisplayFps;
         overlay.GetChild(1).GetChild(0).gameObject.GetComponent<Toggle>().isOn = Settings.Overlay.DisplayMs;
         overlay.GetChild(2).GetChild(0).gameObject.GetComponent<Toggle>().isOn = Settings.Overlay.DisplayCoords;
+        overlay.GetChild(3).GetChild(0).gameObject.GetComponent<Toggle>().isOn = Settings.Overlay.DisplaySaveName;
 
         // keys
         Transform t = scrollParent.transform;
@@ -118,6 +122,7 @@ public class SettingsUI : MonoBehaviour
         Settings.Overlay.DisplayMs = true;
         Settings.Overlay.DisplayFps = true;
         Settings.Overlay.DisplayCoords = true;
+        Settings.Overlay.DisplaySaveName = true;
 
         Settings.KeyMap = new Dictionary<string, KeyCode>
         {
@@ -157,6 +162,7 @@ public class SettingsUI : MonoBehaviour
                 if (key == "Ms") Settings.Overlay.DisplayMs = value == "True";
                 else if (key == "Fps") Settings.Overlay.DisplayFps = value == "True";
                 else if (key == "Coords") Settings.Overlay.DisplayCoords = value == "True";
+                else if (key == "SaveName") Settings.Overlay.DisplaySaveName = value == "True";
                 else if (int.TryParse(value, out i)) Settings.KeyMap[key] = (KeyCode)i;
             }
             file.Close();
