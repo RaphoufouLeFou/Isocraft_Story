@@ -8,6 +8,12 @@ public class Overlay : MonoBehaviour
     private float _displayFps, _displayMs;
     private long _lastUpdate;
     private const long UpdateDelay = 500; // ms
+    private string _saveName;
+
+    private void Start()
+    {
+        _saveName = SaveInfos.SaveName;
+    }
 
     void Update()
     {
@@ -26,7 +32,7 @@ public class Overlay : MonoBehaviour
         if (Settings.Overlay.DisplayCoords)
             text += "[" + Round(pos.x, 3) + ", " + Round(pos.y, 3) + ", " + Round(pos.z, 3) + "]\n";
         if (Settings.Overlay.DisplaySaveName)
-            text += "Name : " + (SaveInfos.SaveName == "" ? "NoName" : SaveInfos.SaveName);
+            text += "Name : " + (_saveName == "" ? "NoName" : _saveName);
         textData.text = text;
     }
 

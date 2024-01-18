@@ -16,7 +16,9 @@ public class Inventory
     public int[,,] Inv = new int[9, 4, 2]; 
     private Image[] _images = new Image[9]; // cells images
     private TMP_Text[] _tmpText = new TMP_Text[9]; // cells numbers
-    public Inventory() {
+
+    public void InitInventory()
+    {
         // set all cells images and numbers in the hotbar
         for (int i = 0; i < 9; i++)
         {
@@ -74,6 +76,20 @@ public class Inventory
             _images[x].sprite = texture; // set the hotbar texture to the sprite if the block is in the hotbar
             _tmpText[x].text = $"{Inv[x, y, 1]}"; // update the hotbar number
         }
+        return remaining; //return the updated block count
+    }
+    
+    public int AddBlockAt(int x, int y, int block, int count)
+    {
+        int remaining = 0;
+        Inv[x, y, 0] = block; // increment the inventory cell block count by the given count
+        if (count + Inv[x, y, 1] > 64)
+        {
+            int newCount = 64 - Inv[x, y, 1];
+            remaining = count - newCount;
+            count = newCount;
+        }
+        Inv[x, y, 1]+= count; // increment the inventory cell block count by the given count
         return remaining; //return the updated block count
     }
 

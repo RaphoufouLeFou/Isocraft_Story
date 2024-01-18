@@ -20,7 +20,7 @@ public class Player : NetworkBehaviour
 
     public Inventory Inventory;
     
-    public Sprite[] sprites;
+    private Sprite[] _sprites;
 
     void Start()
     {
@@ -29,14 +29,27 @@ public class Player : NetworkBehaviour
 
         // set up objects
         _scriptsGameObject = GameObject.Find("Scripts");
+        _sprites = _scriptsGameObject.GetComponent<Game>().sprites;
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
         //camera = GameObject.Find("Main Camera").GetComponent<Camera>();
         GameObject items = GameObject.Find("HotBarBackground");
 
         health = 1.0f;
         for (int i = 0; i < 9; i++) Hotbar.ItemImages[i] = items.transform.GetChild(i).gameObject;
-        Inventory = new Inventory();
-        Inventory.AddBlock(Game.Blocks.Cobblestone, sprites[Game.Blocks.Cobblestone], 64);
+        if (SaveInfos.HasBeenLoaded)
+        {
+            Inventory = SaveInfos.PlayerInventory;
+            Inventory.InitInventory();
+        }
+        else
+        {
+            Inventory = new ();
+            Inventory.InitInventory();
+            Inventory.AddBlock(Game.Blocks.Cobblestone, _sprites[Game.Blocks.Cobblestone], 64);
+            SaveInfos.PlayerInventory = Inventory;
+        }
+        
+        Hotbar.UpdateHotBarVisual(Inventory, _sprites);
 
         // body settings
         Transform tr = transform;
@@ -138,12 +151,12 @@ public class Player : NetworkBehaviour
                     int count = Inventory.GetCurrentBlockCount(Hotbar.SelectedIndex, 3);
                     if (count <= 0) return;
                     int res = PlaceBreak(hit.point, currentBlock, true); // place the block for this instance
-                    if (res != -1) Inventory.RemoveBlock(Hotbar.SelectedIndex, 3, sprites[0]);
+                    if (res != -1) Inventory.RemoveBlock(Hotbar.SelectedIndex, 3, _sprites[0]);
                 }
                 else
                 {
                     int res = PlaceBreak(hit.point, currentBlock, false); // place the block for this instance
-                    if (res > 0) Inventory.AddBlock(res, sprites[res]); // fixed collecting air
+                    if (res > 0) Inventory.AddBlock(res, _sprites[res]); // fixed collecting air
 
                 }
 
@@ -151,6 +164,8 @@ public class Player : NetworkBehaviour
                 else ClientPlaceBreak(hit.point, currentBlock, right); // client tells the server to place the block
             }
         }
+
+        SaveInfos.PlayerInventory = Inventory;
     }
 
     void DetectOtherActions()
@@ -202,7 +217,7 @@ public class Player : NetworkBehaviour
             if(Settings.IsPaused && inventoryUI.inventoryMenu.activeSelf)
                 inventoryUI.HideInventory();
             else
-                inventoryUI.DisplayInventory(Inventory, sprites, gameObject);
+                inventoryUI.DisplayInventory(Inventory, _sprites, gameObject);
         }
         
         // update these if not paused

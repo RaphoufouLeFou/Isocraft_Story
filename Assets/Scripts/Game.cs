@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using System.Collections;
 using Random = System.Random;
@@ -150,6 +149,8 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Level = 0;
     [NonSerialized] public static int Seed;
     [NonSerialized] public static string SaveName;
+    
+    public Sprite[] sprites;
 
     // structures info
     public static readonly Dictionary<string, Structure> Structs = new();
@@ -208,6 +209,12 @@ public class Game : MonoBehaviour
             "RotationY:" + SaveInfos.PlayerRotation.y + "\n" +
             "RotationZ:" + SaveInfos.PlayerRotation.z + "\n" +
         "";
+        
+        for (int j = 0; j < 4; j++) 
+        for (int i = 0; i < 9; i++)
+            text += "Inv" + i + "" + j + ":" + SaveInfos.PlayerInventory.GetCurrentBlock(i, j) + "." +
+                    SaveInfos.PlayerInventory.GetCurrentBlockCount(i, j) + "\n";
+        
         if(File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, text);
     }
@@ -229,13 +236,9 @@ public class Game : MonoBehaviour
         string path = Application.persistentDataPath + "/Saves/" + SaveName + ".IsoSave";
         if(!File.Exists(path)) return;
         Debug.Log("Loading save " + SaveName);
-        string[] keys =
-        {
-            "PlayerX", "PlayerY", "PlayerZ", "RotationX",  "RotationY",  "RotationZ", 
-        }; // correct keys in save file
-        
         StreamReader file = new StreamReader(path);
-        
+
+        SaveInfos.PlayerInventory = new ();
         float posx = 0, posy = 0, posz = 0;
         float rotx = 0, roty = 0, rotz = 0;
         
@@ -252,8 +255,19 @@ public class Game : MonoBehaviour
             else if (key == "RotationX")  rotx = float.Parse(value);
             else if (key == "RotationY")  roty = float.Parse(value);
             else if (key == "RotationZ")  rotz = float.Parse(value);
+            else if (key.Contains("Inv"))
+            {
+                int x = key[3] - '0';
+                int y = key[4] - '0';
+                int index = value.IndexOf('.');
+                int type = Int32.Parse(value.Substring(0, index));
+                int count = Int32.Parse(value.Substring(index + 1));
+                
+                if (count > 0 && type > 0) SaveInfos.PlayerInventory.AddBlockAt(x, y, type, count);
+            }
 
         }
+        
         SaveInfos.PlayerPosition = new Vector3(posx, posy, posz);
         SaveInfos.PlayerRotation = new Vector3(rotx, roty, rotz);
         SaveInfos.HasBeenLoaded = true;

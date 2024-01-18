@@ -1,10 +1,9 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using TMPro;
 
-public class InventoryUI : MonoBehaviour, IPointerClickHandler
+public class InventoryUI : MonoBehaviour
 {
     public GameObject content;
     public GameObject inventoryMenu;
@@ -133,17 +132,10 @@ public class InventoryUI : MonoBehaviour, IPointerClickHandler
             UpdateInventory(inv);
             _isMovingItem = !_isMovingItem;
         }
-    }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (eventData.button == PointerEventData.InputButton.Left)
-            Debug.Log("Left click");
-        else if (eventData.button == PointerEventData.InputButton.Middle)
-            Debug.Log("Middle click");
-        else if (eventData.button == PointerEventData.InputButton.Right)
-            Debug.Log("Right click");
+        SaveInfos.PlayerInventory = inv;
     }
+    
      void Update()
     {
         if (_isMovingItem)
