@@ -180,11 +180,11 @@ class Structure:
     def update(self, events):
         for event in events:
             if event.type == MOUSEWHEEL:
-                self.layer = min(max(self.layer+event.y, 1), self.size[1]-1)
+                self.layer = min(max(self.layer+event.y, 0), self.size[1]-1)
 
     def get2d(self, x, y, z):
         return int(20 + 500*x/self.size[0] + 100*(1-z/self.size[2])), \
-               int(60 + 400*z/self.size[2] + 300/self.size[0]*(self.layer-y))
+               int(60 + 400*z/self.size[2] + 300/self.size[0]*(self.layer-y+1))
 
     # right, top, front
     face_indices = [(5, 7, 6, 4), (3, 2, 6, 7), (1, 3, 7, 5)]
@@ -197,17 +197,16 @@ class Structure:
         p = [(p[0]-x0, p[1]-y0) for p in p]
 
         surf = pygame.Surface((p[4][0], p[1][1]), SRCALPHA)
-        i = 0
-        alpha = 127
-        for a, b, c, d in self.face_indices:
-            if (i == 0 and x < self.size[0]-1 and self.data[x+1][y][z]): \
-                #or (i == 1 and y < self.size[1]-1 and self.data[x][y+1][z]) \
-                #or (i == 2 and z < self.size[2]-1 and self.data[x][y][z+1]):
+        for i, indices in enumerate(self.face_indices):
+            a, b, c, d = indices
+            if (i == 0 and x < self.size[0]-1 and self.data[x+1][y][z]) \
+                or (i == 1 and y < self.size[1]-1 and self.data[x][y+1][z] \
+                    and y != self.layer) \
+                or (i == 2 and z < self.size[2]-1 and self.data[x][y][z+1]):
                 continue
             m = (0.7, 1, 0.9)[i]
             col = int(R*m), int(G*m), int(B*m)
             pygame.draw.polygon(surf, col, (p[a], p[b], p[c], p[d]))
-            i += 1
 
         surf.set_alpha(alpha)
         screen.blit(surf, (x0, y0))
@@ -218,9 +217,9 @@ class Structure:
                                  for y in (0, self.size[1])
                                  for z in (0, self.size[2])]
         for i in range(7):
-            if not i&1: pygame.draw.line(screen, DGRAY, p[i], p[i+1])
-            if i < 6 and not i&2: pygame.draw.line(screen, DGRAY, p[i], p[i+2])
-            if i < 4: pygame.draw.line(screen, DGRAY, p[i], p[i+4])
+            if not i&1: pygame.draw.line(screen, GRID1, p[i], p[i+1])
+            if i < 6 and not i&2: pygame.draw.line(screen, GRID1, p[i], p[i+2])
+            if i < 4: pygame.draw.line(screen, GRID1, p[i], p[i+4])
 
         # blocks
         for x in range(self.size[0]):
@@ -229,16 +228,25 @@ class Structure:
                     if self.data[x][y][z]:
                         if y == self.layer: alpha = 255
                         elif y < self.layer: alpha = 200
-                        else: alpha = 20
+                        else: alpha = 30
                         self.draw_cube(x, y, z, DGRAY, alpha)
 
         # selection grid
-        #for x in range(self.size[0]):
-        #    pygame.draw.line(screen, LGRAY, 
+        """for i in range(2, self.size[0]<<1):
+            i, j = i>>1, i&1
+            if j:
+                a = self.get2d(i, self.layer, 0)
+                b = self.get2d(i, self.layer, self.size[2])
+            else:
+                a = self.get2d(0, self.layer, i)
+                b = self.get2d(self.size[0], self.layer, i)
+            pygame.draw.line(screen, GRID2, a, b)"""
 
-BLACK, DGRAY, LGRAY, WHITE, CYAN = (0,   0,   0  ), \
-                                   (100, 100, 100), (200, 200, 200), \
-                                   (255, 255, 255), (230, 250, 255)
+BLACK, DGRAY, LGRAY, WHITE, CYAN, GRID1, GRID2 = \
+                             (0,   0,   0  ), (100, 100, 100), \
+                             (200, 200, 200), (255, 255, 255), \
+                             (230, 250, 255), \
+                             (255, 255, 127), (230, 230, 230)
 
 pygame.init()
 pygame.display.set_caption('Schematic editor')
@@ -256,7 +264,7 @@ while True:
         if event.type == QUIT:
             pygame.quit()
             running = False
-    if not running break
+    if not running: break
 
     screen.fill(CYAN)
 
