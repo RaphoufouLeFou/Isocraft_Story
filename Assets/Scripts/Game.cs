@@ -47,7 +47,7 @@ public class Structure
             for (int i = 0; i < data.Length; i++)
             {
                 int b = data[i] == "" ? -1 : int.Parse(data[i]); // empty value: -1 (ignore)
-                _blocks[i % X, i / X / Z, i / X % Z] = b;
+                _blocks[i % X, i / X % Y, i / (X * Y)] = b;
             }
         }
         catch
@@ -155,7 +155,7 @@ public class Game : MonoBehaviour
 
     // structures info
     public static readonly Dictionary<string, Structure> Structs = new();
-    private static readonly string[] StructNames = { "Tree", "Random" };
+    private static readonly string[] StructNames = { "Tree", "Trunk", "Bush", "Penis" };
     [NonSerialized] public static int MaxStructSize; // how many blocks out can structures be searched for
 
     static class Tiles

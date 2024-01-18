@@ -127,7 +127,6 @@ class Structure:
     txt = [('IsoCraft Story schematics', '.txt')]
 
     def __init__(self, size=[5, 5, 5]):
-        self.zoom = 1
         self.size = size
         self.init_data()
 
@@ -135,6 +134,7 @@ class Structure:
         self.data = [[[-1]*self.size[2]
                       for _ in range(self.size[1])]
                       for _ in range(self.size[0])]
+        self.zoom = 1
         self.layer = 0
 
     def load(self):
@@ -152,8 +152,8 @@ class Structure:
             self.init_data()
             x = y = z = 0
             for d in data:
-                if z == Z: x, z = x+1, 0
-                if x == X: y, x = y+1, 0
+                if z == Z: y, z = y+1, 0
+                if y == Y: x, y = x+1, 0
                 self.data[x][y][z] = d
                 z += 1
 
@@ -171,12 +171,12 @@ class Structure:
             for x in range(self.size[0]):
                 for y in range(self.size[1]):
                     for z in range(self.size[2]):
-                        if data: data += '.'
+                        data += '.'
                         b = self.data[x][y][z]
                         if b != -1: data += str(b)
 
             with open(name, 'w') as f:
-                f.write('%d.%d.%d\n0.0.0\n%s' %(*self.size, data))
+                f.write('%d.%d.%d\n0.0.0\n%s' %(*self.size, data[1:]))
         tk.destroy()
 
     def update(self, events):
