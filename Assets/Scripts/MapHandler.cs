@@ -11,59 +11,19 @@ public class MapHandler : NetworkBehaviour
 
     private Transform _chunksParent;
     [NonSerialized] public static Dictionary<string, Chunk> Chunks;
-    
-    /*
-    [Command(requiresAuthority = false)]
-    public void RequestChunks()
-    {
-        Debug.Log($"Spawning chunks");
-        foreach (var chunk in Chunks)
-        {
-
-            NetworkManager nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-            nm.spawnPrefabs.Add(chunk.Value.gameObject);
-
-            System.Guid creatureAssetId = System.Guid.NewGuid();
-            
-            NetworkClient.RegisterPrefab(chunk.Value.gameObject, 69);
-           
-
-            Debug.Log($"Spawning chunk ({chunk.Key})");
-            NetworkServer.Spawn(chunk.Value.gameObject);
-        }
-
-    }*/
 
     void Start()
     {
-        NetworkManagement manager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
-        Transform parent = chunkParent.transform;
+        //NetworkManagement manager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
+        //Transform parent = chunkParent.transform;
 
-        // if (NetworkInfos.IsHost) {
         _chunksParent = chunkParent.transform;
         Chunks = new Dictionary<string, Chunk>();
         transform.position = new Vector3(0, 0, 0);
         
-   
-        
         for (int x = -4; x < 5; x++)
         for (int z = -4; z < 5; z++)
             GenChunk(x, z);
-        
-        //else
-        //{
-            //while (!manager.IsChunksReady) ;
-
-        //    Debug.Log("Requesting chunks");
-        //    RequestChunks();
-        //    Debug.Log("Requested chunks");
-            /*
-            foreach (var chunk in Chunks)
-            {
-                GameObject InstanceChunk = Instantiate(chunk.Value.gameObject, parent);
-                InstanceChunk.name = chunk.Key;
-            }*/
-        //}
     }
     
     void GenChunk(int x, int z)

@@ -48,7 +48,7 @@ class Input:
                 else: self.refresh_size() # also reset color
 
             if event.type == KEYDOWN and self.active:
-                if event.unicode.isnumeric():
+                if event.unicode.isnumeric() and self.n < self.max/10:
                     self.n = self.n*10 + int(event.unicode)
                     self.refreshed = False
                 elif event.key == K_BACKSPACE:

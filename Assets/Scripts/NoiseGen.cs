@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public static class NoiseGen
 {
@@ -57,7 +56,7 @@ public static class NoiseGen
 
         if (p < 0.05)
         {
-            Structure s = Game.Structs["Tree"];
+            Structure s = Game.Structs[p < 0.01 ? "Random" : "Tree"];
             int y = (int)GetHeight(x + s.Offset.x, z + s.Offset.z);
             return (y + s.Offset.y, s);
         }

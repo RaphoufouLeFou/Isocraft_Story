@@ -10,7 +10,7 @@ public class Structure
     public readonly int X, Y, Z;
     private readonly int[,,] _blocks;
     public readonly (int x, int y, int z) Offset;
-    private string _type;
+    private readonly string _type;
 
     private string[] GetDataLine(StreamReader file)
     {
@@ -151,10 +151,11 @@ public class Game : MonoBehaviour
     [NonSerialized] public static string SaveName;
     
     public Sprite[] sprites;
+    private bool _autoSave = true;
 
     // structures info
     public static readonly Dictionary<string, Structure> Structs = new();
-    private static readonly string[] StructNames = { "Tree" };
+    private static readonly string[] StructNames = { "Tree", "Random" };
     [NonSerialized] public static int MaxStructSize; // how many blocks out can structures be searched for
 
     static class Tiles
@@ -219,7 +220,7 @@ public class Game : MonoBehaviour
         File.WriteAllText(path, text);
     }
     
-    public void CreateSaveFile()
+    private void CreateSaveFile()
     {
         if(SaveName == "") return;
         string path = Application.persistentDataPath + "/Saves/";
@@ -239,8 +240,8 @@ public class Game : MonoBehaviour
         StreamReader file = new StreamReader(path);
 
         SaveInfos.PlayerInventory = new ();
-        float posx = 0, posy = 0, posz = 0;
-        float rotx = 0, roty = 0, rotz = 0;
+        float posX = 0, posY = 0, posZ = 0;
+        float rotX = 0, rotY = 0, rotZ = 0;
         
         while (file.ReadLine() is { } line)
         {
@@ -249,12 +250,12 @@ public class Game : MonoBehaviour
             for (i = 0; i < line.Length; i++) if (line[i] == ':') break;
             if (i == line.Length) continue;
             string key = line.Substring(0, i), value = line.Substring(i + 1);
-            if (key == "PlayerX") posx = float.Parse(value);
-            else if (key == "PlayerY")  posy = float.Parse(value);
-            else if (key == "PlayerZ")  posz = float.Parse(value);
-            else if (key == "RotationX")  rotx = float.Parse(value);
-            else if (key == "RotationY")  roty = float.Parse(value);
-            else if (key == "RotationZ")  rotz = float.Parse(value);
+            if (key == "PlayerX") posZ = float.Parse(value);
+            else if (key == "PlayerY")  posY = float.Parse(value);
+            else if (key == "PlayerZ")  posZ = float.Parse(value);
+            else if (key == "RotationX")  rotX = float.Parse(value);
+            else if (key == "RotationY")  rotY = float.Parse(value);
+            else if (key == "RotationZ")  rotZ = float.Parse(value);
             else if (key.Contains("Inv"))
             {
                 int x = key[3] - '0';
@@ -268,8 +269,8 @@ public class Game : MonoBehaviour
 
         }
         
-        SaveInfos.PlayerPosition = new Vector3(posx, posy, posz);
-        SaveInfos.PlayerRotation = new Vector3(rotx, roty, rotz);
+        SaveInfos.PlayerPosition = new Vector3(posX, posY, posZ);
+        SaveInfos.PlayerRotation = new Vector3(rotX, rotY, rotZ);
         SaveInfos.HasBeenLoaded = true;
         file.Close();
     }
@@ -302,11 +303,12 @@ public class Game : MonoBehaviour
 
     void OnApplicationQuit()
     {
+        _autoSave = false;
         SaveGame();
     }
     private IEnumerator AutoSave()
     {
-        while (true)
+        while (_autoSave)
         {
             yield return new WaitForSecondsRealtime(10);
             SaveInfos.PlayerPosition = NetworkInfos.PlayerPos;
