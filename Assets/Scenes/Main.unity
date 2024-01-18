@@ -7375,7 +7375,7 @@ MonoBehaviour:
   onlineScene: Assets/Scenes/Main.unity
   transport: {fileID: 520568131}
   networkAddress: localhost
-  maxConnections: 100
+  maxConnections: 20
   authenticator: {fileID: 0}
   playerPrefab: {fileID: 6898874048799245517, guid: bd62b9d82520a9641a08bb763a969a8c, type: 3}
   autoCreatePlayer: 1
@@ -11177,7 +11177,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 10
+  m_Text: 20
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0

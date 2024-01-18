@@ -9,4 +9,5 @@ public static class NetworkInfos
     public static Vector3 PlayerPos { get; set; }
     public static Uri uri { get; set; }
     public static bool IsLocalHost { get; set; }
+
 }

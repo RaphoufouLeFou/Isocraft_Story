@@ -25,6 +25,7 @@ public class Overlay : MonoBehaviour
         if (Settings.Overlay.DisplayMs) text += " (last: " + Round(_displayMs, 1) + "ms)";
         if (Settings.Overlay.DisplayCoords)
             text += "\n[" + Round(pos.x, 3) + ", " + Round(pos.y, 3) + ", " + Round(pos.z, 3) + "]";
+        text += "\nName : " + SaveInfos.SaveName;
         textData.text = text;
     }
 

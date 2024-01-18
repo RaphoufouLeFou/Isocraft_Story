@@ -23,7 +23,7 @@ public class NetworkManagement : MonoBehaviour
         }
         bool isOnline = NetworkInfos.IsMultiplayerGame;
         _isHost = NetworkInfos.IsHost;
-        _manager.maxConnections = isOnline ? 10 : 1;
+        _manager.maxConnections = isOnline ? 20 : 1;
         if (_isHost)
         {
             if(isOnline) _manager.GetComponent<KcpTransport>().Port = (ushort)NetworkInfos.uri.Port;
@@ -45,8 +45,14 @@ public class NetworkManagement : MonoBehaviour
     {
         if (_isHost) _manager.StopHost();
         else _manager.StopClient();
-
-        SceneManager.LoadScene(mainMenuSceneName);
+        NetworkInfos.PlayerPos = new Vector3();
+        NetworkInfos.IsLocalHost = false;
+        NetworkInfos.IsMultiplayerGame = false;
+        NetworkInfos.StartedFromMainMenu = false;
+        NetworkInfos.IsHost = false;
+        SaveInfos.SaveName = "UnNamedSave1";
+        _manager.StopAllCoroutines();
+        SceneManager.LoadScene(mainMenuSceneName, LoadSceneMode.Single);
     }
 
     public void ChangeMaxConnection(int max)

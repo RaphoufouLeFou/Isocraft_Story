@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 
@@ -12,6 +14,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject loadGameParent;
     [SerializeField] private GameObject joinGameParent;
     [SerializeField] private GameObject backButton;
+    [SerializeField] private GameObject SaveTextPrefab;
+    
     [SerializeField] private TMP_InputField addressInput;
     [SerializeField] private TMP_InputField portInput;
     [SerializeField] private TMP_InputField portNewGameInput;
@@ -66,20 +70,61 @@ public class MainMenu : MonoBehaviour
         NetworkInfos.StartedFromMainMenu = true;
         SceneManager.LoadScene(mainSceneName);
     }
-    public void MultiPlayerButtonClick()
+    public void MultiPlayerButtonClick(GameObject saveName)
     {
+        string nm = saveName.GetComponent<TMP_InputField>().text;
+        if(nm == "") return;
+        SaveInfos.SaveName = nm;
         NetworkInfos.uri = new Uri($"kcp://{_IPAddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = true;
         NetworkInfos.StartedFromMainMenu = true;
         SceneManager.LoadScene(mainSceneName);
     }
-    public void SinglePlayerButtonClick()
+    
+    public void MultiPlayer(string saveName)
     {
+        if(saveName == "") return;
+        SaveInfos.SaveName = saveName;
+        NetworkInfos.uri = new Uri($"kcp://{_IPAddress}:{_port}");
+        NetworkInfos.IsMultiplayerGame = true;
+        NetworkInfos.IsHost = true;
+        NetworkInfos.StartedFromMainMenu = true;
+        SceneManager.LoadScene(mainSceneName);
+    }
+    
+    public void SinglePlayerButtonClick(GameObject saveName)
+    {
+        string nm = saveName.GetComponent<TMP_InputField>().text;
+        if(nm == "") return;
+        SaveInfos.SaveName = nm;
         NetworkInfos.IsMultiplayerGame = false;
         NetworkInfos.IsHost = true;
         NetworkInfos.StartedFromMainMenu = true;
         SceneManager.LoadScene(mainSceneName);
+    }
+
+    public void LoadGame(string saveName)
+    {
+        MultiPlayer(saveName);
+    }
+
+    public void RefreshSaveList(GameObject content)
+    {        
+        string path = Application.persistentDataPath + "/Saves/";
+        if(!Directory.Exists(path)) return;
+        foreach (string file in Directory.EnumerateFiles(path))
+        {
+            string saveName = Path.GetFileName(file);
+            if (!saveName.Contains(".IsoSave")) continue;
+            saveName = saveName.Replace(".IsoSave", "");
+            GameObject go = Instantiate(SaveTextPrefab, Vector3.zero, Quaternion.identity, content.transform);
+            go.GetComponentInChildren<TMP_Text>().text = saveName;
+            go.GetComponentInChildren<Button>().onClick.AddListener(() =>
+            {
+                LoadGame(saveName);
+            });
+        }
     }
 
     public void OnChangedAddress()

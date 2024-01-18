@@ -46,7 +46,7 @@ public class SettingsUI : MonoBehaviour
 
     private string _path;
 
-    private int _maxPlayerConnections = 10;
+    private int _maxPlayerConnections = 20;
 
     // variables when assigning a key
     private bool _isReadingKey; 

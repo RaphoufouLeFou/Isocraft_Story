@@ -147,6 +147,7 @@ public class Game : MonoBehaviour
     [NonSerialized] public static float TickRate = 20;
     [NonSerialized] public static int Level = 0;
     [NonSerialized] public static int Seed;
+    [NonSerialized] public static string SaveName;
 
     // structures info
     public static readonly Dictionary<string, Structure> Structs = new();
@@ -194,8 +195,19 @@ public class Game : MonoBehaviour
         };
     }
 
+    public void SaveGame()
+    {
+        if(SaveName == "") return;
+        string path = Application.persistentDataPath + "/Saves/";
+        Directory.CreateDirectory(path);
+        path += SaveName + ".IsoSave";
+        File.WriteAllText(path, "Ceci est un test");
+    }
+
     void Awake()
     {
+        SaveName = SaveInfos.SaveName;
+        SaveGame();
         Random rand = new Random();
         Seed = (int)rand.NextDouble();
         
@@ -207,7 +219,7 @@ public class Game : MonoBehaviour
         {
             Structure s = new Structure(type);
             MaxStructSize = MaxStructSize > s.X ? MaxStructSize > s.Z ? MaxStructSize : s.Z : s.X > s.Z ? s.X : s.Z;
-            Structs.Add(type, s);
+            Structs.TryAdd(type, s);
         }
     }
 }
