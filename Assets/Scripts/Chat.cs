@@ -78,6 +78,7 @@ public class Chat : NetworkBehaviour
 
     private void Update()
     {
+        if(Settings.KeyMap == null) return; // sometimes this execute without the parameter initiated
         if (Input.GetKeyDown(Settings.KeyMap["Chat"]))
         {
             if (!Settings.IsPaused && !chatWindow.activeSelf)

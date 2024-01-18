@@ -116,7 +116,11 @@ public class MainMenu : MonoBehaviour
     }
 
     public void RefreshSaveList(GameObject content)
-    {        
+    {
+        foreach (Transform child in content.transform)
+        {
+            Destroy(child.gameObject);
+        }
         string path = Application.persistentDataPath + "/Saves/";
         if(!Directory.Exists(path)) return;
         foreach (string file in Directory.EnumerateFiles(path))
@@ -126,11 +130,22 @@ public class MainMenu : MonoBehaviour
             saveName = saveName.Replace(".IsoSave", "");
             GameObject go = Instantiate(SaveTextPrefab, Vector3.zero, Quaternion.identity, content.transform);
             go.GetComponentInChildren<TMP_Text>().text = saveName;
-            go.GetComponentInChildren<Button>().onClick.AddListener(() =>
+            go.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() =>
             {
                 LoadGame(saveName);
             });
+            go.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() =>
+            {
+                DeleteSave(saveName);
+                RefreshSaveList(content);
+            });
         }
+    }
+
+    private void DeleteSave(string saveName)
+    {
+        string path = Application.persistentDataPath + "/Saves/" + saveName + ".IsoSave";
+        if(File.Exists(path)) File.Delete(path);
     }
 
     public void OnChangedAddress()
