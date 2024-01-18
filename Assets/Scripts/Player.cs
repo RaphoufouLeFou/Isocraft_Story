@@ -41,11 +41,17 @@ public class Player : NetworkBehaviour
         // body settings
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
-        SetSpawn(new Vector3(0, Chunk.Size, 0));
+        if (SaveInfos.HasBeenLoaded)
+        {
+            SetSpawn(SaveInfos.PlayerPosition);
+            transform.eulerAngles = new Vector3(0,SaveInfos.PlayerRotation.y,0);
+            playerCamera.GoalRot.y = SaveInfos.PlayerRotation.y;
+        }
+        else SetSpawn(new Vector3(0, Chunk.Size, 0));
         tr.position = Spawn;
-    }
 
-    void SetSpawn(Vector3 pos)
+    }
+    public void SetSpawn(Vector3 pos)
     {
         int y = pos.y < 0 ? 0 : pos.y >= Chunk.Size ? Chunk.Size1 : (int)pos.y;
 

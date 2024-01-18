@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using System.Collections;
 using Random = System.Random;
 
 public class Structure
@@ -197,17 +199,73 @@ public class Game : MonoBehaviour
 
     public void SaveGame()
     {
+        string path = Application.persistentDataPath + "/Saves/" + SaveName + ".IsoSave";
+        string text =
+            "PlayerX:" + SaveInfos.PlayerPosition.x + "\n" +
+            "PlayerY:" + SaveInfos.PlayerPosition.y + "\n" +
+            "PlayerZ:" + SaveInfos.PlayerPosition.z + "\n" +
+            "RotationX:" + SaveInfos.PlayerRotation.x + "\n" +
+            "RotationY:" + SaveInfos.PlayerRotation.y + "\n" +
+            "RotationZ:" + SaveInfos.PlayerRotation.z + "\n" +
+        "";
+        if(File.Exists(path)) File.Delete(path);
+        File.WriteAllText(path, text);
+    }
+    
+    public void CreateSaveFile()
+    {
         if(SaveName == "") return;
         string path = Application.persistentDataPath + "/Saves/";
         Directory.CreateDirectory(path);
         path += SaveName + ".IsoSave";
-        File.WriteAllText(path, "Ceci est un test");
+        if(!File.Exists(path)) File.WriteAllText(path, "");
+        StartCoroutine(AutoSave());
+    }
+
+    private void LoadSave()
+    {
+        SaveInfos.HasBeenLoaded = false;
+        if(SaveName == "") return;
+        string path = Application.persistentDataPath + "/Saves/" + SaveName + ".IsoSave";
+        if(!File.Exists(path)) return;
+        Debug.Log("Loading save " + SaveName);
+        string[] keys =
+        {
+            "PlayerX", "PlayerY", "PlayerZ", "RotationX",  "RotationY",  "RotationZ", 
+        }; // correct keys in save file
+        
+        StreamReader file = new StreamReader(path);
+        
+        float posx = 0, posy = 0, posz = 0;
+        float rotx = 0, roty = 0, rotz = 0;
+        
+        while (file.ReadLine() is { } line)
+        {
+            // check if valid line and edit settings
+            int i;
+            for (i = 0; i < line.Length; i++) if (line[i] == ':') break;
+            if (i == line.Length) continue;
+            string key = line.Substring(0, i), value = line.Substring(i + 1);
+            if (key == "PlayerX") posx = float.Parse(value);
+            else if (key == "PlayerY")  posy = float.Parse(value);
+            else if (key == "PlayerZ")  posz = float.Parse(value);
+            else if (key == "RotationX")  rotx = float.Parse(value);
+            else if (key == "RotationY")  roty = float.Parse(value);
+            else if (key == "RotationZ")  rotz = float.Parse(value);
+
+        }
+        SaveInfos.PlayerPosition = new Vector3(posx, posy, posz);
+        SaveInfos.PlayerRotation = new Vector3(rotx, roty, rotz);
+        SaveInfos.HasBeenLoaded = true;
+        file.Close();
     }
 
     void Awake()
     {
         SaveName = SaveInfos.SaveName;
-        SaveGame();
+
+        LoadSave();
+        
         Random rand = new Random();
         Seed = (int)rand.NextDouble();
         
@@ -220,6 +278,25 @@ public class Game : MonoBehaviour
             Structure s = new Structure(type);
             MaxStructSize = MaxStructSize > s.X ? MaxStructSize > s.Z ? MaxStructSize : s.Z : s.X > s.Z ? s.X : s.Z;
             Structs.TryAdd(type, s);
+        }
+    }
+
+    private void Start()
+    {
+        CreateSaveFile();
+    }
+
+    void OnApplicationQuit()
+    {
+        SaveGame();
+    }
+    private IEnumerator AutoSave()
+    {
+        while (true)
+        {
+            yield return new WaitForSecondsRealtime(10);
+            SaveInfos.PlayerPosition = NetworkInfos.PlayerPos;
+            SaveGame();
         }
     }
 }
