@@ -1,11 +1,11 @@
 import pygame
+from os.path import exists
 from tkinter import *
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from pygame.locals import *
 
 # TODO: set offset
 # TODO: keep blocks when resizing
-# TODO: transparent air
 
 class Button:
     def __init__(self, x, text, f):
@@ -48,7 +48,7 @@ class Input:
                 else: self.refresh_size() # also reset color
 
             if event.type == KEYDOWN and self.active:
-                if event.unicode.isnumeric() and self.n < self.max/10:
+                if event.unicode.isnumeric():
                     self.n = self.n*10 + int(event.unicode)
                     self.refreshed = False
                 elif event.key == K_BACKSPACE:
@@ -70,7 +70,7 @@ class Input:
         self.n = struct.size[self.i]
 
     def refresh_size(self):
-        if self.n < self.min: self.n = self.min
+        self.n = min(max(self.n, self.min), self.max)
 
         if self.i == -1: return
 
@@ -94,7 +94,7 @@ class Ui:
         self.inputs = (Input(254, 'x=', 0, 1, 100),
                        Input(306, 'y=', 1, 1, 100),
                        Input(358, 'z=', 2, 1, 100),
-                       Input(410, 'ID', -1, 0, 9))
+                       Input(410, 'ID', -1, 0, len(colors)))
 
         self.back = pygame.Surface((640, 40))
         self.back.fill(LGRAY)
@@ -102,20 +102,24 @@ class Ui:
 
     def update(self, events):
         screen.blit(self.back, (0, 0))
+
+        # get event to optimize buttons update
         click = None
         for event in events:
             if event.type == MOUSEBUTTONDOWN:
                 click = event
                 break
+
+        # update and display widgets
         for b in self.buttons:
             b.update(click)
         for i in self.inputs:
             i.update(events)
 
-def mkwin():
-    tk = Tk()
-    tk.wm_attributes('-alpha', 0)
-    return tk
+        # show current block name
+        if self.inputs[3].n: name = blocks_names[self.inputs[3].n-1]
+        else: name = 'Air'
+        screen.blit(font.render(name, 1, BLACK), (462, 12))
 
 class Structure:
     # right, top, front
@@ -141,7 +145,7 @@ class Structure:
                 lines = f.read().split('\n')
 
             X, Y, Z = lines[0].split('.')
-            self.size = X, Y, Z = int(X), int(Y), int(Z)
+            self.size = X, Y, Z = [int(X), int(Y), int(Z)]
             data = [-1 if x == '' else int(x) for x in lines[2].split('.')]
 
             # put data into 3D array
@@ -256,11 +260,15 @@ class Structure:
         for x in range(self.size[0]):
             for y in range(self.size[1]):
                 for z in range(self.size[2]):
-                    if self.data[x][y][z] != -1:
+                    b = self.data[x][y][z]
+                    if b != -1:
                         if y == self.layer: alpha = 255
                         elif y < self.layer: alpha = 230
                         else: alpha = 30
-                        self.draw_cube(x, y, z, DGRAY, alpha)
+
+                        if b == 0: col, alpha = WHITE, alpha*0.3
+                        else: col = colors[b-1]
+                        self.draw_cube(x, y, z, col, alpha)
 
         # selection grid
         y = self.layer+1
@@ -276,6 +284,38 @@ class Structure:
             if i < 6 and not i&2: pygame.draw.line(screen, GRID1, p[i], p[i+2])
             if i < 4: pygame.draw.line(screen, GRID1, p[i], p[i+4])
 
+def mkwin():
+    tk = Tk()
+    tk.wm_attributes('-alpha', 0)
+    return tk
+
+def load_textures():
+    # sorry gotta add them manually
+    global blocks_names, colors
+    blocks_names = ['sand_side', 'red_sand', 'sandstone_side', 'bedrock',
+                    'cobblestone', 'oak_log', 'oak_leaves']
+    colors = []
+
+    for i, name in enumerate(blocks_names):
+        n = '../Textures/%s.png' %name
+        if not exists(n): n = n[:-3]+'jpg' # WHYYYYY
+        surf = pygame.image.load(n).convert_alpha()
+        surf = pygame.transform.scale(surf, (32, 32)) # WHYYYYY again
+        r = g = b = 0
+        for x in range(32):
+            for y in range(32):
+                _r, _g, _b, a = surf.get_at((x, y))
+                a /= 255
+                r, g, b = r + _r*a, g + _g*a, b + _b*a
+        colors.append((r/1024, g/1024, b/1024))
+
+        # also edit the name in a C# way
+        s = ''
+        for j, c in enumerate(name.lower().replace('side', '')):
+            if j == 0 or name[j-1] == '_': s += c.upper()
+            elif c != '_': s += c
+        blocks_names[i] = s
+
 BLACK, DGRAY, LGRAY, WHITE, CYAN, GRID1, GRID2 = \
                              (0,   0,   0  ), (100, 100, 100), \
                              (200, 200, 200), (255, 255, 255), \
@@ -288,6 +328,7 @@ screen = pygame.display.set_mode((640, 480))
 font = pygame.font.SysFont('consolas', 16)
 clock = pygame.time.Clock()
 
+load_textures()
 struct = Structure()
 ui = Ui()
 

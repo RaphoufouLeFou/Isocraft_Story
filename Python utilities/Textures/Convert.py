@@ -6,12 +6,9 @@ from pygame.locals import SRCALPHA, Rect
 
 def format_name(src):
     dst = ''
-    prev = False
-    for char in src.lower():
-        now = char.isalnum()
-        if not prev and now: dst += char.upper()
-        elif char != '_': dst += char
-        prev = now
+    for i, c in enumerate(src.lower()):
+        if j == 0 or name[j-1] == '_': dst += c.upper()
+        elif c != '_': dst += c
     return dst
 
 RES = 32 # texture resolution
