@@ -123,6 +123,7 @@ class Structure:
     txt = [('IsoCraft Story schematics', '.txt')]
 
     def __init__(self, size=[5, 5, 5]):
+        self.zoom = 1
         self.size = size
         self.init_data()
 
@@ -130,7 +131,7 @@ class Structure:
         self.data = [[[-1]*self.size[2]
                       for _ in range(self.size[1])]
                       for _ in range(self.size[0])]
-        self.layer = self.size[1]-1
+        self.layer = 0
 
     def load(self):
         tk = mkwin()
@@ -159,7 +160,7 @@ class Structure:
 
     def save(self):
         tk = mkwin()
-        name = asksaveasfilename(filetypes=txt)
+        name = asksaveasfilename(filetypes=self.txt)
         if name:
             if not name.endswith('.txt'): name += '.txt'
             data = ''
@@ -167,20 +168,55 @@ class Structure:
                 for y in range(self.size[1]):
                     for z in range(self.size[2]):
                         if data: data += '.'
-                        data += str(self.data[x][y][z])
+                        b = self.data[x][y][z]
+                        if b != -1: data += str(b)
 
             with open(name, 'w') as f:
-                f.write('%d.%d.%d\n0.0.0\n%s' %(*size, data))
+                f.write('%d.%d.%d\n0.0.0\n%s' %(*self.size, data))
         tk.destroy()
 
     def update(self, events):
+        pressed = pygame.key.get_pressed()
+        zoom = pressed[K_LCTRL] or pressed[K_RCTRL]
         for event in events:
             if event.type == MOUSEWHEEL:
-                self.layer = min(max(self.layer+event.y, 0), self.size[1]-1)
+                if zoom:
+                    if event.y > 0: self.zoom *= 1.2
+                    else: self.zoom /= 1.2
+                else:
+                    self.layer = min(max(self.layer+event.y, 0), self.size[1]-1)
+            elif event.type == MOUSEBUTTONDOWN:
+                x = y = 0
+                _x, _y = event.pos
+                ok = 0
+                while not ok:
+                    if x < 0 or y < 0 or x == self.size[0] or y == self.size[2]:
+                        ok = False
+                        break
+                    x0, y0 = self.get2d(x, self.layer+1, y)
+                    x1 = self.get2d(x+1, self.layer+1, y)[0]
+                    y1 = self.get2d(x+1, self.layer+1, y+1)[1]
+                    ok = 3
+                    if _x < x0: x -= 1
+                    elif _x > x1: x += 1
+                    else: ok -= 1
+                    if _y < y0: y -= 1
+                    elif _y > y1: y += 1
+                    else: ok -= 2
+                    ok = not ok
+                if ok:
+                    if event.button == 1:
+                        self.data[x][self.layer][y] = ui.inputs[3].n
+                    elif event.button == 2:
+                        ui.inputs[3].n = self.data[x][self.layer][y]
+                    elif event.button == 3:
+                        self.data[x][self.layer][y] = -1
 
     def get2d(self, x, y, z):
+        x, z = x*self.zoom, z*self.zoom
         return int(20 + 500*x/self.size[0] + 100*(1-z/self.size[2])), \
-               int(60 + 400*z/self.size[2] + 300/self.size[0]*(self.layer-y+1))
+               int(60 + 400*z/self.size[2] +
+                   300/self.size[0]*(self.layer-y+1)*self.zoom)
 
     def draw_cube(self, x, y, z, col, alpha):
         R, G, B = col
@@ -211,7 +247,7 @@ class Structure:
         p = [self.get2d(x, y, z) for x in (0, self.size[0])
                                  for y in (0, self.size[1])
                                  for z in (0, self.size[2])]
-        for i in range(3):
+        for i in range(4):
             if not i&1: pygame.draw.line(screen, GRID1, p[i], p[i+1])
             if i < 6 and not i&2: pygame.draw.line(screen, GRID1, p[i], p[i+2])
             if i < 4: pygame.draw.line(screen, GRID1, p[i], p[i+4])
@@ -235,7 +271,7 @@ class Structure:
             pygame.draw.line(screen, GRID2, a, b)
 
         # front part of outlines
-        for i in range(3, 7):
+        for i in range(4, 7):
             if not i&1: pygame.draw.line(screen, GRID1, p[i], p[i+1])
             if i < 6 and not i&2: pygame.draw.line(screen, GRID1, p[i], p[i+2])
             if i < 4: pygame.draw.line(screen, GRID1, p[i], p[i+4])
