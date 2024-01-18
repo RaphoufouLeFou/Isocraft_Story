@@ -40,6 +40,7 @@ public class SettingsUI : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject pressKeyText;
     public GameObject scrollParent;
+    public GameObject chatWindow;
 
     public NetworkManagement management;
 
@@ -187,7 +188,7 @@ public class SettingsUI : MonoBehaviour
     }
     private void Update()
     {
-        if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape)) // if the escape key is pressed but not while assigning a key
+        if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape) && !chatWindow.activeSelf) // if the escape key is pressed but not while assigning a key
             if (pauseMenu.activeSelf || (!Settings.IsPaused && !inventoryMenu.activeSelf)) // toggle the pause menu except the inventory is shown
             {
                 Settings.IsPaused = !Settings.IsPaused;

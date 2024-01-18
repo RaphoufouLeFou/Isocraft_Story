@@ -80,7 +80,7 @@ public class Player : NetworkBehaviour
     [Command]
     void ClientPlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
-        PlaceBreak(pos, type, isPlacing);
+        ServerPlaceBreak(pos, type, isPlacing);
     }
 
     int PlaceBreak(Vector3 pos, int type, bool isPlacing)

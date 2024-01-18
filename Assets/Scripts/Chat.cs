@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
@@ -17,7 +18,7 @@ public class Chat : NetworkBehaviour
         {
             SendMessages("A new player joined !");
         }
-        chatWindow.SetActive(true);
+        chatWindow.SetActive(false);
     }
 
     [ClientRpc]
@@ -73,5 +74,25 @@ public class Chat : NetworkBehaviour
             Destroy(msg);
         }
         messages.Clear();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(Settings.KeyMap["Chat"]))
+        {
+            if (!Settings.IsPaused && !chatWindow.activeSelf)
+            {
+                Settings.IsPaused = true;
+                chatWindow.SetActive(true);
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (Settings.IsPaused && chatWindow.activeSelf)
+            {
+                Settings.IsPaused = false;
+                chatWindow.SetActive(false);
+            }
+        }
     }
 }

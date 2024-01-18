@@ -2324,6 +2324,7 @@ MonoBehaviour:
   pauseMenu: {fileID: 1931216963}
   pressKeyText: {fileID: 2012243992}
   scrollParent: {fileID: 1410844786}
+  chatWindow: {fileID: 1367280296}
   management: {fileID: 520568134}
 --- !u!114 &124641307
 MonoBehaviour:
