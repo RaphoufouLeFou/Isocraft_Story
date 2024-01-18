@@ -118,27 +118,23 @@ def mkwin():
     return tk
 
 class Structure:
+    # right, top, front
+    face_indices = [(5, 7, 6, 4), (3, 2, 6, 7), (1, 3, 7, 5)]
+    txt = [('IsoCraft Story schematics', '.txt')]
+
     def __init__(self, size=[5, 5, 5]):
         self.size = size
         self.init_data()
 
-        self.txt = [('IsoCraft Story schematics', '.txt')]
-
     def init_data(self):
-        from random import randint
-        self.data = [[[0]*self.size[2]
+        self.data = [[[-1]*self.size[2]
                       for _ in range(self.size[1])]
                       for _ in range(self.size[0])]
-        for y in range(self.size[1]):
-            for x in range(self.size[0]):
-                for z in range(self.size[2]):
-                    if y == 0 or self.data[x][y-1][z] and randint(0, 3):
-                        self.data[x][y][z] = 1
         self.layer = self.size[1]-1
 
-    def load():
+    def load(self):
         tk = mkwin()
-        name = askopenfilename(filetypes=txt)
+        name = askopenfilename(filetypes=self.txt)
         if name:
             with open(name) as f:
                 lines = f.read().split('\n')
@@ -151,17 +147,17 @@ class Structure:
             self.init_data()
             x = y = z = 0
             for d in data:
-                z += 1
-                if z == Z: y, z = y+1, 0
-                if y == Y: x, y = x+1, 0
+                if z == Z: x, z = x+1, 0
+                if x == X: y, x = y+1, 0
                 self.data[x][y][z] = d
+                z += 1
 
             # refresh inputs
             for i in ui.inputs:
-                ui.refresh_ip()
+                i.refresh_ip()
         tk.destroy()
 
-    def save():
+    def save(self):
         tk = mkwin()
         name = asksaveasfilename(filetypes=txt)
         if name:
@@ -186,8 +182,6 @@ class Structure:
         return int(20 + 500*x/self.size[0] + 100*(1-z/self.size[2])), \
                int(60 + 400*z/self.size[2] + 300/self.size[0]*(self.layer-y+1))
 
-    # right, top, front
-    face_indices = [(5, 7, 6, 4), (3, 2, 6, 7), (1, 3, 7, 5)]
     def draw_cube(self, x, y, z, col, alpha):
         R, G, B = col
 
@@ -199,10 +193,11 @@ class Structure:
         surf = pygame.Surface((p[4][0], p[1][1]), SRCALPHA)
         for i, indices in enumerate(self.face_indices):
             a, b, c, d = indices
-            if (i == 0 and x < self.size[0]-1 and self.data[x+1][y][z]) \
-                or (i == 1 and y < self.size[1]-1 and self.data[x][y+1][z] \
-                    and y != self.layer) \
-                or (i == 2 and z < self.size[2]-1 and self.data[x][y][z+1]):
+            if (i == 0 and x < self.size[0]-1 and self.data[x+1][y][z] != -1) \
+                or (i == 1 and y < self.size[1]-1
+                    and self.data[x][y+1][z] != -1 and y != self.layer) \
+                or (i == 2 and z < self.size[2]-1
+                    and self.data[x][y][z+1] != -1):
                 continue
             m = (0.7, 1, 0.9)[i]
             col = int(R*m), int(G*m), int(B*m)
@@ -212,7 +207,7 @@ class Structure:
         screen.blit(surf, (x0, y0))
 
     def display(self):
-        # outlines
+        # back part of outlines
         p = [self.get2d(x, y, z) for x in (0, self.size[0])
                                  for y in (0, self.size[1])
                                  for z in (0, self.size[2])]
@@ -225,9 +220,9 @@ class Structure:
         for x in range(self.size[0]):
             for y in range(self.size[1]):
                 for z in range(self.size[2]):
-                    if self.data[x][y][z]:
+                    if self.data[x][y][z] != -1:
                         if y == self.layer: alpha = 255
-                        elif y < self.layer: alpha = 200
+                        elif y < self.layer: alpha = 230
                         else: alpha = 30
                         self.draw_cube(x, y, z, DGRAY, alpha)
 
@@ -239,6 +234,7 @@ class Structure:
             else: a, b = self.get2d(0, y, i), self.get2d(self.size[0], y, i)
             pygame.draw.line(screen, GRID2, a, b)
 
+        # front part of outlines
         for i in range(3, 7):
             if not i&1: pygame.draw.line(screen, GRID1, p[i], p[i+1])
             if i < 6 and not i&2: pygame.draw.line(screen, GRID1, p[i], p[i+2])
