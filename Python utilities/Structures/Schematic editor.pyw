@@ -124,9 +124,10 @@ class Ui:
             i.update(events)
 
         # show current block name
-        if self.inputs[3].n: name = blocks_names[self.inputs[3].n-1]
-        else: name = 'Air'
-        screen.blit(font.render('(%s)' %name, 1, BLACK), (512, 12))
+        if self.inputs[3].n >= len(blocks_names): name = '[unknown]'
+        elif self.inputs[3].n: name = '(%s)' %blocks_names[self.inputs[3].n-1]
+        else: name = '[Air]'
+        screen.blit(font.render(name, 1, BLACK), (512, 12))
 
 class Structure:
     # right, top, front
