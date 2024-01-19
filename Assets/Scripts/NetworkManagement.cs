@@ -19,7 +19,7 @@ public class NetworkManagement : MonoBehaviour
         {
             NetworkInfos.IsHost = true;
             NetworkInfos.IsMultiplayerGame = true;
-            NetworkInfos.uri = new Uri("kcp://127.0.0.1:1234");
+            NetworkInfos.uri = new Uri("kcp://127.0.0.1:7777");
             SaveInfos.SaveName = "";
         }
         bool isOnline = NetworkInfos.IsMultiplayerGame;
