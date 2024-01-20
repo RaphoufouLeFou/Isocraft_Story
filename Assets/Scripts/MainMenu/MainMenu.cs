@@ -95,7 +95,7 @@ public class MainMenu : MonoBehaviour
 
     private bool DoesSaveExist(string saveName)
     {
-        string path = Application.persistentDataPath + "/Saves/";
+        string path = Application.persistentDataPath + "/Saves/" + saveName + "/";
         return File.Exists(path + saveName + ".IsoSave");
     }
     
@@ -123,11 +123,9 @@ public class MainMenu : MonoBehaviour
         }
         string path = Application.persistentDataPath + "/Saves/";
         if(!Directory.Exists(path)) return;
-        foreach (string file in Directory.EnumerateFiles(path))
+        foreach (string dir in Directory.EnumerateDirectories(path))
         {
-            string saveName = Path.GetFileName(file);
-            if (!saveName.Contains(".IsoSave")) continue;
-            saveName = saveName.Replace(".IsoSave", "");
+            string saveName = new DirectoryInfo(dir).Name;
             GameObject go = Instantiate(SaveTextPrefab, Vector3.zero, Quaternion.identity, content.transform);
             go.GetComponentInChildren<TMP_Text>().text = saveName;
             go.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() =>
@@ -144,8 +142,8 @@ public class MainMenu : MonoBehaviour
 
     private void DeleteSave(string saveName)
     {
-        string path = Application.persistentDataPath + "/Saves/" + saveName + ".IsoSave";
-        if(File.Exists(path)) File.Delete(path);
+        string path = Application.persistentDataPath + "/Saves/" + saveName + "/";
+        if(Directory.Exists(path)) Directory.Delete(path);
     }
 
     public void OnChangedAddress()

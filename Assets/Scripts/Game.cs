@@ -201,7 +201,7 @@ public class Game : MonoBehaviour
 
     public void SaveGame()
     {
-        string path = Application.persistentDataPath + "/Saves/" + SaveName + ".IsoSave";
+        string path = Application.persistentDataPath + "/Saves/" + SaveName + "/" + SaveName + ".IsoSave";
         string text =
             "PlayerX:" + SaveInfos.PlayerPosition.x + "\n" +
             "PlayerY:" + SaveInfos.PlayerPosition.y + "\n" +
@@ -223,10 +223,12 @@ public class Game : MonoBehaviour
     private void CreateSaveFile()
     {
         if(SaveName == "") return;
-        string path = Application.persistentDataPath + "/Saves/";
+        string path = Application.persistentDataPath + "/Saves/" + SaveName + "/";
         Directory.CreateDirectory(path);
-        path += SaveName + ".IsoSave";
-        if(!File.Exists(path)) File.WriteAllText(path, "");
+        string mainSave = path + SaveName + ".IsoSave";
+        if(!File.Exists(mainSave)) File.WriteAllText(mainSave, "");
+        string chunkSave = path + "Chunks/";
+        if (!Directory.Exists(chunkSave)) Directory.CreateDirectory(chunkSave);
         StartCoroutine(AutoSave());
     }
 
@@ -234,7 +236,7 @@ public class Game : MonoBehaviour
     {
         SaveInfos.HasBeenLoaded = false;
         if(SaveName == "") return;
-        string path = Application.persistentDataPath + "/Saves/" + SaveName + ".IsoSave";
+        string path = Application.persistentDataPath + "/Saves/" + SaveName + "/" + SaveName + ".IsoSave";
         if(!File.Exists(path)) return;
         Debug.Log("Loading save " + SaveName);
         StreamReader file = new StreamReader(path);
@@ -275,7 +277,7 @@ public class Game : MonoBehaviour
         file.Close();
     }
 
-    void Awake()
+    public void SartGame()
     {
         SaveName = SaveInfos.SaveName;
 
