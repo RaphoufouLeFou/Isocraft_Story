@@ -2352,7 +2352,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aced5722dcb64f439526882a44adbb2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunksParent: {fileID: 851175655}
   sprites:
   - {fileID: 21300000, guid: 433482b1419840d42bca7ae9771092a2, type: 3}
   - {fileID: 21300000, guid: 9c57b1e3bc5a73d418e564a5e46e4e8b, type: 3}
@@ -22591,7 +22590,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 520568134}
         m_TargetAssemblyTypeName: NetworkManagement, Assembly-CSharp
         m_MethodName: LeaveGameButtonClick
         m_Mode: 1
