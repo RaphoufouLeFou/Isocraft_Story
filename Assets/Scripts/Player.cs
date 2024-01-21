@@ -121,6 +121,8 @@ public class Player : NetworkBehaviour
             chunk.Blocks[x, y, z] = 0;
         }
         chunk.BuildMesh();
+        
+        if(isServer) GameObject.Find("MapHandler").GetComponent<MapHandler>().SaveChunks(chunk); //save the chunk when modified
 
         // update nearby chunks if placed on a chunk border
         List<string> toCheck = new();
@@ -208,7 +210,7 @@ public class Player : NetworkBehaviour
         if (health > 1) health = 1;
         _healthImage.transform.localScale = new Vector3(health,1 ,1);
         Body.Update(Settings.IsPaused);
-        NetworkInfos.PlayerPos = transform.position;
+        SaveInfos.PlayerPosition = transform.position;
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
 
         if (Input.GetKeyDown(Settings.KeyMap["Inventory"]) || (Input.GetKeyDown(KeyCode.Escape) && _scriptsGameObject.GetComponent<InventoryUI>().inventoryMenu.activeSelf))

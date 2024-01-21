@@ -47,13 +47,12 @@ public class NetworkManagement : MonoBehaviour
         GameObject.Find("Scripts").GetComponent<Game>().SaveGame();
         if (_isHost) _manager.StopHost();
         else _manager.StopClient();
-        NetworkInfos.PlayerPos = new Vector3();
         NetworkInfos.IsLocalHost = false;
         NetworkInfos.IsMultiplayerGame = false;
         NetworkInfos.StartedFromMainMenu = false;
         NetworkInfos.IsHost = false;
         _manager.StopAllCoroutines();
-        SceneManager.LoadScene(mainMenuSceneName, LoadSceneMode.Single);
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 
     public void ChangeMaxConnection(int max)

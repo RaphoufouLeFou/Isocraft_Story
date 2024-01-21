@@ -2326,7 +2326,7 @@ MonoBehaviour:
   pressKeyText: {fileID: 2012243992}
   scrollParent: {fileID: 1410844786}
   chatWindow: {fileID: 1367280296}
-  management: {fileID: 0}
+  management: {fileID: 520568134}
 --- !u!114 &124641307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2352,6 +2352,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aced5722dcb64f439526882a44adbb2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chunksParent: {fileID: 851175655}
   sprites:
   - {fileID: 21300000, guid: 433482b1419840d42bca7ae9771092a2, type: 3}
   - {fileID: 21300000, guid: 9c57b1e3bc5a73d418e564a5e46e4e8b, type: 3}

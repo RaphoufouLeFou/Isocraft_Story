@@ -31,21 +31,24 @@ public class Chunk : MonoBehaviour
     [NonSerialized] public const int Size1 = Size - 1;
     [NonSerialized] public readonly int[,,] Blocks = new int[Size, Size, Size];
 
-    private Vector2 _pos;
+    private Vector2 _pos; 
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
     private readonly FaceUtils _faceUtils = new();
 
-    public void Init(Vector3 pos)
+    public int GetSize() { return Size; }
+
+    public void Init(Vector3 pos, bool loadedMesh)
     {
         _meshFilter = GetComponent<MeshFilter>();
         _meshCollider = GetComponent<MeshCollider>();
+
         _pos = new Vector2(pos.x, pos.z);
         transform.position = pos * Size;
         
-
+        if (!loadedMesh)
+            GenerateBlocks();
         
-        GenerateBlocks();
         BuildMesh(true);
     }
     
@@ -168,7 +171,6 @@ public class Chunk : MonoBehaviour
         mesh.uv = uvs.ToArray();
 
         mesh.RecalculateNormals();
-
         _meshFilter.mesh = mesh;
         _meshCollider.sharedMesh = mesh;
         
@@ -177,4 +179,6 @@ public class Chunk : MonoBehaviour
             foreach (Chunk c in neighbors.Values)
                 c.BuildMesh();
     }
+    
+
 }

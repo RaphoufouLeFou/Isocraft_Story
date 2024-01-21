@@ -25,7 +25,9 @@ public class NeworkSync : NetworkBehaviour
         //{
             //SaveInfos.SaveName = "AZERTY";
         //}
-        
+
+        SaveInfos.SaveName ??= "";
+
         //start the game after syncing
         GetComponent<Game>().SartGame();
     }

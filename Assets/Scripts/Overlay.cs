@@ -26,13 +26,13 @@ public class Overlay : MonoBehaviour
         }
 
         string text = "";
-        Vector3 pos = NetworkInfos.PlayerPos;
+        Vector3 pos = SaveInfos.PlayerPosition;
         if (Settings.Overlay.DisplayFps) text += Round(_displayFps, 1) + " FPS" + (Settings.Overlay.DisplayMs ? " " : "\n");
         if (Settings.Overlay.DisplayMs) text += "(last: " + Round(_displayMs, 1) + "ms)\n";
         if (Settings.Overlay.DisplayCoords)
             text += "[" + Round(pos.x, 3) + ", " + Round(pos.y, 3) + ", " + Round(pos.z, 3) + "]\n";
         if (Settings.Overlay.DisplaySaveName)
-            text += "Name : " + (_saveName == "" ? "NoName" : _saveName);
+            text += "Name : " + (_saveName == "" ? "UnNamed" : _saveName);
         textData.text = text;
     }
 

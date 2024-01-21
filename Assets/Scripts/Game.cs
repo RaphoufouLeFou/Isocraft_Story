@@ -212,12 +212,14 @@ public class Game : MonoBehaviour
         "";
         
         for (int j = 0; j < 4; j++) 
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 9; i++) 
             text += "Inv" + i + "" + j + ":" + SaveInfos.PlayerInventory.GetCurrentBlock(i, j) + "." +
                     SaveInfos.PlayerInventory.GetCurrentBlockCount(i, j) + "\n";
         
         if(File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, text);
+        
+            
     }
     
     private void CreateSaveFile()
@@ -252,7 +254,7 @@ public class Game : MonoBehaviour
             for (i = 0; i < line.Length; i++) if (line[i] == ':') break;
             if (i == line.Length) continue;
             string key = line.Substring(0, i), value = line.Substring(i + 1);
-            if (key == "PlayerX") posZ = float.Parse(value);
+            if (key == "PlayerX") posX = float.Parse(value);
             else if (key == "PlayerY")  posY = float.Parse(value);
             else if (key == "PlayerZ")  posZ = float.Parse(value);
             else if (key == "RotationX")  rotX = float.Parse(value);
@@ -272,13 +274,19 @@ public class Game : MonoBehaviour
         }
         
         SaveInfos.PlayerPosition = new Vector3(posX, posY, posZ);
-        SaveInfos.PlayerRotation = new Vector3(rotX, rotY, rotZ);
+        SaveInfos.PlayerRotation = new Vector3(
+            rotX,
+            Mathf.Round(rotY / 45) * 45,
+            rotZ
+            );
         SaveInfos.HasBeenLoaded = true;
         file.Close();
     }
 
     public void SartGame()
     {
+        
+        
         SaveName = SaveInfos.SaveName;
 
         LoadSave();
@@ -312,8 +320,7 @@ public class Game : MonoBehaviour
     {
         while (_autoSave)
         {
-            yield return new WaitForSecondsRealtime(10);
-            SaveInfos.PlayerPosition = NetworkInfos.PlayerPos;
+            yield return new WaitForSecondsRealtime(1);
             SaveGame();
         }
     }
