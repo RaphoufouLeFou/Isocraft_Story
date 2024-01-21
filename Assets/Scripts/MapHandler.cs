@@ -58,12 +58,12 @@ public class MapHandler : NetworkBehaviour
         {
             int currBlock = blocks[i, j, k];
             
-            // saving as 16bit number for now, we don't need more than 32 000 blocks types
+            // saving as 16bit number, we don't need more than 127 blocks types for now
             
-            //fs.WriteByte((byte)((currBlock >> 24) & 0xFF));
-            //fs.WriteByte((byte)((currBlock >> 16) & 0xFF));
-            fs.WriteByte((byte)((currBlock >> 8) & 0xFF));
-            fs.WriteByte((byte)(currBlock & 0xFF));
+            //fs.WriteByte((byte)((currBlock >> 24) & 0xFF));   //uncomment for 32bit saves ( 2147483647 types )
+            //fs.WriteByte((byte)((currBlock >> 16) & 0xFF));   //uncomment for 24bit saves ( 8388607 types )
+            //fs.WriteByte((byte)((currBlock >> 8) & 0xFF));    //uncomment for 16bit saves ( 32767 types )
+            fs.WriteByte((byte)(currBlock & 0xFF));             //uncomment for  8bit saves ( 127 types )
         }
         fs.Close();
     }
@@ -85,12 +85,12 @@ public class MapHandler : NetworkBehaviour
         for (int j = 0; j < size; j++)
         for (int k = 0; k < size; k++)
         {
-            int currBlock;
+            int currBlock = 0;
             
-            //currBlock = fs.ReadByte() << 24;
-            //currBlock |= fs.ReadByte() << 16;
-            currBlock = fs.ReadByte() << 8;
-            currBlock |= fs.ReadByte();
+            //currBlock |= fs.ReadByte() << 24;     //uncomment for 32bit saves ( 2147483647 types )
+            //currBlock |= fs.ReadByte() << 16;     //uncomment for 24bit saves ( 8388607 types )
+            //currBlock |= fs.ReadByte() << 8;      //uncomment for 16bit saves ( 32767 types )
+            currBlock |= fs.ReadByte();             //uncomment for  8bit saves ( 127 types )
             blocks[i, j, k] = currBlock;
         }
         fs.Close();

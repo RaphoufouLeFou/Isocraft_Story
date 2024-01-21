@@ -14,7 +14,7 @@ public class NetworkManagement : MonoBehaviour
     void Start()
     {
         _manager = GetComponent<NetworkManager>();
-
+        _manager.enabled = true;
         if (!NetworkInfos.StartedFromMainMenu)
         {
             NetworkInfos.IsHost = true;
@@ -28,6 +28,7 @@ public class NetworkManagement : MonoBehaviour
         if (_isHost)
         {
             if(isOnline) _manager.GetComponent<KcpTransport>().Port = (ushort)NetworkInfos.uri.Port;
+            
             _manager.StartHost();
         }
         else
@@ -40,7 +41,6 @@ public class NetworkManagement : MonoBehaviour
                 _manager.StartClient(NetworkInfos.uri);
             }
         }
-
     }
     public void LeaveGameButtonClick()
     {
@@ -51,7 +51,6 @@ public class NetworkManagement : MonoBehaviour
         NetworkInfos.IsMultiplayerGame = false;
         NetworkInfos.StartedFromMainMenu = false;
         NetworkInfos.IsHost = false;
-        _manager.StopAllCoroutines();
         SceneManager.LoadScene(mainMenuSceneName);
     }
 

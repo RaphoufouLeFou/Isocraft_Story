@@ -201,6 +201,7 @@ public class Game : MonoBehaviour
 
     public void SaveGame()
     {
+        if(SaveName == "") return;
         string path = Application.persistentDataPath + "/Saves/" + SaveName + "/" + SaveName + ".IsoSave";
         string text =
             "PlayerX:" + SaveInfos.PlayerPosition.x + "\n" +
