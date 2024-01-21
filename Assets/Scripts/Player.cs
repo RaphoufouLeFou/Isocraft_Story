@@ -54,6 +54,12 @@ public class Player : NetworkBehaviour
         // body settings
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
+        
+    }
+
+    public void SpawnPlayer()
+    {
+        Transform tr = transform;
         if (SaveInfos.HasBeenLoaded)
         {
             SetSpawn(SaveInfos.PlayerPosition);
@@ -62,7 +68,6 @@ public class Player : NetworkBehaviour
         }
         else SetSpawn(new Vector3(0, Chunk.Size, 0));
         tr.position = Spawn;
-
     }
     public void SetSpawn(Vector3 pos)
     {
@@ -70,7 +75,7 @@ public class Player : NetworkBehaviour
 
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
         Spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
-        if (MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
+        if (MapHandler.Chunks != null && MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
         {
             int modX = (int)(pos.x - chunkX * Chunk.Size),
                 modZ = (int)(pos.z - chunkZ * Chunk.Size);
@@ -209,7 +214,8 @@ public class Player : NetworkBehaviour
 
         if (health > 1) health = 1;
         _healthImage.transform.localScale = new Vector3(health,1 ,1);
-        Body.Update(Settings.IsPaused);
+        if(MapHandler.Chunks != null)
+            Body.Update(Settings.IsPaused);
         SaveInfos.PlayerPosition = transform.position;
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
 

@@ -9,15 +9,11 @@ public class MapHandler : NetworkBehaviour
     public GameObject chunkPlane;
     public GameObject chunkParent;
     public Material material;
-
     private Transform _chunksParent;
     [NonSerialized] public static Dictionary<string, Chunk> Chunks;
 
-    void Start()
+    public void StartMapHandle()
     {
-        //NetworkManagement manager = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
-        //Transform parent = chunkParent.transform;
-
         _chunksParent = chunkParent.transform;
         Chunks = new Dictionary<string, Chunk>();
         transform.position = new Vector3(0, 0, 0);
@@ -26,20 +22,31 @@ public class MapHandler : NetworkBehaviour
         for (int z = -4; z < 5; z++)
             GenChunk(x, z);
     }
-    
-    void GenChunk(int x, int z)
-    {
-        Vector3 pos = new Vector3(x, 0, z);
-        GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
-        chunkObject.name = pos.x + "." + pos.z;
 
-        Chunk chunk = chunkObject.GetComponent<Chunk>();
-        MeshRenderer meshRenderer = chunkObject.GetComponent<MeshRenderer>();
-        meshRenderer.material = material;
-        Chunks.Add(chunkObject.name, chunk);
-        int res = LoadChunksMesh(chunk);
-        chunk.Init(pos, res == 0);
-        SaveChunks(chunk);
+    private void GenChunk(int x, int z)
+    {
+
+
+        
+        if (!isServer)
+        {
+            RequestChunk(x, z);
+        }
+        else
+        {
+            Vector3 pos = new Vector3(x, 0, z);
+            GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
+            chunkObject.name = pos.x + "." + pos.z;
+        
+            Chunk chunk = chunkObject.GetComponent<Chunk>();
+            MeshRenderer meshRenderer = chunkObject.GetComponent<MeshRenderer>();
+            meshRenderer.material = material;
+            Chunks.TryAdd(chunkObject.name, chunk);
+            
+            int res = LoadChunksMesh(chunk);
+            chunk.Init(pos, res == 0);
+            SaveChunks(chunk);
+        }
     }
     public void SaveChunks(Chunk chunk)
     {
@@ -47,7 +54,7 @@ public class MapHandler : NetworkBehaviour
         string dirPath = Application.persistentDataPath + "/Saves/" + SaveInfos.SaveName + "/Chunks/";
         string path = dirPath + chunk.name + ".Chunk";
         int[,,] blocks = chunk.Blocks;
-        int size = chunk.GetSize();
+        int size = Chunk.Size;
         if(File.Exists(path)) File.Delete(path);
         if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
         FileStream fs = new FileStream(path, FileMode.Create);
@@ -67,15 +74,15 @@ public class MapHandler : NetworkBehaviour
         }
         fs.Close();
     }
-    
-    
-    public int LoadChunksMesh(Chunk chunk)
+
+
+    private int LoadChunksMesh(Chunk chunk)
     {
         if(SaveInfos.SaveName == "") return 1;
         string path = Application.persistentDataPath + "/Saves/" + SaveInfos.SaveName + "/Chunks/" + chunk.name + ".Chunk";
         if (!File.Exists(path)) return 1;
         
-        int size = chunk.GetSize();
+        int size = Chunk.Size;
         
         int[,,] blocks = chunk.Blocks;
         
@@ -97,6 +104,39 @@ public class MapHandler : NetworkBehaviour
         return 0;
     }
     
+    [Command (requiresAuthority = false)]
+    private void RequestChunk(int x, int z)
+    {
+        int[,,] blocks = GameObject.Find(x + "." + z).GetComponent<Chunk>().Blocks;
+        int len = blocks.Length;
+        int[] bytes = new int[len];
+        Buffer.BlockCopy(blocks, 0, bytes, 0, len*4);
+        SendChunk(bytes, x, z);
+    }
+    [ClientRpc]
+    private void SendChunk(int[] bytes, int x, int z)
+    {
+        
+        int[,,] blocks = new int[Chunk.Size,Chunk.Size,Chunk.Size];
+        Buffer.BlockCopy(bytes, 0, blocks, 0, bytes.Length*4);
+        
+       
+        
+        Vector3 pos = new Vector3(x, 0, z);
+        GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
+        chunkObject.name = pos.x + "." + pos.z;
+        
+        Chunk chunk = chunkObject.GetComponent<Chunk>();
+        MeshRenderer meshRenderer = chunkObject.GetComponent<MeshRenderer>();
+        meshRenderer.material = material;
+        
+        chunk.Blocks = blocks;
+        
+        Chunks.TryAdd(chunkObject.name, chunk);
+        chunk.Init(pos, true);
+        if (x == 4 && z == 4) 
+            NetworkClient.localPlayer.gameObject.GetComponent<Player>().SpawnPlayer();
+    }
 }
 
 

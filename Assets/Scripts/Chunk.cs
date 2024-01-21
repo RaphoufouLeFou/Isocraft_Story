@@ -29,14 +29,12 @@ public class Chunk : MonoBehaviour
 {
     [NonSerialized] public const int Size = 16;
     [NonSerialized] public const int Size1 = Size - 1;
-    [NonSerialized] public readonly int[,,] Blocks = new int[Size, Size, Size];
+    [NonSerialized] public int[,,] Blocks = new int[Size, Size, Size];
 
     private Vector2 _pos; 
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
     private readonly FaceUtils _faceUtils = new();
-
-    public int GetSize() { return Size; }
 
     public void Init(Vector3 pos, bool loadedMesh)
     {

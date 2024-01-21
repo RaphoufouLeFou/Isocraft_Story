@@ -309,6 +309,7 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
+        GetComponentInChildren<MapHandler>().StartMapHandle();
         CreateSaveFile();
     }
 
