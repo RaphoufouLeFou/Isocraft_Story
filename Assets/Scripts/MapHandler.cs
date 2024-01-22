@@ -30,7 +30,8 @@ public class MapHandler : NetworkBehaviour
         
         if (!isServer)
         {
-            RequestChunk(x, z);
+            int id = NetworkClient.localPlayer.GetInstanceID();
+            RequestChunk(x, z, id);
         }
         else
         {
@@ -67,10 +68,10 @@ public class MapHandler : NetworkBehaviour
             
             // saving as 16bit number, we don't need more than 127 blocks types for now
             
-            //fs.WriteByte((byte)((currBlock >> 24) & 0xFF));   //uncomment for 32bit saves ( 2147483647 types )
-            //fs.WriteByte((byte)((currBlock >> 16) & 0xFF));   //uncomment for 24bit saves ( 8388607 types )
-            //fs.WriteByte((byte)((currBlock >> 8) & 0xFF));    //uncomment for 16bit saves ( 32767 types )
-            fs.WriteByte((byte)(currBlock & 0xFF));             //uncomment for  8bit saves ( 127 types )
+            //fs.WriteByte((byte)((currBlock >> 24) & 0xFF));   //uncomment for 32bit saves ( 2^32 types )
+            //fs.WriteByte((byte)((currBlock >> 16) & 0xFF));   //uncomment for 24bit saves ( 2^24 types )
+            //fs.WriteByte((byte)((currBlock >> 8) & 0xFF));    //uncomment for 16bit saves ( 2^16 types )
+            fs.WriteByte((byte)(currBlock & 0xFF));             //uncomment for  8bit saves ( 256 types )
         }
         fs.Close();
     }
@@ -94,10 +95,10 @@ public class MapHandler : NetworkBehaviour
         {
             int currBlock = 0;
             
-            //currBlock |= fs.ReadByte() << 24;     //uncomment for 32bit saves ( 2147483647 types )
-            //currBlock |= fs.ReadByte() << 16;     //uncomment for 24bit saves ( 8388607 types )
-            //currBlock |= fs.ReadByte() << 8;      //uncomment for 16bit saves ( 32767 types )
-            currBlock |= fs.ReadByte();             //uncomment for  8bit saves ( 127 types )
+            //currBlock |= fs.ReadByte() << 24;     //uncomment for 32bit saves ( 2^32 types )
+            //currBlock |= fs.ReadByte() << 16;     //uncomment for 24bit saves ( 2^24 types )
+            //currBlock |= fs.ReadByte() << 8;      //uncomment for 16bit saves ( 2^16 types )
+            currBlock |= fs.ReadByte();             //uncomment for  8bit saves ( 256 types )
             blocks[i, j, k] = currBlock;
         }
         fs.Close();
@@ -105,18 +106,22 @@ public class MapHandler : NetworkBehaviour
     }
     
     [Command (requiresAuthority = false)]
-    private void RequestChunk(int x, int z)
+    private void RequestChunk(int x, int z, int id)
     {
         int[,,] blocks = GameObject.Find(x + "." + z).GetComponent<Chunk>().Blocks;
         int len = blocks.Length;
         int[] bytes = new int[len];
         Buffer.BlockCopy(blocks, 0, bytes, 0, len*4);
-        SendChunk(bytes, x, z);
+        
+       
+        SendChunk(bytes, x, z, id);
     }
     [ClientRpc]
-    private void SendChunk(int[] bytes, int x, int z)
+    private void SendChunk(int[] bytes, int x, int z, int id)
     {
-        
+        if (NetworkClient.localPlayer.GetInstanceID() != id) return;
+
+
         int[,,] blocks = new int[Chunk.Size,Chunk.Size,Chunk.Size];
         Buffer.BlockCopy(bytes, 0, blocks, 0, bytes.Length*4);
         
