@@ -143,6 +143,10 @@ public class MainMenu : MonoBehaviour
     private void DeleteSave(string saveName)
     {
         string path = Application.persistentDataPath + "/Saves/" + saveName + "/";
+        foreach (string file in Directory.EnumerateFiles(path))
+        {
+            File.Delete(file);
+        }
         if(Directory.Exists(path)) Directory.Delete(path);
     }
 
