@@ -7,7 +7,7 @@ from pygame.locals import SRCALPHA, Rect
 def format_name(src):
     dst = ''
     for i, c in enumerate(src.lower()):
-        if j == 0 or name[j-1] == '_': dst += c.upper()
+        if not i or src[i-1] == '_': dst += c.upper()
         elif c != '_': dst += c
     return dst
 
@@ -41,6 +41,7 @@ pygame.image.save(texmap, TEXMAP)
 
 # generate cs code
 # tile positions
+print('\n/!\ Don\'t forget to use .png images')
 code = '\nprivate readonly int _texWidth = %s, _texHeight = %s;' %(w, h)
 code += '\n\npublic static readonly Tile'
 for i, name in zip(range(l), images):
