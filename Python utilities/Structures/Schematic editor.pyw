@@ -99,9 +99,9 @@ class Ui:
                        Input(316, ' y=', 1, 1, 100),
                        Input(378, ' z=', 2, 1, 100),
                        Input(440, 'ID:', -1, 0, len(colors)),
-                       Input(602, 'x0=', -2, 0, 100),
-                       Input(664, 'dy=', -3, -16, 100, True),
-                       Input(726, 'z0=', -4, 0, 100))
+                       Input(702, 'x0=', -2, 0, 100),
+                       Input(764, 'dy=', -3, -16, 100, True),
+                       Input(826, 'z0=', -4, 0, 100))
 
         self.back = pygame.Surface((900, 40))
         self.back.fill(LGRAY)
@@ -124,7 +124,7 @@ class Ui:
             i.update(events)
 
         # show current block name
-        if self.inputs[3].n >= len(blocks_names): name = '[unknown]'
+        if self.inputs[3].n > len(blocks_names): name = '[unknown]'
         elif self.inputs[3].n: name = '(%s)' %blocks_names[self.inputs[3].n-1]
         else: name = '[Air]'
         screen.blit(font.render(name, 1, BLACK), (512, 12))
@@ -303,17 +303,17 @@ def mkwin():
     return tk
 
 def load_textures():
-    # sorry gotta add them manually
+    # sorry gotta add them manually e.g. for blocks order
     global blocks_names, colors
     blocks_names = ['sand_side', 'red_sand', 'sandstone_side', 'bedrock',
-                    'cobblestone', 'oak_log', 'oak_leaves']
+                    'cobblestone', 'desert_log', 'desert_leaves']
     colors = []
 
     for i, name in enumerate(blocks_names):
         n = '../Textures/%s.png' %name
-        if not exists(n): n = n[:-3]+'jpg' # WHYYYYY
+        if not exists(n): raise Exception('%s does not exist' %n)
         surf = pygame.image.load(n).convert_alpha()
-        surf = pygame.transform.scale(surf, (32, 32)) # WHYYYYY again
+        surf = pygame.transform.scale(surf, (32, 32)) # just to make sure
         r = g = b = 0
         for x in range(32):
             for y in range(32):
@@ -324,7 +324,7 @@ def load_textures():
 
         # also edit the name in a C# way
         s = ''
-        for j, c in enumerate(name.lower().replace('side', '')):
+        for j, c in enumerate(name.replace('side', '').replace('top', '')):
             if j == 0 or name[j-1] == '_': s += c.upper()
             elif c != '_': s += c
         blocks_names[i] = s

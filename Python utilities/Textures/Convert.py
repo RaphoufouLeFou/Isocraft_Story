@@ -4,7 +4,10 @@ from os.path import splitext
 import pygame
 from pygame.locals import SRCALPHA, Rect
 
-def format_name(src):
+def format_name(src, ext):
+    if ext != '.png':
+        print('Wrong image extension (%s), skipped %s' %(ext, src))
+
     dst = ''
     for i, c in enumerate(src):
         if not i or src[i-1] == '_': dst += c.upper()
@@ -14,7 +17,7 @@ def format_name(src):
 RES = 32 # texture resolution
 TEXMAP = 'texmap.png'
 
-images = {format_name(splitext(path)[0]):
+images = {format_name(*splitext(path)):
           pygame.transform.scale(pygame.image.load(path), (RES, RES))
           for path in listdir()
           if '.py' not in path and '.meta' not in path and path != TEXMAP}
