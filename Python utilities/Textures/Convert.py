@@ -6,7 +6,7 @@ from pygame.locals import SRCALPHA, Rect
 
 def format_name(src):
     dst = ''
-    for i, c in enumerate(src.lower()):
+    for i, c in enumerate(src):
         if not i or src[i-1] == '_': dst += c.upper()
         elif c != '_': dst += c
     return dst

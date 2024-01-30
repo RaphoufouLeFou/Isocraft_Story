@@ -163,9 +163,9 @@ public class Game : MonoBehaviour
         public static readonly Tile
             Bedrock = new(new Vector2(0, 2)),
             Cobblestone = new(new Vector2(1, 2)),
-            OakLeaves = new(new Vector2(2, 2)),
-            OakLog = new(new Vector2(3, 2)),
-            OakLogTop = new(new Vector2(0, 1)),
+            DesertLeaves = new(new Vector2(2, 2)),
+            DesertLog = new(new Vector2(3, 2)),
+            DesertLogTop = new(new Vector2(0, 1)),
             RedSand = new(new Vector2(1, 1)),
             SandstoneSide = new(new Vector2(2, 1)),
             SandstoneTop = new(new Vector2(3, 1)),
@@ -194,8 +194,8 @@ public class Game : MonoBehaviour
             {Sandstone, new Block(Sandstone, Tiles.SandstoneTop, Tiles.SandstoneSide, Tiles.SandstoneTop)},
             {Bedrock, new Block(Bedrock, Tiles.Bedrock)},
             {Cobblestone, new Block(Cobblestone, Tiles.Cobblestone)},
-            {OakLog, new Block(OakLog, Tiles.OakLogTop, Tiles.OakLog, Tiles.OakLogTop)},
-            {OakLeaves, new Block(OakLeaves, Tiles.OakLeaves)}
+            {OakLog, new Block(OakLog, Tiles.DesertLogTop, Tiles.DesertLog, Tiles.DesertLogTop)},
+            {OakLeaves, new Block(OakLeaves, Tiles.DesertLeaves)}
         };
     }
 
