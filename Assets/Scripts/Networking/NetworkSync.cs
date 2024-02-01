@@ -1,7 +1,7 @@
 using Mirror;
 using UnityEngine;
 
-public class NeworkSync : NetworkBehaviour
+public class NetworkSync : NetworkBehaviour
 {
     
     [ClientRpc]
@@ -23,12 +23,12 @@ public class NeworkSync : NetworkBehaviour
         // sync everything
         //if (isClientOnly)
         //{
-            //SaveInfos.SaveName = "AZERTY";
+            //SaveInfos.SaveName = "foo";
         //}
 
         SaveInfos.SaveName ??= "";
 
-        //start the game after syncing
-        GetComponent<Game>().SartGame();
+        // start the game after syncing
+        GetComponent<Game>().StartGame();
     }
 }

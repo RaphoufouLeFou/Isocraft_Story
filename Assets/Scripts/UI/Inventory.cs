@@ -10,20 +10,20 @@ public class Inventory
      *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
      *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
      *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
-     *   hotbar:
+     *   hotBar:
      *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
      */
-    public int[,,] Inv = new int[9, 4, 2]; 
-    private Image[] _images = new Image[9]; // cells images
-    private TMP_Text[] _tmpText = new TMP_Text[9]; // cells numbers
+    public readonly int[,,] Inv = new int[9, 4, 2]; 
+    private readonly Image[] _images = new Image[9]; // cells images
+    private readonly TMP_Text[] _tmpText = new TMP_Text[9]; // cells numbers
 
     public void InitInventory()
     {
-        // set all cells images and numbers in the hotbar
+        // set all cells images and numbers in the hotBar
         for (int i = 0; i < 9; i++)
         {
-            _images[i] = Hotbar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();   
-            _tmpText[i] = Hotbar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponentInChildren<TMP_Text>();
+            _images[i] = HotBar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();   
+            _tmpText[i] = HotBar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponentInChildren<TMP_Text>();
         }
     }
     
@@ -36,8 +36,8 @@ public class Inventory
                 Inv[i, j, 0] = block; // set the inventory cell block id to the given id
                 Inv[i, j, 1]++; // increment the inventory cell block count by 1
                 if(j == 3) {
-                    _images[i].sprite = texture; // set the hotbar texture to the sprite if the block is in the hotbar
-                    _tmpText[i].text = $"{Inv[i, j, 1]}"; // update the hotbar number
+                    _images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
+                    _tmpText[i].text = $"{Inv[i, j, 1]}"; // update the hotBar number
                 }
                 return Inv[i, j, 1]; // return the updated block count
             }
@@ -53,8 +53,8 @@ public class Inventory
                 Inv[i, j, 0] = block; // set the inventory cell block id to the given id
                 Inv[i, j, 1]+= count; // increment the inventory cell block count by the given count
                 if(j == 3) {
-                    _images[i].sprite = texture; // set the hotbar texture to the sprite if the block is in the hotbar
-                    _tmpText[i].text = $"{Inv[i, j, 1]}"; // update the hotbar number
+                    _images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
+                    _tmpText[i].text = $"{Inv[i, j, 1]}"; // update the hotBar number
                 }
                 return Inv[i, j, 1]; //return the updated block count
             }
@@ -73,8 +73,8 @@ public class Inventory
         }
         Inv[x, y, 1]+= count; // increment the inventory cell block count by the given count
         if(y == 3) {
-            _images[x].sprite = texture; // set the hotbar texture to the sprite if the block is in the hotbar
-            _tmpText[x].text = $"{Inv[x, y, 1]}"; // update the hotbar number
+            _images[x].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
+            _tmpText[x].text = $"{Inv[x, y, 1]}"; // update the hotBar number
         }
         return remaining; //return the updated block count
     }
@@ -98,7 +98,7 @@ public class Inventory
     {
         if (Inv[x, y, 1] == 0) return; // if the inventory doesn't have a block at the given x and y, return;
         Inv[x, y, 1]--; // remove one block from the cell
-        if (Inv[x, y, 1] == 0) // update the hotbar
+        if (Inv[x, y, 1] == 0) // update the hotBar
         {
             _images[x].sprite = texture;
             _tmpText[x].text = "";

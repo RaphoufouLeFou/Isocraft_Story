@@ -35,7 +35,7 @@ public class Player : NetworkBehaviour
         GameObject items = GameObject.Find("HotBarBackground");
 
         health = 1.0f;
-        for (int i = 0; i < 9; i++) Hotbar.ItemImages[i] = items.transform.GetChild(i).gameObject;
+        for (int i = 0; i < 9; i++) HotBar.ItemImages[i] = items.transform.GetChild(i).gameObject;
         if (SaveInfos.HasBeenLoaded)
         {
             Inventory = SaveInfos.PlayerInventory;
@@ -49,7 +49,7 @@ public class Player : NetworkBehaviour
             SaveInfos.PlayerInventory = Inventory;
         }
         
-        Hotbar.UpdateHotBarVisual(Inventory, _sprites);
+        HotBar.UpdateHotBarVisual(Inventory, _sprites);
 
         // body settings
         Transform tr = transform;
@@ -152,13 +152,13 @@ public class Player : NetworkBehaviour
                 // move into or out of the block to get the right targeted block
                 hit.point += 0.01f * (right ? 1 : -1) * hit.normal;
 
-                int currentBlock = Inventory.GetCurrentBlock(Hotbar.SelectedIndex, 3);
+                int currentBlock = Inventory.GetCurrentBlock(HotBar.SelectedIndex, 3);
                 if (right)
                 {
-                    int count = Inventory.GetCurrentBlockCount(Hotbar.SelectedIndex, 3);
+                    int count = Inventory.GetCurrentBlockCount(HotBar.SelectedIndex, 3);
                     if (count <= 0) return;
                     int res = PlaceBreak(hit.point, currentBlock, true); // place the block for this instance
-                    if (res != -1) Inventory.RemoveBlock(Hotbar.SelectedIndex, 3, _sprites[0]);
+                    if (res != -1) Inventory.RemoveBlock(HotBar.SelectedIndex, 3, _sprites[0]);
                 }
                 else
                 {
@@ -231,7 +231,7 @@ public class Player : NetworkBehaviour
         // update these if not paused
         if (Settings.IsPaused) return;
 
-        Hotbar.UpdateHotBar();
+        HotBar.UpdateHotBar();
         DetectPlaceBreak();
         DetectOtherActions();
     }

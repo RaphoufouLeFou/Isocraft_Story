@@ -20,8 +20,7 @@ public class PlayerCamera : MonoBehaviour
     {
         // force starting position to avoid clipping in ground
         _currentPos = player.transform.position + new Vector3(0, 3, 0);
-        if (SaveInfos.HasBeenLoaded) _currentRot = SaveInfos.PlayerRotation;
-        else _currentRot = new Vector3(45, 0, 0);
+        _currentRot = SaveInfos.HasBeenLoaded ? SaveInfos.PlayerRotation : new Vector3(45, 0, 0);
     }
 
     void Update()

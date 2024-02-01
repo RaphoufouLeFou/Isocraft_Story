@@ -25,9 +25,6 @@ public class MapHandler : NetworkBehaviour
 
     private void GenChunk(int x, int z)
     {
-
-
-        
         if (!isServer)
         {
             int id = NetworkClient.localPlayer.GetInstanceID();

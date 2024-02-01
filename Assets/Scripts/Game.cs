@@ -64,7 +64,7 @@ public class Structure
         {
             if ((dx, dy, dz) == (1, 0, 1)) return Game.Blocks.RedSand;
             if (dx != 1 && dy == 5 && dz != 1 && b == -1)
-                return NoiseGen.PrngPos(x + dx, y + dy, z + dz) < 0.5f ? Game.Blocks.OakLeaves : Game.Blocks.None;
+                return NoiseGen.PrngPos(x + dx, y + dy, z + dz) < 0.5f ? Game.Blocks.DesertLeaves : Game.Blocks.None;
         }
         return b;
     }
@@ -146,9 +146,12 @@ public class Block
 public class Game : MonoBehaviour
 {
     [NonSerialized] public static float TickRate = 20;
+    [NonSerialized] public static int Tick;
     [NonSerialized] public static int Level = 0;
     [NonSerialized] public static int Seed;
     [NonSerialized] public static string SaveName;
+    
+    private float _prevTime;
     
     public Sprite[] sprites;
     private bool _autoSave = true;
@@ -183,8 +186,8 @@ public class Game : MonoBehaviour
             Sandstone = 3,
             Bedrock = 4,
             Cobblestone = 5,
-            OakLog = 6,
-            OakLeaves = 7;
+            DesertLog = 6,
+            DesertLeaves = 7;
 
         public static readonly Dictionary<int, Block> FromId = new()
         {
@@ -194,8 +197,8 @@ public class Game : MonoBehaviour
             {Sandstone, new Block(Sandstone, Tiles.SandstoneTop, Tiles.SandstoneSide, Tiles.SandstoneTop)},
             {Bedrock, new Block(Bedrock, Tiles.Bedrock)},
             {Cobblestone, new Block(Cobblestone, Tiles.Cobblestone)},
-            {OakLog, new Block(OakLog, Tiles.DesertLogTop, Tiles.DesertLog, Tiles.DesertLogTop)},
-            {OakLeaves, new Block(OakLeaves, Tiles.DesertLeaves)}
+            {DesertLog, new Block(DesertLog, Tiles.DesertLogTop, Tiles.DesertLog, Tiles.DesertLogTop)},
+            {DesertLeaves, new Block(DesertLeaves, Tiles.DesertLeaves)}
         };
     }
 
@@ -209,8 +212,7 @@ public class Game : MonoBehaviour
             "PlayerZ:" + SaveInfos.PlayerPosition.z + "\n" +
             "RotationX:" + SaveInfos.PlayerRotation.x + "\n" +
             "RotationY:" + SaveInfos.PlayerRotation.y + "\n" +
-            "RotationZ:" + SaveInfos.PlayerRotation.z + "\n" +
-        "";
+            "RotationZ:" + SaveInfos.PlayerRotation.z + "\n";
         
         for (int j = 0; j < 4; j++) 
         for (int i = 0; i < 9; i++) 
@@ -284,10 +286,8 @@ public class Game : MonoBehaviour
         file.Close();
     }
 
-    public void SartGame()
+    public void StartGame()
     {
-        
-        
         SaveName = SaveInfos.SaveName;
 
         LoadSave();
@@ -311,6 +311,17 @@ public class Game : MonoBehaviour
     {
         GetComponentInChildren<MapHandler>().StartMapHandle();
         CreateSaveFile();
+        Tick = 0;
+    }
+
+    private void Update()
+    {
+        // tick
+        if (Time.time - _prevTime > 1 / TickRate)
+        {
+            _prevTime = Time.time;
+            Tick++;
+        }
     }
 
     void OnApplicationQuit()

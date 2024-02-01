@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public static class Hotbar
+public static class HotBar
 {
     public static readonly GameObject[] ItemImages = new GameObject[9];
     public static int SelectedIndex;
@@ -10,7 +10,7 @@ public static class Hotbar
     public static void UpdateHotBar()
     {
         SelectedIndex -= (int)Input.mouseScrollDelta.y;
-        SelectedIndex = (SelectedIndex % 9 + 9) % 9; // fit in the hotbar slots
+        SelectedIndex = (SelectedIndex % 9 + 9) % 9; // fit in the hotBar slots
 
         for(int i = 0; i < 10; i++)
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
@@ -34,8 +34,8 @@ public static class Hotbar
 
             if (type > 0 && count > 0)
             {
-                images.sprite = texture[type]; // set the hotbar texture to the sprite if the block is in the hotbar
-                tmpText.text = $"{count}"; // update the hotbar number
+                images.sprite = texture[type]; // set the hotBar texture to the sprite if the block is in the hotBar
+                tmpText.text = $"{count}"; // update the hotBar number
             }
 
         }

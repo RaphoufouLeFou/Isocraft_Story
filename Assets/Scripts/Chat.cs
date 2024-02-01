@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
@@ -22,7 +21,7 @@ public class Chat : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void RcpClientReceveMessageFromUser(string prefix ,string message)
+    private void RcpClientReceiveMessageFromUser(string prefix ,string message)
     {
         GameObject msg = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, contentParent.transform);
         msg.GetComponent<TMP_Text>().text = $"{prefix} : {message}";
@@ -30,20 +29,19 @@ public class Chat : NetworkBehaviour
     }
     
     [Command(requiresAuthority = false)]
-    private void CommandReceveMessageFromUser(string prefix, string message)
+    private void CommandReceiveMessageFromUser(string prefix, string message)
     {
-        RcpClientReceveMessageFromUser(prefix, message);
+        RcpClientReceiveMessageFromUser(prefix, message);
     }
 
-    public void SendMessagesFromUser(string message)
+    private void SendMessagesFromUser(string message)
     {
-        if (isServer) RcpClientReceveMessageFromUser("Server", message);
-        else CommandReceveMessageFromUser("Client", message);
+        if (isServer) RcpClientReceiveMessageFromUser("Server", message);
+        else CommandReceiveMessageFromUser("Client", message);
     }
-
     
     [ClientRpc]
-    private void RcpClientReceveMessage(string message)
+    private void RcpClientReceiveMessage(string message)
     {
         GameObject msg = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, contentParent.transform);
         msg.GetComponent<TMP_Text>().text = $"{message}";
@@ -51,14 +49,14 @@ public class Chat : NetworkBehaviour
     }
     
     [Command(requiresAuthority = false)]
-    private void CommandReceveMessage( string message)
+    private void CommandReceiveMessage( string message)
     {
-        RcpClientReceveMessage(message);
+        RcpClientReceiveMessage(message);
     }
-    public void SendMessages(string message)
+    private void SendMessages(string message)
     {
-        if (isServer) RcpClientReceveMessage(message);
-        else CommandReceveMessage(message);
+        if (isServer) RcpClientReceiveMessage(message);
+        else CommandReceiveMessage(message);
     }
     
     public void SendMessageFromChatUI(GameObject self)
