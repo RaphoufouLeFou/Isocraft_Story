@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,6 +14,9 @@ public class PlayerCamera : MonoBehaviour
     private Vector3 _currentRot;
     private float _lastPlayerY;
     private bool _followMouse;
+    private float _startMouseShift;
+    private Vector2 _startMousePos, _goalMousePos;
+    private Vector2 _prevMousePos;
 
     private Vector3 _goalPos;
     [NonSerialized] public Vector3 GoalRot;
@@ -20,35 +24,71 @@ public class PlayerCamera : MonoBehaviour
 
     private void MouseMovement()
     {
-        Vector3 pos = Input.mousePosition;
+        // change camera depending on mouse position
+        Vector2 pos = Input.mousePosition;
         int w = Screen.width, h = Screen.height;
         float x = pos.x / w, y = pos.y / h;
-        bool change = false;
-        if (x < 0.3f)
+        int change = 0;
+        if (x < 0.2f)
         {
             if (_followMouse) GoalRot.y -= 45;
-            change = true;
-            Mouse.current.WarpCursorPosition(new Vector3(w >> 1, h >> 1, 0));
+            change = 1;
         }
-        else if (x > 0.7f)
+        else if (x > 0.8f)
         {
             if (_followMouse) GoalRot.y += 45;
-            change = true;
+            change = 1;
         }
 
-        if (y < 0.2f && !_targetAbove)
+        if (y < 0.3f && !_targetAbove)
         {
             if (_followMouse) _targetAbove = true;
-            change = true;
+            change = 2;
         }
         else if (y > 0.8f && _targetAbove)
         {
             if (_followMouse) _targetAbove = false;
-            change = true;
+            change = 2;
         }
         
-        _followMouse = !change;
+        if (_followMouse && change != 0) // initiate mouse movement when changing rotation
+        {
+            _startMousePos = pos;
+            Vector2 goal = pos;
+            if (change == 1) // x shift
+            {
+                if (goal.x < w >> 1) goal.x += w * 0.1f;
+                else goal.x -= w * 0.1f;
+            }
+            else // y shift
+            {
+                if (goal.y < h >> 1) goal.y += h * 0.1f;
+                else goal.y -= h * 0.1f;
+            }
+
+            _goalMousePos = goal;
+            _startMouseShift = Time.time;
+        }
+        _followMouse = change == 0;
         
+        // move mouse according to rotation changes
+        float t = (Time.time - _startMouseShift) / _rotDelay / 2f;
+        if (t < 1)
+        {
+            // edit _goalMousePos according to player mouse movement
+            Vector2 delta = pos - _prevMousePos;
+            if (delta != new Vector2())
+            {
+                _goalMousePos += delta;
+                _startMousePos += delta;
+            }
+            
+            // update pos for _prevMousePos setting
+            pos = _startMousePos + (_goalMousePos - _startMousePos) * Game.SmoothStep(t);
+            Mouse.current.WarpCursorPosition(new Vector2((float)Math.Round(pos.x), (float)Math.Round(pos.y)));
+        }
+
+        _prevMousePos = pos;
     }
     
     private void Start()
@@ -56,6 +96,10 @@ public class PlayerCamera : MonoBehaviour
         // force starting position to avoid clipping in ground
         _currentPos = player.transform.position + new Vector3(0, 3, 0);
         _currentRot = SaveInfos.HasBeenLoaded ? SaveInfos.PlayerRotation : new Vector3(45, 0, 0);
+        
+        // set the mouse in the center of the screen
+        Mouse.current.WarpCursorPosition(new Vector2(Screen.width >> 1, Screen.height >> 1));
+        _prevMousePos = Input.mousePosition;
     }
 
     private void Update()

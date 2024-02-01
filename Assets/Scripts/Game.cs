@@ -202,6 +202,11 @@ public class Game : MonoBehaviour
         };
     }
 
+    public static float SmoothStep(float t)
+    {
+        return (3 - 2 * t) * t * t;
+    }
+    
     public void SaveGame()
     {
         if(SaveName == "") return;
