@@ -13,8 +13,7 @@ public class PlayerCamera : MonoBehaviour
     private Vector3 _currentPos;
     private Vector3 _currentRot;
     private float _lastPlayerY;
-    private bool _followMouse;
-    private float _startMouseShift;
+    private float _startMouseShift = -1000f; // avoid playing the animation at the start
     private Vector2 _startMousePos, _goalMousePos;
     private Vector2 _prevMousePos;
 
@@ -29,29 +28,32 @@ public class PlayerCamera : MonoBehaviour
         int w = Screen.width, h = Screen.height;
         float x = pos.x / w, y = pos.y / h;
         int change = 0;
-        if (x < 0.2f)
+        bool debounce = Time.time > _startMouseShift + 0.2f; // leave time to react and not rotate twice
+
+        if (x < 0.2f && pos.x + 0.5f < _prevMousePos.x && debounce)
         {
-            if (_followMouse) GoalRot.y -= 45;
+            // allow to rotate multiple times in a row
+            GoalRot.y -= 45;
             change = 1;
         }
-        else if (x > 0.8f)
+        else if (x > 0.8f && pos.x - 0.5f > _prevMousePos.x && debounce)
         {
-            if (_followMouse) GoalRot.y += 45;
+            GoalRot.y += 45;
             change = 1;
         }
 
         if (y < 0.3f && !_targetAbove)
         {
-            if (_followMouse) _targetAbove = true;
+            _targetAbove = true;
             change = 2;
         }
         else if (y > 0.8f && _targetAbove)
         {
-            if (_followMouse) _targetAbove = false;
+            _targetAbove = false;
             change = 2;
         }
         
-        if (_followMouse && change != 0) // initiate mouse movement when changing rotation
+        if (change != 0) // initiate mouse movement when changing rotation
         {
             _startMousePos = pos;
             Vector2 goal = pos;
@@ -69,7 +71,6 @@ public class PlayerCamera : MonoBehaviour
             _goalMousePos = goal;
             _startMouseShift = Time.time;
         }
-        _followMouse = change == 0;
         
         // move mouse according to rotation changes
         float t = (Time.time - _startMouseShift) / _rotDelay / 2f;
@@ -84,7 +85,7 @@ public class PlayerCamera : MonoBehaviour
             }
             
             // update pos for _prevMousePos setting
-            pos = _startMousePos + (_goalMousePos - _startMousePos) * Game.SmoothStep(t);
+            pos = _startMousePos + (_goalMousePos - _startMousePos) * Game.SmoothStep(t); 
             Mouse.current.WarpCursorPosition(new Vector2((float)Math.Round(pos.x), (float)Math.Round(pos.y)));
         }
 
@@ -96,10 +97,6 @@ public class PlayerCamera : MonoBehaviour
         // force starting position to avoid clipping in ground
         _currentPos = player.transform.position + new Vector3(0, 3, 0);
         _currentRot = SaveInfos.HasBeenLoaded ? SaveInfos.PlayerRotation : new Vector3(45, 0, 0);
-        
-        // set the mouse in the center of the screen
-        Mouse.current.WarpCursorPosition(new Vector2(Screen.width >> 1, Screen.height >> 1));
-        _prevMousePos = Input.mousePosition;
     }
 
     private void Update()
