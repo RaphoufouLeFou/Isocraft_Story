@@ -14,7 +14,7 @@ public static class NoiseGen
 
     private static float GetHeight(int x, int z)
     {
-        return _noise.GetNoise(x, z) * 2 + 7 + _noise.GetNoise(x * 10 + 1000, z * 10 + 1000) / 2;
+        return _noise.GetNoise(x, z) * 2 + 5 + _noise.GetNoise(x * 10 + 1000, z * 10 + 1000) / 2;
     }
 
     public static IEnumerable<int> GetColumn(int x, int z)

@@ -175,9 +175,9 @@ public class Player : NetworkBehaviour
         SaveInfos.PlayerInventory = Inventory;
     }
 
-    void DetectOtherActions()
+    void Keys()
     {
-        // rotate camera about the Y axis
+        /*// rotate camera about the Y axis
         Vector3 rotation = transform.rotation.eulerAngles;
         bool change = false;
         if (Input.GetKeyDown(Settings.KeyMap["CamLeft"]))
@@ -194,7 +194,9 @@ public class Player : NetworkBehaviour
         // toggle camera target X rotation
         if (Input.GetKeyDown(Settings.KeyMap["TopView"])) playerCamera.TargetAbove = !playerCamera.TargetAbove;
         
-        if (change) playerCamera.GoalRot.y = rotation.y;
+        if (change) playerCamera.GoalRot.y = rotation.y;*/
+        Vector3 rotation = transform.rotation.eulerAngles;
+        rotation.y = playerCamera.GoalRot.y;
         transform.rotation = Quaternion.Euler(rotation);
         
         if (Input.GetKeyDown(Settings.KeyMap["Kill"])) // kill
@@ -210,7 +212,7 @@ public class Player : NetworkBehaviour
     
     void Update()
     {
-        if (!isLocalPlayer) return;
+        if (!isLocalPlayer) return; // don't update other players
 
         if (health > 1) health = 1;
         _healthImage.transform.localScale = new Vector3(health,1 ,1);
@@ -233,6 +235,6 @@ public class Player : NetworkBehaviour
 
         HotBar.UpdateHotBar();
         DetectPlaceBreak();
-        DetectOtherActions();
+        Keys();
     }
 }

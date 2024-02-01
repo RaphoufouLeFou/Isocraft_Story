@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerCamera : MonoBehaviour
 {
@@ -11,20 +12,57 @@ public class PlayerCamera : MonoBehaviour
     private Vector3 _currentPos;
     private Vector3 _currentRot;
     private float _lastPlayerY;
+    private bool _followMouse;
 
     private Vector3 _goalPos;
     [NonSerialized] public Vector3 GoalRot;
-    [NonSerialized] public bool TargetAbove = false;
+    [NonSerialized] private bool _targetAbove;
+
+    private void MouseMovement()
+    {
+        Vector3 pos = Input.mousePosition;
+        int w = Screen.width, h = Screen.height;
+        float x = pos.x / w, y = pos.y / h;
+        bool change = false;
+        if (x < 0.3f)
+        {
+            if (_followMouse) GoalRot.y -= 45;
+            change = true;
+            Mouse.current.WarpCursorPosition(new Vector3(w >> 1, h >> 1, 0));
+        }
+        else if (x > 0.7f)
+        {
+            if (_followMouse) GoalRot.y += 45;
+            change = true;
+        }
+
+        if (y < 0.2f && !_targetAbove)
+        {
+            if (_followMouse) _targetAbove = true;
+            change = true;
+        }
+        else if (y > 0.8f && _targetAbove)
+        {
+            if (_followMouse) _targetAbove = false;
+            change = true;
+        }
+        
+        _followMouse = !change;
+        
+    }
     
-    void Start()
+    private void Start()
     {
         // force starting position to avoid clipping in ground
         _currentPos = player.transform.position + new Vector3(0, 3, 0);
         _currentRot = SaveInfos.HasBeenLoaded ? SaveInfos.PlayerRotation : new Vector3(45, 0, 0);
     }
 
-    void Update()
+    private void Update()
     {
+        // change camera target with mouse movement
+        MouseMovement();
+
         if (player.Body == null) return; // if this is not the current player, skip 
 
         Transform tr = transform;
@@ -49,7 +87,7 @@ public class PlayerCamera : MonoBehaviour
         while (goalRotY - currentRotY > 180) currentRotY += 360;
         
         // set target X rotation
-        float targetX = TargetAbove ? 90 : 80 - _lastPlayerY * 4;
+        float targetX = _targetAbove ? 90 : 80 - _lastPlayerY * 4;
         
         // smoothly interpolate according to fps:
         // (current * (fps-1) + goal) / fps

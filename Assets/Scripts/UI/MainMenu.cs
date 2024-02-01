@@ -14,13 +14,13 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject loadGameParent;
     [SerializeField] private GameObject joinGameParent;
     [SerializeField] private GameObject backButton;
-    [SerializeField] private GameObject SaveTextPrefab;
+    [SerializeField] private GameObject saveTextPrefab;
     
     [SerializeField] private TMP_InputField addressInput;
     [SerializeField] private TMP_InputField portInput;
     [SerializeField] private TMP_InputField portNewGameInput;
 
-    private string _IPAddress = "localhost";
+    private string _ipAddress = "localhost";
     private string _port = "7777";
 
     void Start()
@@ -62,9 +62,9 @@ public class MainMenu : MonoBehaviour
     }
     public void ConnectGameButtonClick()
     {
-        NetworkInfos.IsLocalHost = _IPAddress.ToLower() == "localhost";
-        Debug.Log($"Address = {_IPAddress}");
-        NetworkInfos.uri = new Uri($"kcp://{_IPAddress}:{_port}");
+        NetworkInfos.IsLocalHost = _ipAddress.ToLower() == "localhost";
+        Debug.Log($"Address = {_ipAddress}");
+        NetworkInfos.uri = new Uri($"kcp://{_ipAddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = false;
         NetworkInfos.StartedFromMainMenu = true;
@@ -75,18 +75,18 @@ public class MainMenu : MonoBehaviour
         string nm = saveName.GetComponent<TMP_InputField>().text;
         if(nm == "" || DoesSaveExist(nm)) return;
         SaveInfos.SaveName = nm;
-        NetworkInfos.uri = new Uri($"kcp://{_IPAddress}:{_port}");
+        NetworkInfos.uri = new Uri($"kcp://{_ipAddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = true;
         NetworkInfos.StartedFromMainMenu = true;
         SceneManager.LoadScene(mainSceneName);
     }
     
-    public void MultiPlayer(string saveName)
+    private void MultiPlayer(string saveName)
     {
         if(saveName == "") return;
         SaveInfos.SaveName = saveName;
-        NetworkInfos.uri = new Uri($"kcp://{_IPAddress}:{_port}");
+        NetworkInfos.uri = new Uri($"kcp://{_ipAddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = true;
         NetworkInfos.StartedFromMainMenu = true;
@@ -110,7 +110,7 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(mainSceneName);
     }
 
-    public void LoadGame(string saveName)
+    private void LoadGame(string saveName)
     {
         MultiPlayer(saveName);
     }
@@ -126,7 +126,7 @@ public class MainMenu : MonoBehaviour
         foreach (string dir in Directory.EnumerateDirectories(path))
         {
             string saveName = new DirectoryInfo(dir).Name;
-            GameObject go = Instantiate(SaveTextPrefab, Vector3.zero, Quaternion.identity, content.transform);
+            GameObject go = Instantiate(saveTextPrefab, Vector3.zero, Quaternion.identity, content.transform);
             go.GetComponentInChildren<TMP_Text>().text = saveName;
             go.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() =>
             {
@@ -152,8 +152,8 @@ public class MainMenu : MonoBehaviour
 
     public void OnChangedAddress()
     {
-        _IPAddress = addressInput.text;
-        Debug.Log($"Entered address = {_IPAddress}");
+        _ipAddress = addressInput.text;
+        Debug.Log($"Entered address = {_ipAddress}");
     }
     public void OnChangedPort()
     {
