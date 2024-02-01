@@ -7,19 +7,23 @@ public class PlayerCamera : MonoBehaviour
 {
     public Player player;
     public Camera cam;
-    private readonly float _moveDelay = 0.5f, _rotDelay = 0.3f, _zoom = 4;
+    private readonly float _moveDelay = 0.5f, _rotDelay = 0.1f, _zoom = 4, _debounceTime = 0.25f;
     private float _currentRotDelay; // different possible rotation speeds
 
+    // position and rotation
     private Vector3 _currentPos;
     private Vector3 _currentRot;
     private float _lastPlayerY;
-    private float _startMouseShift = -1000f; // avoid playing the animation at the start
-    private Vector2 _startMousePos, _goalMousePos;
-    private Vector2 _prevMousePos;
 
+    // rotation target
     private Vector3 _goalPos;
     [NonSerialized] public Vector3 GoalRot;
     [NonSerialized] private bool _targetAbove;
+
+    // mouse movement
+    private Vector2 _prevMousePos;
+    private float _startMouseShift = -1000f; // avoid playing the animation at the start
+    private float _mouseOffset = -1000f;
 
     private void MouseMovement()
     {
@@ -27,66 +31,47 @@ public class PlayerCamera : MonoBehaviour
         Vector2 pos = Input.mousePosition;
         int w = Screen.width, h = Screen.height;
         float x = pos.x / w, y = pos.y / h;
-        int change = 0;
-        bool debounce = Time.time > _startMouseShift + 0.2f; // leave time to react and not rotate twice
 
-        if (x < 0.2f && pos.x + 0.5f < _prevMousePos.x && debounce)
+        // allow to rotate multiple times in a row, leave time to react and not rotate twice
+        bool debounce = Time.time > _startMouseShift + _debounceTime;
+
+        bool change = false;
+        if (_mouseOffset > 0) _mouseOffset -= Time.deltaTime * 3; // add hysteresis
+        else _mouseOffset = 0;
+        if (x < 0.2f)
         {
-            // allow to rotate multiple times in a row
-            GoalRot.y -= 45;
-            change = 1;
+            if (pos.x + 1.5f < _prevMousePos.x && debounce)
+            {
+                GoalRot.y -= 45;
+                change = true;
+            }
+
+            _mouseOffset = 1;
         }
-        else if (x > 0.8f && pos.x - 0.5f > _prevMousePos.x && debounce)
+        else if (x > 0.8f)
         {
-            GoalRot.y += 45;
-            change = 1;
+            if (pos.x - 1.5f > _prevMousePos.x && debounce)
+            {
+                GoalRot.y += 45;
+                change = true;
+            }
+
+            _mouseOffset = 1;
         }
 
-        if (y < 0.3f && !_targetAbove)
-        {
-            _targetAbove = true;
-            change = 2;
-        }
-        else if (y > 0.8f && _targetAbove)
-        {
-            _targetAbove = false;
-            change = 2;
-        }
+        if (y < 0.3f) _targetAbove = true;
+        else if (y > 0.8f) _targetAbove = false;
+
+        if (change) _startMouseShift = Time.time;
         
-        if (change != 0) // initiate mouse movement when changing rotation
+        // move the mouse towards the center if needed
+        if (_mouseOffset > 0)
         {
-            _startMousePos = pos;
-            Vector2 goal = pos;
-            if (change == 1) // x shift
-            {
-                if (goal.x < w >> 1) goal.x += w * 0.1f;
-                else goal.x -= w * 0.1f;
-            }
-            else // y shift
-            {
-                if (goal.y < h >> 1) goal.y += h * 0.1f;
-                else goal.y -= h * 0.1f;
-            }
-
-            _goalMousePos = goal;
-            _startMouseShift = Time.time;
-        }
-        
-        // move mouse according to rotation changes
-        float t = (Time.time - _startMouseShift) / _rotDelay / 2f;
-        if (t < 1)
-        {
-            // edit _goalMousePos according to player mouse movement
-            Vector2 delta = pos - _prevMousePos;
-            if (delta != new Vector2())
-            {
-                _goalMousePos += delta;
-                _startMousePos += delta;
-            }
-            
-            // update pos for _prevMousePos setting
-            pos = _startMousePos + (_goalMousePos - _startMousePos) * Game.SmoothStep(t); 
-            Mouse.current.WarpCursorPosition(new Vector2((float)Math.Round(pos.x), (float)Math.Round(pos.y)));
+            float goalX = x < 0.5f ? w * 0.3f : w * 0.7f;
+            if ((x < 0.5f) ^ (pos.x < goalX)) _mouseOffset = 0; // stop animation early if moved back to the center
+            float fps = Time.deltaTime == 0 ? 10e6f : _rotDelay / Time.deltaTime;
+            pos.x = (pos.x * (fps - 1) + goalX) / fps;
+            Mouse.current.WarpCursorPosition(pos);
         }
 
         _prevMousePos = pos;
@@ -119,8 +104,8 @@ public class PlayerCamera : MonoBehaviour
         pPos.y = _lastPlayerY + player.Body.MoveRelative.z * (m.x * m.x + m.z * m.z) * 3;
         float goalRotY = GoalRot.y + player.Body.MoveRelative.x * 5; 
 
-        float fps = Time.deltaTime == 0 ? 10e6f : _moveDelay / Time.deltaTime;
-        float posFps = _moveDelay * fps, rotFps = _rotDelay * (1 + _lastPlayerY / 4) * fps;
+        float fps = Time.deltaTime == 0 ? 10e6f : 1 / Time.deltaTime;
+        float posFps = _moveDelay * fps, rotFps = _rotDelay * (1 + _lastPlayerY / 8) * fps;
         
         // fix y rotation 360 wrapping
         float currentRotY = _currentRot.y;
