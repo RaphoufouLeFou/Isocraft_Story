@@ -45,6 +45,7 @@ public class InventoryUI : MonoBehaviour
     {
         inventoryMenu.SetActive(true);
         UpdateInventory();
+        Settings.Playing = false;
     }
 
     private void UpdateInventory()
@@ -75,6 +76,7 @@ public class InventoryUI : MonoBehaviour
             Destroy(_movingItemImage);
         }
         inventoryMenu.SetActive(false);
+        Settings.Playing = true;
     }
 
     public void UICellButtonListener(GameObject self, string mouse)
@@ -99,7 +101,7 @@ public class InventoryUI : MonoBehaviour
         }
         else
         {
-            if(_playerInv.GetCurrentBlockCount(x, y) == 0) return;
+            if (_playerInv.GetCurrentBlockCount(x, y) == 0) return;
             if (mouse == "Left")
             {
                 _movingItem = (_playerInv.GetCurrentBlock(x, y), _playerInv.GetCurrentBlockCount(x, y));

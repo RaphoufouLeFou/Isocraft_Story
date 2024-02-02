@@ -9,6 +9,7 @@ using TMPro;
 public static class Settings
 {       
     public static bool IsPaused;
+    public static bool Playing; // true only if no popup is open
     public static Dictionary<string, KeyCode> KeyMap; // key: input name, value: keycode
 
     public struct OverlayStruct // overlay info struct
@@ -71,11 +72,15 @@ public class SettingsUI : MonoBehaviour
     {
         if (menu == "None") // close menus
         {
+            Settings.Playing = true;
             Settings.IsPaused = false;
             pauseMenu.SetActive(false);
             SaveSettings();
             return;
         }
+        Settings.Playing = false;
+        Settings.IsPaused = true;
+
         bool pause = menu == "Pause";
         pauseMenu.SetActive(pause);
         settingsMenu.SetActive(!pause);
@@ -183,35 +188,43 @@ public class SettingsUI : MonoBehaviour
             management.ChangeMaxConnection(NetworkInfos.IsMultiplayerGame ? _maxPlayerConnections : 1);
         }
         else if (self.name == "Port")
-        {
             management.ChangePort((ushort)Int32.Parse(self.GetComponent<TMP_InputField>().text));
-        }
         else if (self.name == "Players")
         {
             _maxPlayerConnections = Int32.Parse(self.GetComponent<TMP_InputField>().text);
             management.ChangeMaxConnection(_maxPlayerConnections);
         }
     }
+    
     private void Update()
     {
-        // if the escape key is pressed but not while assigning a key
-        if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape) && !chatWindow.activeSelf)
+        // handle escape key for all popups, including chat and inventory
+        if (Input.GetKeyDown(KeyCode.Escape) && !_isReadingKey) // avoid checking when assigning a key
         {
-            // toggle the pause menu except the inventory is shown
-            if (pauseMenu.activeSelf || (!Settings.IsPaused && !inventoryMenu.activeSelf))
+            if (Settings.Playing) GoToMenu("Pause"); // show the pause menu
+            else // exit any popup, or go back to parent popup
             {
-                Settings.IsPaused = !Settings.IsPaused;
-                pauseMenu.SetActive(Settings.IsPaused);
-                if (Settings.IsPaused == false) SaveSettings(); // save settings
+                if (
+                    pauseMenu.activeSelf
+                    || inventoryMenu.activeSelf
+                    || chatWindow.activeSelf
+                    // popups
+                    )
+                {
+                    pauseMenu.SetActive(false);
+                    inventoryMenu.SetActive(false);
+                    chatWindow.SetActive(false);
+                    Settings.Playing = true;
+                    Settings.IsPaused = false;
+                }
+                else if (settingsMenuButtons.activeSelf) GoToMenu("Pause");
+                else if (
+                    overlayMenu.activeSelf
+                    || controlsMenu.activeSelf
+                    || multiplayerMenu.activeSelf
+                    // submenus
+                ) GoToMenu("Settings");
             }
-            else if (settingsMenuButtons.activeSelf) GoToMenu("Pause");
-            else if (
-                overlayMenu.activeSelf
-                || controlsMenu.activeSelf
-                || multiplayerMenu.activeSelf
-                // otherMenu parameters
-                // ...
-            ) GoToMenu("Settings"); // get back of one setting window
         }
 
         if (!_isReadingKey) return; // if is not in key assign mode, the update is done

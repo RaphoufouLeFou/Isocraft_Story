@@ -76,22 +76,11 @@ public class Chat : NetworkBehaviour
 
     private void Update()
     {
-        if(Settings.KeyMap == null) return; // sometimes this execute without the parameter initiated
-        if (Input.GetKeyDown(Settings.KeyMap["Chat"]))
+        if (Settings.KeyMap == null) return; // in case this runs before settings are loaded
+        if (Input.GetKeyDown(Settings.KeyMap["Chat"]) && Settings.Playing)
         {
-            if (!Settings.IsPaused && !chatWindow.activeSelf)
-            {
-                Settings.IsPaused = true;
-                chatWindow.SetActive(true);
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (Settings.IsPaused && chatWindow.activeSelf)
-            {
-                Settings.IsPaused = false;
-                chatWindow.SetActive(false);
-            }
+            chatWindow.SetActive(true);
+            Settings.Playing = false;
         }
     }
 }

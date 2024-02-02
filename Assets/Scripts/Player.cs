@@ -202,14 +202,14 @@ public class Player : NetworkBehaviour
         _healthImage.transform.localScale = new Vector3(Health,1 ,1);
 
         bool invVisible = _inventoryUI.inventoryMenu.activeSelf;
-        if (Input.GetKeyDown(Settings.KeyMap["Inventory"]) || (Input.GetKeyDown(KeyCode.Escape) && invVisible))
+        if (Input.GetKeyDown(Settings.KeyMap["Inventory"]))
         {
             if (invVisible) _inventoryUI.HideInventory();
-            else _inventoryUI.DisplayInventory();
+            else if (!Settings.IsPaused) _inventoryUI.DisplayInventory();
         }
         
         // update the following if in-game
-        if (Settings.IsPaused || invVisible) return;
+        if (!Settings.Playing) return;
         HotBar.UpdateHotBar();
         DetectPlaceBreak();
         Keys();

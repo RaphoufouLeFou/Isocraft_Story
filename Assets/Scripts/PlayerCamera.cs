@@ -30,6 +30,7 @@ public class PlayerCamera : MonoBehaviour
         Vector2 pos = Input.mousePosition;
         int w = Screen.width, h = Screen.height;
         float x = pos.x / w, y = pos.y / h;
+        if (x < 0 || x > 1 || y < 0 || y > 1) return; // outside of screen
 
         // allow to rotate multiple times in a row, leave time to react and not rotate twice
         bool debounce = Time.time > _startMouseShift + _debounceTime;
@@ -86,7 +87,7 @@ public class PlayerCamera : MonoBehaviour
     private void Update()
     {
         // change camera target with mouse movement
-        MouseMovement();
+        if (Settings.Playing && Application.isFocused) MouseMovement();
 
         if (player.Body == null) return; // if this is not the current player, skip 
 
