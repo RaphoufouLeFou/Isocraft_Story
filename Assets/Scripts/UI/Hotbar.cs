@@ -23,19 +23,20 @@ public static class HotBar
         }
     }
 
-    public static void UpdateHotBarVisual(Inventory inv, Sprite[] texture)
+    public static void UpdateHotBarVisual(Inventory inv)
     {
         for (int i = 0; i < 9; i++)
         {
-            Image images = ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();   
-            TMP_Text tmpText = ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponentInChildren<TMP_Text>();
+            Image images = ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();
+            TMP_Text tmpText = ItemImages[i].transform.GetChild(0).GetChild(0).gameObject
+                .GetComponentInChildren<TMP_Text>();
             int type = inv.GetCurrentBlock(i, 3);
             int count = inv.GetCurrentBlockCount(i, 3);
 
             if (type > 0 && count > 0)
             {
-                images.sprite = texture[type]; // set the hotBar texture to the sprite if the block is in the hotBar
-                tmpText.text = $"{count}"; // update the hotBar number
+                images.sprite = Game.InvSprites[type];
+                tmpText.text = count.ToString();
             }
 
         }

@@ -19,8 +19,6 @@ public class Player : NetworkBehaviour
     [NonSerialized] public float Health;
 
     public Inventory Inventory;
-    
-    private Sprite[] _sprites;
 
     private void Start()
     {
@@ -32,7 +30,6 @@ public class Player : NetworkBehaviour
         // set up other objects
         GameObject scripts = GameObject.Find("Scripts");
         _inventoryUI = scripts.GetComponent<InventoryUI>();
-        _sprites = scripts.GetComponent<Game>().sprites;
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
         _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>();
         
@@ -46,13 +43,14 @@ public class Player : NetworkBehaviour
         }
         else
         {
-            Inventory = new ();
+            Inventory = new();
             Inventory.InitInventory();
-            Inventory.AddBlock(Game.Blocks.Cobblestone, _sprites[Game.Blocks.Cobblestone], 64);
+            Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
             SaveInfos.PlayerInventory = Inventory;
         }
+        _inventoryUI.SetPlayerInv(Inventory);
         
-        HotBar.UpdateHotBarVisual(Inventory, _sprites);
+        HotBar.UpdateHotBarVisual(Inventory);
 
         // body settings
         Transform tr = transform;
@@ -160,12 +158,12 @@ public class Player : NetworkBehaviour
                     int count = Inventory.GetCurrentBlockCount(HotBar.SelectedIndex, 3);
                     if (count <= 0) return;
                     int res = PlaceBreak(hit.point, currentBlock, true); // place the block for this instance
-                    if (res != -1) Inventory.RemoveBlock(HotBar.SelectedIndex, 3, _sprites[0]);
+                    if (res != -1) Inventory.RemoveBlock(HotBar.SelectedIndex, 3, Game.InvSprites[0]);
                 }
                 else
                 {
                     int res = PlaceBreak(hit.point, currentBlock, false); // place the block for this instance
-                    if (res > 0) Inventory.AddBlock(res, _sprites[res]); // fixed collecting air
+                    if (res > 0) Inventory.AddBlock(res, Game.InvSprites[res]); // fixed collecting air
 
                 }
 
@@ -203,14 +201,15 @@ public class Player : NetworkBehaviour
 
         _healthImage.transform.localScale = new Vector3(Health,1 ,1);
 
-        if (Input.GetKeyDown(Settings.KeyMap["Inventory"]) || (Input.GetKeyDown(KeyCode.Escape) && _inventoryUI.gameObject.activeSelf))
+        bool invVisible = _inventoryUI.inventoryMenu.activeSelf;
+        if (Input.GetKeyDown(Settings.KeyMap["Inventory"]) || (Input.GetKeyDown(KeyCode.Escape) && invVisible))
         {
-            if (Settings.IsPaused && _inventoryUI.inventoryMenu.activeSelf) _inventoryUI.HideInventory();
-            else _inventoryUI.DisplayInventory(Inventory, _sprites, gameObject);
+            if (invVisible) _inventoryUI.HideInventory();
+            else _inventoryUI.DisplayInventory();
         }
         
-        // update the following if not paused
-        if (Settings.IsPaused) return;
+        // update the following if in-game
+        if (Settings.IsPaused || invVisible) return;
         HotBar.UpdateHotBar();
         DetectPlaceBreak();
         Keys();

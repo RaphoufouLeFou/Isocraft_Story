@@ -87,6 +87,11 @@ public static class Utils
 
         return (int)x;
     }
+
+    public static float SmoothStep(float t)
+    {
+        return (3 - 2 * t) * t * t;
+    }
 }
 
 public class Tile
@@ -150,6 +155,7 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Level = 0;
     [NonSerialized] public static int Seed;
     [NonSerialized] public static string SaveName;
+    [NonSerialized] public static Sprite[] InvSprites;
     
     private float _prevTime;
     
@@ -201,11 +207,6 @@ public class Game : MonoBehaviour
             {DesertLeaves, new Block(DesertLeaves, Tiles.DesertLeaves)}
         };
     }
-
-    public static float SmoothStep(float t)
-    {
-        return (3 - 2 * t) * t * t;
-    }
     
     public void SaveGame()
     {
@@ -226,8 +227,6 @@ public class Game : MonoBehaviour
         
         if(File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, text);
-        
-            
     }
     
     private void CreateSaveFile()
@@ -317,6 +316,8 @@ public class Game : MonoBehaviour
         GetComponentInChildren<MapHandler>().StartMapHandle();
         CreateSaveFile();
         Tick = 0;
+        GameObject scripts = GameObject.Find("Scripts");
+        InvSprites = scripts.GetComponent<Game>().sprites;
     }
 
     private void Update()

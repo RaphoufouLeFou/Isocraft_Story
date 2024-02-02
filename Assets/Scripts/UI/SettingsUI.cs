@@ -194,21 +194,26 @@ public class SettingsUI : MonoBehaviour
     }
     private void Update()
     {
-        if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape) && !chatWindow.activeSelf) // if the escape key is pressed but not while assigning a key
-            if (pauseMenu.activeSelf || (!Settings.IsPaused && !inventoryMenu.activeSelf)) // toggle the pause menu except the inventory is shown
+        // if the escape key is pressed but not while assigning a key
+        if (!_isReadingKey && Input.GetKeyDown(KeyCode.Escape) && !chatWindow.activeSelf)
+        {
+            // toggle the pause menu except the inventory is shown
+            if (pauseMenu.activeSelf || (!Settings.IsPaused && !inventoryMenu.activeSelf))
             {
                 Settings.IsPaused = !Settings.IsPaused;
                 pauseMenu.SetActive(Settings.IsPaused);
-                if (Settings.IsPaused == false) SaveSettings(); // save the settings
-            } else if (settingsMenuButtons.activeSelf) GoToMenu("Pause");
+                if (Settings.IsPaused == false) SaveSettings(); // save settings
+            }
+            else if (settingsMenuButtons.activeSelf) GoToMenu("Pause");
             else if (
-                overlayMenu.activeSelf 
+                overlayMenu.activeSelf
                 || controlsMenu.activeSelf
                 || multiplayerMenu.activeSelf
                 // otherMenu parameters
                 // ...
             ) GoToMenu("Settings"); // get back of one setting window
-        
+        }
+
         if (!_isReadingKey) return; // if is not in key assign mode, the update is done
 
         if (Input.anyKey) // if a key is detected

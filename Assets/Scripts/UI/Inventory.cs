@@ -22,8 +22,9 @@ public class Inventory
         // set all cells images and numbers in the hotBar
         for (int i = 0; i < 9; i++)
         {
-            _images[i] = HotBar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>();   
-            _tmpText[i] = HotBar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject.GetComponentInChildren<TMP_Text>();
+            GameObject go = HotBar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject;
+            _images[i] = go.GetComponent<Image>();   
+            _tmpText[i] = go.GetComponentInChildren<TMP_Text>();
         }
     }
     
@@ -35,9 +36,9 @@ public class Inventory
             {
                 Inv[i, j, 0] = block; // set the inventory cell block id to the given id
                 Inv[i, j, 1]++; // increment the inventory cell block count by 1
-                if(j == 3) {
+                if (j == 3) {
                     _images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
-                    _tmpText[i].text = $"{Inv[i, j, 1]}"; // update the hotBar number
+                    _tmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
                 }
                 return Inv[i, j, 1]; // return the updated block count
             }
@@ -51,10 +52,11 @@ public class Inventory
             if ((Inv[i, j, 0] == block && Inv[i, j, 1] + count <= 64) || Inv[i, j, 1] == 0) 
             {
                 Inv[i, j, 0] = block; // set the inventory cell block id to the given id
-                Inv[i, j, 1]+= count; // increment the inventory cell block count by the given count
-                if(j == 3) {
+                Inv[i, j, 1] += count; // increment the inventory cell block count by the given count
+                if (j == 3)
+                {
                     _images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
-                    _tmpText[i].text = $"{Inv[i, j, 1]}"; // update the hotBar number
+                    _tmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
                 }
                 return Inv[i, j, 1]; //return the updated block count
             }
@@ -71,10 +73,11 @@ public class Inventory
             remaining = count - newCount;
             count = newCount;
         }
-        Inv[x, y, 1]+= count; // increment the inventory cell block count by the given count
-        if(y == 3) {
+        Inv[x, y, 1] += count; // increment the inventory cell block count by the given count
+        if (y == 3)
+        {
             _images[x].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
-            _tmpText[x].text = $"{Inv[x, y, 1]}"; // update the hotBar number
+            _tmpText[x].text = Inv[x, y, 1].ToString(); // update the hotBar number
         }
         return remaining; //return the updated block count
     }
@@ -89,7 +92,7 @@ public class Inventory
             remaining = count - newCount;
             count = newCount;
         }
-        Inv[x, y, 1]+= count; // increment the inventory cell block count by the given count
+        Inv[x, y, 1] += count; // increment the inventory cell block count by the given count
         return remaining; // return the updated block count
     }
 
@@ -103,7 +106,7 @@ public class Inventory
             _images[x].sprite = texture;
             _tmpText[x].text = "";
         }
-        else _tmpText[x].text = $"{Inv[x, y, 1]}";
+        else _tmpText[x].text = Inv[x, y, 1].ToString();
     }
     
     public void RemoveHalfBlocks(int x, int y, Sprite texture)
@@ -112,7 +115,7 @@ public class Inventory
         if (Inv[x, y, 1] == 0) return; // if the inventory doesn't have a block at the given x and y, return;
         Inv[x, y, 1] /= 2; // remove one block from the cell
         if (y == 3)
-            _tmpText[x].text = $"{Inv[x, y, 1]}";
+            _tmpText[x].text = Inv[x, y, 1].ToString();
     }
     
     public void RemoveAllBlocks(int x, int y, Sprite texture)
