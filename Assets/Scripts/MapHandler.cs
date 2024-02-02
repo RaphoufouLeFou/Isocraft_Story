@@ -10,8 +10,17 @@ public class MapHandler : NetworkBehaviour
     public GameObject chunkParent;
     public Material material;
     private Transform _chunksParent;
+
     [NonSerialized] public static Dictionary<string, Chunk> Chunks;
 
+    public GameObject game;
+    private Game _game;
+
+    void Start()
+    {
+        _game = game.GetComponent<Game>();
+    }
+    
     public void StartMapHandle()
     {
         _chunksParent = chunkParent.transform;
@@ -46,10 +55,11 @@ public class MapHandler : NetworkBehaviour
             SaveChunks(chunk);
         }
     }
+    
     public void SaveChunks(Chunk chunk)
     {
-        if(SaveInfos.SaveName == "") return;
-        string dirPath = Application.persistentDataPath + "/Saves/" + SaveInfos.SaveName + "/Chunks/";
+        if (_game.SaveManager.SaveName == "") return;
+        string dirPath = Application.persistentDataPath + "/Saves/" + _game.SaveManager.SaveName + "/Chunks/";
         string path = dirPath + chunk.name + ".Chunk";
         int[,,] blocks = chunk.Blocks;
         int size = Chunk.Size;
@@ -72,12 +82,11 @@ public class MapHandler : NetworkBehaviour
         }
         fs.Close();
     }
-
-
+    
     private int LoadChunksMesh(Chunk chunk)
     {
-        if(SaveInfos.SaveName == "") return 1;
-        string path = Application.persistentDataPath + "/Saves/" + SaveInfos.SaveName + "/Chunks/" + chunk.name + ".Chunk";
+        if (_game.SaveManager.SaveName == "") return 1;
+        string path = Application.persistentDataPath + "/Saves/" + _game.SaveManager.SaveName + "/Chunks/" + chunk.name + ".Chunk";
         if (!File.Exists(path)) return 1;
         
         int size = Chunk.Size;
@@ -108,21 +117,18 @@ public class MapHandler : NetworkBehaviour
         int[,,] blocks = GameObject.Find(x + "." + z).GetComponent<Chunk>().Blocks;
         int len = blocks.Length;
         int[] bytes = new int[len];
-        Buffer.BlockCopy(blocks, 0, bytes, 0, len*4);
+        Buffer.BlockCopy(blocks, 0, bytes, 0, len * 4);
         
-       
         SendChunk(bytes, x, z, id);
     }
+    
     [ClientRpc]
     private void SendChunk(int[] bytes, int x, int z, int id)
     {
         if (NetworkClient.localPlayer.GetInstanceID() != id) return;
-
-
+        
         int[,,] blocks = new int[Chunk.Size,Chunk.Size,Chunk.Size];
         Buffer.BlockCopy(bytes, 0, blocks, 0, bytes.Length*4);
-        
-       
         
         Vector3 pos = new Vector3(x, 0, z);
         GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
@@ -136,9 +142,5 @@ public class MapHandler : NetworkBehaviour
         
         Chunks.TryAdd(chunkObject.name, chunk);
         chunk.Init(pos, true);
-        if (x == 4 && z == 4) 
-            NetworkClient.localPlayer.gameObject.GetComponent<Player>().SpawnPlayer();
     }
 }
-
-

@@ -2,8 +2,6 @@
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
-using Random = System.Random;
 
 public class Structure
 {
@@ -61,11 +59,8 @@ public class Structure
         // used to add additional generation conditions to structures
         int b = _blocks[dx, dy, dz];
         if (_type == "Tree")
-        {
-            if ((dx, dy, dz) == (1, 0, 1)) return Game.Blocks.RedSand;
             if (dx != 1 && dy == 5 && dz != 1 && b == -1)
                 return NoiseGen.PrngPos(x + dx, y + dy, z + dz) < 0.5f ? Game.Blocks.DesertLeaves : Game.Blocks.None;
-        }
         return b;
     }
 }
@@ -154,13 +149,17 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Tick;
     [NonSerialized] public static int Level = 0;
     [NonSerialized] public static int Seed;
-    [NonSerialized] public static string SaveName;
     [NonSerialized] public static Sprite[] InvSprites;
+
+    [NonSerialized] public SaveManagement SaveManager;
+    public Player player;
+    public MapHandler mapHandler;
     
-    private float _prevTime;
+    private float _prevTick;
+    private float _prevSave;
+    private const int AutoSaveDelay = 15;
     
     public Sprite[] sprites;
-    private bool _autoSave = true;
 
     // structures info
     public static readonly Dictionary<string, Structure> Structs = new();
@@ -208,95 +207,11 @@ public class Game : MonoBehaviour
         };
     }
     
-    public void SaveGame()
-    {
-        if(SaveName == "") return;
-        string path = Application.persistentDataPath + "/Saves/" + SaveName + "/" + SaveName + ".IsoSave";
-        string text =
-            "PlayerX:" + SaveInfos.PlayerPosition.x + "\n" +
-            "PlayerY:" + SaveInfos.PlayerPosition.y + "\n" +
-            "PlayerZ:" + SaveInfos.PlayerPosition.z + "\n" +
-            "RotationX:" + SaveInfos.PlayerRotation.x + "\n" +
-            "RotationY:" + SaveInfos.PlayerRotation.y + "\n" +
-            "RotationZ:" + SaveInfos.PlayerRotation.z + "\n";
-        
-        for (int j = 0; j < 4; j++) 
-        for (int i = 0; i < 9; i++) 
-            text += "Inv" + i + "" + j + ":" + SaveInfos.PlayerInventory.GetCurrentBlock(i, j) + "." +
-                    SaveInfos.PlayerInventory.GetCurrentBlockCount(i, j) + "\n";
-        
-        if(File.Exists(path)) File.Delete(path);
-        File.WriteAllText(path, text);
-    }
-    
-    private void CreateSaveFile()
-    {
-        if(SaveName == "") return;
-        string path = Application.persistentDataPath + "/Saves/" + SaveName + "/";
-        Directory.CreateDirectory(path);
-        string mainSave = path + SaveName + ".IsoSave";
-        if(!File.Exists(mainSave)) File.WriteAllText(mainSave, "");
-        string chunkSave = path + "Chunks/";
-        if (!Directory.Exists(chunkSave)) Directory.CreateDirectory(chunkSave);
-        StartCoroutine(AutoSave());
-    }
-
-    private void LoadSave()
-    {
-        SaveInfos.HasBeenLoaded = false;
-        if(SaveName == "") return;
-        string path = Application.persistentDataPath + "/Saves/" + SaveName + "/" + SaveName + ".IsoSave";
-        if(!File.Exists(path)) return;
-        Debug.Log("Loading save " + SaveName);
-        StreamReader file = new StreamReader(path);
-
-        SaveInfos.PlayerInventory = new ();
-        float posX = 0, posY = 0, posZ = 0;
-        float rotX = 0, rotY = 0, rotZ = 0;
-        
-        while (file.ReadLine() is { } line)
-        {
-            // check if valid line and edit settings
-            int i;
-            for (i = 0; i < line.Length; i++) if (line[i] == ':') break;
-            if (i == line.Length) continue;
-            string key = line.Substring(0, i), value = line.Substring(i + 1);
-            if (key == "PlayerX") posX = float.Parse(value);
-            else if (key == "PlayerY")  posY = float.Parse(value);
-            else if (key == "PlayerZ")  posZ = float.Parse(value);
-            else if (key == "RotationX")  rotX = float.Parse(value);
-            else if (key == "RotationY")  rotY = float.Parse(value);
-            else if (key == "RotationZ")  rotZ = float.Parse(value);
-            else if (key.Contains("Inv"))
-            {
-                int x = key[3] - '0';
-                int y = key[4] - '0';
-                int index = value.IndexOf('.');
-                int type = Int32.Parse(value.Substring(0, index));
-                int count = Int32.Parse(value.Substring(index + 1));
-                
-                if (count > 0 && type > 0) SaveInfos.PlayerInventory.AddBlockAt(x, y, type, count);
-            }
-
-        }
-        
-        SaveInfos.PlayerPosition = new Vector3(posX, posY, posZ);
-        SaveInfos.PlayerRotation = new Vector3(
-            rotX,
-            Mathf.Round(rotY / 45) * 45,
-            rotZ
-            );
-        SaveInfos.HasBeenLoaded = true;
-        file.Close();
-    }
-
     public void StartGame()
     {
-        SaveName = SaveInfos.SaveName;
-
-        LoadSave();
+        SaveManager.LoadSave();
         
-        Random rand = new Random();
+        System.Random rand = new System.Random();
         Seed = (int)rand.NextDouble();
         
         // initialize static classes
@@ -311,36 +226,38 @@ public class Game : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        SaveManager = new(this);
+    }
+
     private void Start()
     {
-        GetComponentInChildren<MapHandler>().StartMapHandle();
-        CreateSaveFile();
+        mapHandler.StartMapHandle();
+        SaveManager.CreateSaveFile();
         Tick = 0;
-        GameObject scripts = GameObject.Find("Scripts");
-        InvSprites = scripts.GetComponent<Game>().sprites;
+        InvSprites = sprites;
     }
 
     private void Update()
     {
         // tick
-        if (Time.time - _prevTime > 1 / TickRate)
+        if (Time.time - _prevTick > 1 / TickRate)
         {
-            _prevTime = Time.time;
+            _prevTick = Time.time;
             Tick++;
+        }
+        
+        // autoSave
+        if (Time.time - _prevSave > AutoSaveDelay)
+        {
+            _prevSave = Time.time;
+            SaveManager.SaveGame();
         }
     }
 
     void OnApplicationQuit()
     {
-        _autoSave = false;
-        SaveGame();
-    }
-    private IEnumerator AutoSave()
-    {
-        while (_autoSave)
-        {
-            yield return new WaitForSecondsRealtime(1);
-            SaveGame();
-        }
+        SaveManager.SaveGame();
     }
 }

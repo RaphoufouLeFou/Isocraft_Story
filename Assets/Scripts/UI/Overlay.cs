@@ -5,17 +5,18 @@ using System;
 public class Overlay : MonoBehaviour
 {
     public TMP_Text textData;
+    public GameObject game;
+    private Game _game;
     private float _displayFps, _displayMs;
     private long _lastUpdate;
     private const long UpdateDelay = 500; // ms
-    private string _saveName;
-
+    
     private void Start()
     {
-        _saveName = SaveInfos.SaveName;
+        _game = game.GetComponent<Game>();
     }
-
-    void Update()
+    
+    private void Update()
     {
         long now = DateTime.Now.Ticks / 10000;
         if (now >= _lastUpdate + UpdateDelay)
@@ -26,13 +27,13 @@ public class Overlay : MonoBehaviour
         }
 
         string text = "";
-        Vector3 pos = SaveInfos.PlayerPosition;
+        Vector3 pos = _game.player.transform.position;
         if (Settings.Overlay.DisplayFps) text += Round(_displayFps, 1) + " FPS" + (Settings.Overlay.DisplayMs ? " " : "\n");
         if (Settings.Overlay.DisplayMs) text += "(last: " + Round(_displayMs, 1) + "ms)\n";
         if (Settings.Overlay.DisplayCoords)
             text += "[" + Round(pos.x, 3) + ", " + Round(pos.y, 3) + ", " + Round(pos.z, 3) + "]\n";
         if (Settings.Overlay.DisplaySaveName)
-            text += "Name : " + (_saveName == "" ? "UnNamed" : _saveName);
+            text += "Name : " + (_game.SaveManager.SaveName == "" ? "Unnamed" : _game.SaveManager.SaveName);
         textData.text = text;
     }
 

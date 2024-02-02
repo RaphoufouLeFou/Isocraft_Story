@@ -36,18 +36,9 @@ public class Player : NetworkBehaviour
         GameObject items = GameObject.Find("HotBarBackground");
         Health = 1;
         for (int i = 0; i < 9; i++) HotBar.ItemImages[i] = items.transform.GetChild(i).gameObject;
-        if (SaveInfos.HasBeenLoaded)
-        {
-            Inventory = SaveInfos.PlayerInventory;
-            Inventory.InitInventory();
-        }
-        else
-        {
-            Inventory = new();
-            Inventory.InitInventory();
-            Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
-            SaveInfos.PlayerInventory = Inventory;
-        }
+        Inventory = new();
+        Inventory.InitInventory();
+        Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
         _inventoryUI.SetPlayerInv(Inventory);
         
         HotBar.UpdateHotBarVisual(Inventory);
@@ -55,21 +46,21 @@ public class Player : NetworkBehaviour
         // body settings
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
-    }
-
-    public void SpawnPlayer()
-    {
-        Transform tr = transform;
-        if (SaveInfos.HasBeenLoaded)
-        {
-            SetSpawn(SaveInfos.PlayerPosition);
-            transform.eulerAngles = new Vector3(0,SaveInfos.PlayerRotation.y,0);
-            playerCamera.GoalRot.y = SaveInfos.PlayerRotation.y;
-        }
-        else SetSpawn(new Vector3(0, Chunk.Size, 0));
+        SetSpawn(new Vector3(0, Chunk.Size, 0));
         tr.position = _spawn;
     }
-    public void SetSpawn(Vector3 pos)
+
+    public void SaveLoaded(Vector3 pos, Vector3 rot, Inventory inv)
+    {
+        // save infos loaded: set position, rotation, inventory, respawn
+        SetSpawn(pos);
+        transform.position = _spawn;
+        playerCamera.GoalRot.y = MathF.Round(rot.y / 45) * 45;
+        Inventory = inv;
+        Inventory.InitInventory();
+    }
+    
+    private void SetSpawn(Vector3 pos)
     {
         int y = pos.y < 0 ? 0 : pos.y >= Chunk.Size ? Chunk.Size1 : (int)pos.y;
 
@@ -171,16 +162,10 @@ public class Player : NetworkBehaviour
                 else ClientPlaceBreak(hit.point, currentBlock, right); // client tells the server to place the block
             }
         }
-
-        SaveInfos.PlayerInventory = Inventory;
     }
 
     void Keys()
     {
-        Vector3 pos = transform.position;
-        // warning: player rotation may be down into the ground
-        transform.rotation = Quaternion.Euler(playerCamera.GoalRot);
-
         if (Input.GetKeyDown(Settings.KeyMap["Kill"])) // kill
         {
             transform.position = _spawn;
@@ -188,13 +173,12 @@ public class Player : NetworkBehaviour
         }
 
         // set spawn
-        if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn(pos);
+        if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn(transform.position);
     }
     
     void Update()
     {
         if (!isLocalPlayer) return; // don't update other players
-        SaveInfos.PlayerPosition = transform.position;
 
         Body.Update(Settings.IsPaused);
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
@@ -208,6 +192,9 @@ public class Player : NetworkBehaviour
             else if (!Settings.IsPaused) _inventoryUI.DisplayInventory();
         }
         
+        // warning: player rotation may be down into the ground
+        transform.rotation = Quaternion.Euler(playerCamera.GoalRot);
+
         // update the following if in-game
         if (!Settings.Playing) return;
         HotBar.UpdateHotBar();

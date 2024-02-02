@@ -3,22 +3,24 @@ using UnityEngine;
 
 public class NetworkSync : NetworkBehaviour
 {
-    
+    public GameObject game;
+    private Game _game;
+
     [ClientRpc]
     private void GetName(string saveName)
     {
         //SaveInfos.SaveName = saveName;
-        Debug.LogError("Name Server 2 = " + SaveInfos.SaveName);
+        Debug.LogError("Name Server 2 = " + _game.SaveManager.SaveName);
     }
 
     [Command(requiresAuthority = false)]
     private void AskSaveName()
     {
-        Debug.LogError("Name Server = " + SaveInfos.SaveName);
-        GetName(SaveInfos.SaveName);
+        Debug.LogError("Name Server = " + _game.SaveManager.SaveName);
+        GetName(_game.SaveManager.SaveName);
     }
 
-    private void Awake()
+    private void Start()
     {
         // sync everything
         //if (isClientOnly)
@@ -26,9 +28,10 @@ public class NetworkSync : NetworkBehaviour
             //SaveInfos.SaveName = "foo";
         //}
 
-        SaveInfos.SaveName ??= "";
+        _game = game.GetComponent<Game>();
+        _game.SaveManager.SaveName ??= "";
 
         // start the game after syncing
-        GetComponent<Game>().StartGame();
+        _game.StartGame();
     }
 }

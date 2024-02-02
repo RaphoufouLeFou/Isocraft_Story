@@ -125,7 +125,6 @@ public class InventoryUI : MonoBehaviour
         }
 
         UpdateInventory();
-        SaveInfos.PlayerInventory = _playerInv;
     }
     
     void Update()

@@ -8,20 +8,23 @@ using TMPro;
 public class MainMenu : MonoBehaviour
 {
 
-    [SerializeField] private string mainSceneName = "Main";
-    [SerializeField] private GameObject mainParent;
-    [SerializeField] private GameObject newGameParent;
-    [SerializeField] private GameObject loadGameParent;
-    [SerializeField] private GameObject joinGameParent;
-    [SerializeField] private GameObject backButton;
-    [SerializeField] private GameObject saveTextPrefab;
+    public string mainSceneName = "Main";
+    public GameObject mainParent;
+    public GameObject newGameParent;
+    public GameObject loadGameParent;
+    public GameObject joinGameParent;
+    public GameObject backButton;
+    public GameObject saveTextPrefab;
     
-    [SerializeField] private TMP_InputField addressInput;
-    [SerializeField] private TMP_InputField portInput;
-    [SerializeField] private TMP_InputField portNewGameInput;
+    public TMP_InputField addressInput;
+    public TMP_InputField portInput;
+    public TMP_InputField portNewGameInput;
 
     private string _ipAddress = "localhost";
     private string _port = "7777";
+
+    public GameObject game;
+    private Game _game;
 
     void Start()
     {
@@ -30,6 +33,8 @@ public class MainMenu : MonoBehaviour
         newGameParent.SetActive(false);
         loadGameParent.SetActive(false);
         joinGameParent.SetActive(false);
+
+        _game = game.GetComponent<Game>();
     }
 
     public void NewGameButtonClick()
@@ -74,7 +79,7 @@ public class MainMenu : MonoBehaviour
     {
         string nm = saveName.GetComponent<TMP_InputField>().text;
         if(nm == "" || DoesSaveExist(nm)) return;
-        SaveInfos.SaveName = nm;
+        _game.SaveManager.SaveName = nm;
         NetworkInfos.uri = new Uri($"kcp://{_ipAddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = true;
@@ -85,7 +90,7 @@ public class MainMenu : MonoBehaviour
     private void MultiPlayer(string saveName)
     {
         if(saveName == "") return;
-        SaveInfos.SaveName = saveName;
+        _game.SaveManager.SaveName = saveName;
         NetworkInfos.uri = new Uri($"kcp://{_ipAddress}:{_port}");
         NetworkInfos.IsMultiplayerGame = true;
         NetworkInfos.IsHost = true;
@@ -103,7 +108,7 @@ public class MainMenu : MonoBehaviour
     {
         string nm = saveName.GetComponent<TMP_InputField>().text;
         if(nm == "" || DoesSaveExist(nm)) return;
-        SaveInfos.SaveName = nm;
+        _game.SaveManager.SaveName = nm;
         NetworkInfos.IsMultiplayerGame = false;
         NetworkInfos.IsHost = true;
         NetworkInfos.StartedFromMainMenu = true;
