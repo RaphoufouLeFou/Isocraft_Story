@@ -5,36 +5,39 @@ using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
-    public new Camera camera;
+    private Camera _camera;
     public PlayerCamera playerCamera;
 
     [NonSerialized] public CustomRigidBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
-    [NonSerialized] public Vector3 Spawn;
+    private Vector3 _spawn;
 
     private GameObject _healthImage;
+    private MapHandler _mapHandler;
+    private InventoryUI _inventoryUI;
 
-    private GameObject _scriptsGameObject;
-
-    public float health; // from 0 to 1
+    [NonSerialized] public float Health;
 
     public Inventory Inventory;
     
     private Sprite[] _sprites;
 
-    void Start()
+    private void Start()
     {
-        camera.enabled = isLocalPlayer;
+        // camera
+        _camera = GameObject.Find("Main Camera").GetComponent<Camera>();
+        _camera.enabled = isLocalPlayer;
         if (!isLocalPlayer) return;
 
-        // set up objects
-        _scriptsGameObject = GameObject.Find("Scripts");
-        _sprites = _scriptsGameObject.GetComponent<Game>().sprites;
+        // set up other objects
+        GameObject scripts = GameObject.Find("Scripts");
+        _inventoryUI = scripts.GetComponent<InventoryUI>();
+        _sprites = scripts.GetComponent<Game>().sprites;
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
-        //camera = GameObject.Find("Main Camera").GetComponent<Camera>();
+        _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>();
+        
         GameObject items = GameObject.Find("HotBarBackground");
-
-        health = 1.0f;
+        Health = 1;
         for (int i = 0; i < 9; i++) HotBar.ItemImages[i] = items.transform.GetChild(i).gameObject;
         if (SaveInfos.HasBeenLoaded)
         {
@@ -54,7 +57,6 @@ public class Player : NetworkBehaviour
         // body settings
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
-        
     }
 
     public void SpawnPlayer()
@@ -67,14 +69,14 @@ public class Player : NetworkBehaviour
             playerCamera.GoalRot.y = SaveInfos.PlayerRotation.y;
         }
         else SetSpawn(new Vector3(0, Chunk.Size, 0));
-        tr.position = Spawn;
+        tr.position = _spawn;
     }
     public void SetSpawn(Vector3 pos)
     {
         int y = pos.y < 0 ? 0 : pos.y >= Chunk.Size ? Chunk.Size1 : (int)pos.y;
 
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
-        Spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
+        _spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
         if (MapHandler.Chunks != null && MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
         {
             int modX = (int)(pos.x - chunkX * Chunk.Size),
@@ -82,32 +84,32 @@ public class Player : NetworkBehaviour
             // try to find a height near Spawn.y
             for (int offset = 0; offset < Chunk.Size << 1; offset++)
             {
-                float searchY = Spawn.y + (offset >> 1) * ((offset & 1) == 1 ? -1 : 1);
+                float searchY = _spawn.y + (offset >> 1) * ((offset & 1) == 1 ? -1 : 1);
                 if (chunk.Blocks[modX, (int)searchY, modZ] == 0)
                 {
-                    Spawn.y = searchY;
+                    _spawn.y = searchY;
                     break;
                 }
             }
         }
         else throw new ArgumentException("Cannot set spawn in unloaded chunk");
 
-        Spawn.y++; // player needs to be one block above
+        _spawn.y++; // player needs to be one block above the ground
     }
 
     [ClientRpc]
-    void ServerPlaceBreak(Vector3 pos, int type, bool isPlacing)
+    private void ServerPlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
         PlaceBreak(pos, type, isPlacing);
     }
 
     [Command]
-    void ClientPlaceBreak(Vector3 pos, int type, bool isPlacing)
+    private void ClientPlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
         ServerPlaceBreak(pos, type, isPlacing);
     }
 
-    int PlaceBreak(Vector3 pos, int type, bool isPlacing)
+    private int PlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
         int chunkX = Utils.Floor(pos.x / Chunk.Size),
             chunkZ = Utils.Floor(pos.z / Chunk.Size);
@@ -127,7 +129,7 @@ public class Player : NetworkBehaviour
         }
         chunk.BuildMesh();
         
-        if(isServer) GameObject.Find("MapHandler").GetComponent<MapHandler>().SaveChunks(chunk); //save the chunk when modified
+        if(isServer) _mapHandler.SaveChunks(chunk); //save the chunk when modified
 
         // update nearby chunks if placed on a chunk border
         List<string> toCheck = new();
@@ -146,7 +148,7 @@ public class Player : NetworkBehaviour
         bool left = Input.GetMouseButtonDown(0), right = Input.GetMouseButtonDown(1);
         if (left || right)
         {
-            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 // move into or out of the block to get the right targeted block
@@ -177,35 +179,16 @@ public class Player : NetworkBehaviour
 
     void Keys()
     {
-        /*// rotate camera about the Y axis
-        Vector3 rotation = transform.rotation.eulerAngles;
-        bool change = false;
-        if (Input.GetKeyDown(Settings.KeyMap["CamLeft"]))
-        {
-            change = true;
-            rotation.y -= 45;
-        }
-        if (Input.GetKeyDown(Settings.KeyMap["CamRight"]))
-        {
-            change = true;
-            rotation.y += 45;
-        }
+        Vector3 pos = transform.position;
+        // warning: player rotation may be down into the ground
+        transform.rotation = Quaternion.Euler(playerCamera.GoalRot);
 
-        // toggle camera target X rotation
-        if (Input.GetKeyDown(Settings.KeyMap["TopView"])) playerCamera.TargetAbove = !playerCamera.TargetAbove;
-        
-        if (change) playerCamera.GoalRot.y = rotation.y;*/
-        Vector3 rotation = transform.rotation.eulerAngles;
-        rotation.y = playerCamera.GoalRot.y;
-        transform.rotation = Quaternion.Euler(rotation);
-        
         if (Input.GetKeyDown(Settings.KeyMap["Kill"])) // kill
         {
-            transform.position = Spawn;
+            transform.position = _spawn;
             Body.Movement = Vector3.zero;
         }
 
-        Vector3 pos = transform.position;
         // set spawn
         if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn(pos);
     }
@@ -213,26 +196,21 @@ public class Player : NetworkBehaviour
     void Update()
     {
         if (!isLocalPlayer) return; // don't update other players
-
-        if (health > 1) health = 1;
-        _healthImage.transform.localScale = new Vector3(health,1 ,1);
-        if(MapHandler.Chunks != null)
-            Body.Update(Settings.IsPaused);
         SaveInfos.PlayerPosition = transform.position;
+
+        Body.Update(Settings.IsPaused);
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
 
-        if (Input.GetKeyDown(Settings.KeyMap["Inventory"]) || (Input.GetKeyDown(KeyCode.Escape) && _scriptsGameObject.GetComponent<InventoryUI>().inventoryMenu.activeSelf))
+        _healthImage.transform.localScale = new Vector3(Health,1 ,1);
+
+        if (Input.GetKeyDown(Settings.KeyMap["Inventory"]) || (Input.GetKeyDown(KeyCode.Escape) && _inventoryUI.gameObject.activeSelf))
         {
-            InventoryUI inventoryUI = _scriptsGameObject.GetComponent<InventoryUI>();
-            if(Settings.IsPaused && inventoryUI.inventoryMenu.activeSelf)
-                inventoryUI.HideInventory();
-            else
-                inventoryUI.DisplayInventory(Inventory, _sprites, gameObject);
+            if (Settings.IsPaused && _inventoryUI.inventoryMenu.activeSelf) _inventoryUI.HideInventory();
+            else _inventoryUI.DisplayInventory(Inventory, _sprites, gameObject);
         }
         
-        // update these if not paused
+        // update the following if not paused
         if (Settings.IsPaused) return;
-
         HotBar.UpdateHotBar();
         DetectPlaceBreak();
         Keys();
