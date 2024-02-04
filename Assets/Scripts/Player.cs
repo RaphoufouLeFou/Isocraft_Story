@@ -19,9 +19,10 @@ public class Player : NetworkBehaviour
     [NonSerialized] public float Health;
 
     public Inventory Inventory;
-
+    
     private void Start()
     {
+        if (isLocalPlayer) Game.Player = this;
         // camera
         _camera = GameObject.Find("Main Camera").GetComponent<Camera>();
         _camera.enabled = isLocalPlayer;
@@ -33,16 +34,13 @@ public class Player : NetworkBehaviour
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
         _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>();
         
-        GameObject items = GameObject.Find("HotBarBackground");
         Health = 1;
-        for (int i = 0; i < 9; i++) HotBar.ItemImages[i] = items.transform.GetChild(i).gameObject;
         Inventory = new();
-        Inventory.InitInventory();
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
         _inventoryUI.SetPlayerInv(Inventory);
         
         HotBar.UpdateHotBarVisual(Inventory);
-
+        
         // body settings
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
@@ -57,12 +55,11 @@ public class Player : NetworkBehaviour
         transform.position = _spawn;
         playerCamera.GoalRot.y = MathF.Round(rot.y / 45) * 45;
         Inventory = inv;
-        Inventory.InitInventory();
     }
     
     private void SetSpawn(Vector3 pos)
     {
-        int y = pos.y < 0 ? 0 : pos.y >= Chunk.Size ? Chunk.Size1 : (int)pos.y;
+        int y = pos.y < 0 ? 0 : pos.y > Chunk.Size1 ? Chunk.Size1 : (int)pos.y;
 
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
         _spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
@@ -74,7 +71,7 @@ public class Player : NetworkBehaviour
             for (int offset = 0; offset < Chunk.Size << 1; offset++)
             {
                 float searchY = _spawn.y + (offset >> 1) * ((offset & 1) == 1 ? -1 : 1);
-                if (chunk.Blocks[modX, (int)searchY, modZ] == 0)
+                if (searchY is >= 0 and < Chunk.Size && chunk.Blocks[modX, (int)searchY, modZ] == 0)
                 {
                     _spawn.y = searchY;
                     break;

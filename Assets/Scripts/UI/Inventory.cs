@@ -14,17 +14,17 @@ public class Inventory
      *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
      */
     public readonly int[,,] Inv = new int[9, 4, 2]; 
-    private readonly Image[] _images = new Image[9]; // cells images
-    private readonly TMP_Text[] _tmpText = new TMP_Text[9]; // cells numbers
+    private static readonly Image[] Images = new Image[9]; // cells images
+    private static readonly TMP_Text[] TmpText = new TMP_Text[9]; // cells numbers
 
-    public void InitInventory()
+    public static void Init()
     {
         // set all cells images and numbers in the hotBar
         for (int i = 0; i < 9; i++)
         {
             GameObject go = HotBar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject;
-            _images[i] = go.GetComponent<Image>();   
-            _tmpText[i] = go.GetComponentInChildren<TMP_Text>();
+            Images[i] = go.GetComponent<Image>();   
+            TmpText[i] = go.GetComponentInChildren<TMP_Text>();
         }
     }
     
@@ -37,8 +37,8 @@ public class Inventory
                 Inv[i, j, 0] = block; // set the inventory cell block id to the given id
                 Inv[i, j, 1]++; // increment the inventory cell block count by 1
                 if (j == 3) {
-                    _images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
-                    _tmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
+                    Images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
+                    TmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
                 }
                 return Inv[i, j, 1]; // return the updated block count
             }
@@ -55,8 +55,8 @@ public class Inventory
                 Inv[i, j, 1] += count; // increment the inventory cell block count by the given count
                 if (j == 3)
                 {
-                    _images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
-                    _tmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
+                    Images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
+                    TmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
                 }
                 return Inv[i, j, 1]; //return the updated block count
             }
@@ -76,8 +76,8 @@ public class Inventory
         Inv[x, y, 1] += count; // increment the inventory cell block count by the given count
         if (y == 3)
         {
-            _images[x].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
-            _tmpText[x].text = Inv[x, y, 1].ToString(); // update the hotBar number
+            Images[x].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
+            TmpText[x].text = Inv[x, y, 1].ToString(); // update the hotBar number
         }
         return remaining; //return the updated block count
     }
@@ -103,10 +103,10 @@ public class Inventory
         Inv[x, y, 1]--; // remove one block from the cell
         if (Inv[x, y, 1] == 0) // update the hotBar
         {
-            _images[x].sprite = texture;
-            _tmpText[x].text = "";
+            Images[x].sprite = texture;
+            TmpText[x].text = "";
         }
-        else _tmpText[x].text = Inv[x, y, 1].ToString();
+        else TmpText[x].text = Inv[x, y, 1].ToString();
     }
     
     public void RemoveHalfBlocks(int x, int y, Sprite texture)
@@ -115,7 +115,7 @@ public class Inventory
         if (Inv[x, y, 1] == 0) return; // if the inventory doesn't have a block at the given x and y, return;
         Inv[x, y, 1] /= 2; // remove one block from the cell
         if (y == 3)
-            _tmpText[x].text = Inv[x, y, 1].ToString();
+            TmpText[x].text = Inv[x, y, 1].ToString();
     }
     
     public void RemoveAllBlocks(int x, int y, Sprite texture)
@@ -124,8 +124,8 @@ public class Inventory
         Inv[x, y, 1] = 0;
         if (y == 3)
         {
-            _images[x].sprite = texture;
-            _tmpText[x].text = "";
+            Images[x].sprite = texture;
+            TmpText[x].text = "";
         }
     }
 

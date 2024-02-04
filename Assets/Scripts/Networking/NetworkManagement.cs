@@ -6,58 +6,62 @@ using UnityEngine.SceneManagement;
 
 public class NetworkManagement : MonoBehaviour
 {
-    public GameObject game;
-    private Game _game;
-
     private NetworkManager _manager;
     private bool _isHost;
 
-    public string mainMenuSceneName = "MainMenu";
+    public string mainMenuSceneName;
+
+    public GameObject game;
+    private Game _game;
 
     void Start()
     {
         _game = game.GetComponent<Game>();
+        _game.InitGameUtils();
 
         _manager = GetComponent<NetworkManager>();
         _manager.enabled = true;
-        if (!NetworkInfos.StartedFromMainMenu)
+        if (!SuperGlobals.StartedFromMainMenu)
         {
-            NetworkInfos.IsHost = true;
-            NetworkInfos.IsMultiplayerGame = true;
-            NetworkInfos.uri = new Uri("kcp://127.0.0.1:7777");
-            _game.SaveManager.SaveName = "";
+            SuperGlobals.IsHost = true;
+            SuperGlobals.IsMultiplayerGame = true;
+            SuperGlobals.Uri = new Uri("kcp://127.0.0.1:7777");
+            Game.SaveManager.SaveName = "";
         }
         
-        bool isOnline = NetworkInfos.IsMultiplayerGame;
-        _isHost = NetworkInfos.IsHost;
+        bool isOnline = SuperGlobals.IsMultiplayerGame;
+        _isHost = SuperGlobals.IsHost;
         _manager.maxConnections = isOnline ? 20 : 1;
+        Debug.Log("NetworkManagement start");
         if (_isHost)
         {
-            if (isOnline) _manager.GetComponent<KcpTransport>().Port = (ushort)NetworkInfos.uri.Port;
-            
+            if (isOnline) _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
+            Debug.Log("starting host");
             _manager.StartHost();
         }
         else
         {
-            if (NetworkInfos.IsLocalHost) _manager.StartClient();
+            if (SuperGlobals.IsLocalHost) _manager.StartClient();
             else
             {
-                _manager.GetComponent<KcpTransport>().Port = (ushort)NetworkInfos.uri.Port;
-                _manager.networkAddress = NetworkInfos.uri.Host;
-                _manager.StartClient(NetworkInfos.uri);
+                _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
+                _manager.networkAddress = SuperGlobals.Uri.Host;
+                _manager.StartClient(SuperGlobals.Uri);
             }
         }
+        
+        // starting server thing is asynchronous, so don't start Game here
     }
     
     public void LeaveGameButtonClick()
     {
-        _game.SaveManager.SaveGame();
+        Game.SaveManager.SaveGame();
         if (_isHost) _manager.StopHost();
         else _manager.StopClient();
-        NetworkInfos.IsLocalHost = false;
-        NetworkInfos.IsMultiplayerGame = false;
-        NetworkInfos.StartedFromMainMenu = false;
-        NetworkInfos.IsHost = false;
+        SuperGlobals.IsLocalHost = false;
+        SuperGlobals.IsMultiplayerGame = false;
+        SuperGlobals.StartedFromMainMenu = false;
+        SuperGlobals.IsHost = false;
         SceneManager.LoadScene(mainMenuSceneName);
     }
 

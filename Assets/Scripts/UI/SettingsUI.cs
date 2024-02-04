@@ -184,8 +184,8 @@ public class SettingsUI : MonoBehaviour
     {
         if (self.name == "IsMulti")
         {
-            NetworkInfos.IsMultiplayerGame = self.GetComponent<Toggle>().isOn;
-            management.ChangeMaxConnection(NetworkInfos.IsMultiplayerGame ? _maxPlayerConnections : 1);
+            SuperGlobals.IsMultiplayerGame = self.GetComponent<Toggle>().isOn;
+            management.ChangeMaxConnection(SuperGlobals.IsMultiplayerGame ? _maxPlayerConnections : 1);
         }
         else if (self.name == "Port")
             management.ChangePort((ushort)Int32.Parse(self.GetComponent<TMP_InputField>().text));

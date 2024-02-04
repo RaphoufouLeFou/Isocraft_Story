@@ -12,14 +12,6 @@ public class MapHandler : NetworkBehaviour
     private Transform _chunksParent;
 
     [NonSerialized] public static Dictionary<string, Chunk> Chunks;
-
-    public GameObject game;
-    private Game _game;
-
-    void Start()
-    {
-        _game = game.GetComponent<Game>();
-    }
     
     public void StartMapHandle()
     {
@@ -58,8 +50,8 @@ public class MapHandler : NetworkBehaviour
     
     public void SaveChunks(Chunk chunk)
     {
-        if (_game.SaveManager.SaveName == "") return;
-        string dirPath = Application.persistentDataPath + "/Saves/" + _game.SaveManager.SaveName + "/Chunks/";
+        if (Game.SaveManager.SaveName == "") return;
+        string dirPath = Application.persistentDataPath + "/Saves/" + Game.SaveManager.SaveName + "/Chunks/";
         string path = dirPath + chunk.name + ".Chunk";
         int[,,] blocks = chunk.Blocks;
         int size = Chunk.Size;
@@ -85,8 +77,8 @@ public class MapHandler : NetworkBehaviour
     
     private int LoadChunksMesh(Chunk chunk)
     {
-        if (_game.SaveManager.SaveName == "") return 1;
-        string path = Application.persistentDataPath + "/Saves/" + _game.SaveManager.SaveName + "/Chunks/" + chunk.name + ".Chunk";
+        if (Game.SaveManager.SaveName == "") return 1;
+        string path = Application.persistentDataPath + "/Saves/" + Game.SaveManager.SaveName + "/Chunks/" + chunk.name + ".Chunk";
         if (!File.Exists(path)) return 1;
         
         int size = Chunk.Size;

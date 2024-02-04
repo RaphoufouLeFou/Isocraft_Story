@@ -4,9 +4,15 @@ using TMPro;
 
 public static class HotBar
 {
-    public static readonly GameObject[] ItemImages = new GameObject[9];
+    public static GameObject[] ItemImages = new GameObject[9];
     public static int SelectedIndex;
 
+    public static void InitImages()
+    {
+        GameObject items = GameObject.Find("HotBarBackground");
+        for (int i = 0; i < 9; i++) HotBar.ItemImages[i] = items.transform.GetChild(i).gameObject;
+    }
+    
     public static void UpdateHotBar()
     {
         SelectedIndex -= (int)Input.mouseScrollDelta.y;
@@ -38,7 +44,6 @@ public static class HotBar
                 images.sprite = Game.InvSprites[type];
                 tmpText.text = count.ToString();
             }
-
         }
     }
 }

@@ -7,8 +7,8 @@ using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
-
-    public string mainSceneName = "Main";
+    public string mainSceneName;
+    public GameObject superGlobals;
     public GameObject mainParent;
     public GameObject newGameParent;
     public GameObject loadGameParent;
@@ -23,9 +23,6 @@ public class MainMenu : MonoBehaviour
     private string _ipAddress = "localhost";
     private string _port = "7777";
 
-    public GameObject game;
-    private Game _game;
-
     void Start()
     {
         backButton.SetActive(false);
@@ -33,8 +30,11 @@ public class MainMenu : MonoBehaviour
         newGameParent.SetActive(false);
         loadGameParent.SetActive(false);
         joinGameParent.SetActive(false);
-
-        _game = game.GetComponent<Game>();
+        
+        // send SuperGlobals to main scene
+        DontDestroyOnLoad(superGlobals);
+        SuperGlobals.BackToMenu();
+        SuperGlobals.StartedFromMainMenu = true;
     }
 
     public void NewGameButtonClick()
@@ -67,76 +67,56 @@ public class MainMenu : MonoBehaviour
     }
     public void ConnectGameButtonClick()
     {
-        NetworkInfos.IsLocalHost = _ipAddress.ToLower() == "localhost";
+        SuperGlobals.IsLocalHost = _ipAddress.ToLower() == "localhost";
         Debug.Log($"Address = {_ipAddress}");
-        NetworkInfos.uri = new Uri($"kcp://{_ipAddress}:{_port}");
-        NetworkInfos.IsMultiplayerGame = true;
-        NetworkInfos.IsHost = false;
-        NetworkInfos.StartedFromMainMenu = true;
+        SuperGlobals.Uri = new Uri($"kcp://{_ipAddress}:{_port}");
+        SuperGlobals.IsMultiplayerGame = true;
+        SuperGlobals.IsHost = false;
         SceneManager.LoadScene(mainSceneName);
     }
-    public void MultiPlayerButtonClick(GameObject saveName)
+    public void MultiPlayerButtonClick(GameObject save)
     {
-        string nm = saveName.GetComponent<TMP_InputField>().text;
-        if(nm == "" || DoesSaveExist(nm)) return;
-        _game.SaveManager.SaveName = nm;
-        NetworkInfos.uri = new Uri($"kcp://{_ipAddress}:{_port}");
-        NetworkInfos.IsMultiplayerGame = true;
-        NetworkInfos.IsHost = true;
-        NetworkInfos.StartedFromMainMenu = true;
-        SceneManager.LoadScene(mainSceneName);
+        string saveName = save.GetComponent<TMP_InputField>().text;
+        StartGame(saveName, true, false);
     }
     
-    private void MultiPlayer(string saveName)
+    public void SinglePlayerButtonClick(GameObject save)
     {
-        if(saveName == "") return;
-        _game.SaveManager.SaveName = saveName;
-        NetworkInfos.uri = new Uri($"kcp://{_ipAddress}:{_port}");
-        NetworkInfos.IsMultiplayerGame = true;
-        NetworkInfos.IsHost = true;
-        NetworkInfos.StartedFromMainMenu = true;
+        string saveName = save.GetComponent<TMP_InputField>().text;
+        StartGame(saveName, false, false);
+    }
+    
+    private void StartGame(string saveName, bool multi, bool existingSave)
+    {
+        string savePath = Application.persistentDataPath + $"/Saves/{saveName}/{saveName}.IsoSave";
+        if (saveName == "" || (!File.Exists(savePath) && existingSave)) return;
+        SuperGlobals.IsExistingSave = existingSave;
+        SuperGlobals.SaveName = saveName;
+        SuperGlobals.Uri = new Uri($"kcp://{_ipAddress}:{_port}");
+        SuperGlobals.IsMultiplayerGame = multi;
+        SuperGlobals.IsHost = true;
         SceneManager.LoadScene(mainSceneName);
     }
 
-    private bool DoesSaveExist(string saveName)
+    private void LoadGameButton(string saveName)
     {
-        string path = Application.persistentDataPath + "/Saves/" + saveName + "/";
-        return File.Exists(path + saveName + ".IsoSave");
-    }
-    
-    public void SinglePlayerButtonClick(GameObject saveName)
-    {
-        string nm = saveName.GetComponent<TMP_InputField>().text;
-        if(nm == "" || DoesSaveExist(nm)) return;
-        _game.SaveManager.SaveName = nm;
-        NetworkInfos.IsMultiplayerGame = false;
-        NetworkInfos.IsHost = true;
-        NetworkInfos.StartedFromMainMenu = true;
-        SceneManager.LoadScene(mainSceneName);
-    }
-
-    private void LoadGame(string saveName)
-    {
-        MultiPlayer(saveName);
+        StartGame(saveName, true, true);
     }
 
     public void RefreshSaveList(GameObject content)
     {
-        foreach (Transform child in content.transform)
-        {
-            Destroy(child.gameObject);
-        }
+        foreach (Transform child in content.transform) Destroy(child.gameObject);
+
         string path = Application.persistentDataPath + "/Saves/";
-        if(!Directory.Exists(path)) return;
+        if (!Directory.Exists(path)) return;
+        
         foreach (string dir in Directory.EnumerateDirectories(path))
         {
             string saveName = new DirectoryInfo(dir).Name;
             GameObject go = Instantiate(saveTextPrefab, Vector3.zero, Quaternion.identity, content.transform);
             go.GetComponentInChildren<TMP_Text>().text = saveName;
-            go.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() =>
-            {
-                LoadGame(saveName);
-            });
+            
+            go.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => LoadGameButton(saveName));
             go.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() =>
             {
                 DeleteSave(saveName);
@@ -148,11 +128,8 @@ public class MainMenu : MonoBehaviour
     private void DeleteSave(string saveName)
     {
         string path = Application.persistentDataPath + "/Saves/" + saveName + "/";
-        foreach (string file in Directory.EnumerateFiles(path))
-        {
-            File.Delete(file);
-        }
-        if(Directory.Exists(path)) Directory.Delete(path);
+        Debug.Log("Deleting save " + path);
+        if (Directory.Exists(path)) Directory.Delete(path, true);
     }
 
     public void OnChangedAddress()

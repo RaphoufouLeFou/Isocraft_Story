@@ -149,17 +149,19 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Tick;
     [NonSerialized] public static int Level = 0;
     [NonSerialized] public static int Seed;
+    [NonSerialized] public static bool Started;
+    
+    // static variables, get initialized from their serialized variables
     [NonSerialized] public static Sprite[] InvSprites;
+    [NonSerialized] public static Player Player;
+    [NonSerialized] public static SaveManagement SaveManager;
 
-    [NonSerialized] public SaveManagement SaveManager;
-    public Player player;
+    public Sprite[] sprites;
     public MapHandler mapHandler;
     
     private float _prevTick;
     private float _prevSave;
     private const int AutoSaveDelay = 15;
-    
-    public Sprite[] sprites;
 
     // structures info
     public static readonly Dictionary<string, Structure> Structs = new();
@@ -206,15 +208,17 @@ public class Game : MonoBehaviour
             {DesertLeaves, new Block(DesertLeaves, Tiles.DesertLeaves)}
         };
     }
-    
-    public void StartGame()
+
+    public void InitGameUtils()
     {
-        SaveManager.LoadSave();
-        
+        // start some things very early
+        Started = false;
+        SaveManager = new();
+        InvSprites = sprites;
+        HotBar.InitImages();
+        Inventory.Init();
         System.Random rand = new System.Random();
         Seed = (int)rand.NextDouble();
-        
-        // initialize static classes
         NoiseGen.Init();
         
         // initialize structures
@@ -224,23 +228,32 @@ public class Game : MonoBehaviour
             MaxStructSize = MaxStructSize > s.X ? MaxStructSize > s.Z ? MaxStructSize : s.Z : s.X > s.Z ? s.X : s.Z;
             Structs.TryAdd(type, s);
         }
-    }
 
-    private void Awake()
-    {
-        SaveManager = new(this);
+        // set up SuperGlobals
+        GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
+        if (globals != null) SaveManager.SaveName = SuperGlobals.SaveName;
+        Debug.Log(SuperGlobals.StartedFromMainMenu + " " + SaveManager.SaveName);
     }
-
-    private void Start()
+    
+    private void StartGame()
     {
+        Debug.Log("StartGame");
         mapHandler.StartMapHandle();
-        SaveManager.CreateSaveFile();
+        if (SuperGlobals.IsExistingSave) SaveManager.LoadSave();
         Tick = 0;
-        InvSprites = sprites;
+        _prevTick = Time.time;
     }
 
     private void Update()
     {
+        // wait for the player to start
+        if (!Started && Player is not null) // local player joined!
+        {
+            Debug.Log("Found player");
+            StartGame();
+            Started = true;
+        }
+        
         // tick
         if (Time.time - _prevTick > 1 / TickRate)
         {

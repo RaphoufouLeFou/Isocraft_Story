@@ -5,24 +5,21 @@ using UnityEngine;
 public class SaveManagement
 {
     [NonSerialized] public string SaveName;
-    [NonSerialized] public bool HasBeenLoaded;
     private bool _isInit;
-    private readonly Game _game;
-
-    public SaveManagement(Game game)
-    {
-        _game = game;
-    }
-
+    
     public void SaveGame()
     {
-        Vector3 pos = _game.player.transform.position;
-        Vector3 rot = _game.player.playerCamera.GoalRot;
-        if (SaveName == "") return;
-        string path = Application.persistentDataPath + "/Saves/" + SaveName + "/" + SaveName + ".IsoSave";
-        string text = "PlayerX:" + pos.x + "\nPlayerY:" + pos.y + "\nPlayerZ:" + pos.z + "\nRotationY:" + rot.y;
+        CreateSaveFile();
 
-        Inventory inv = _game.player.Inventory;
+        Debug.Log("SaveGame");
+        Vector3 pos = Game.Player.transform.position;
+        Vector3 rot = Game.Player.playerCamera.GoalRot;
+        Debug.Log(pos + " " + rot);
+        if (SaveName == "") return;
+        string path = Application.persistentDataPath + $"/Saves/{SaveName}/{SaveName}.IsoSave";
+        string text = $"PlayerX:{pos.x}\nPlayerY:{pos.y}\nPlayerZ:{pos.z}\nRotationY:{rot.y}\n";
+
+        Inventory inv = Game.Player.Inventory;
         for (int j = 0; j < 4; j++)
         for (int i = 0; i < 9; i++)
             text += "Inv" + i + "" + j + ":" + inv.GetCurrentBlock(i, j) +
@@ -34,6 +31,8 @@ public class SaveManagement
     
     public void CreateSaveFile()
     {
+        // make sure the save file exists, used when creating a new game
+        Debug.Log("CreateSaveFile " + SaveName);
         if (SaveName == "") return;
         
         string path = Application.persistentDataPath + "/Saves/" + SaveName + "/";
@@ -48,8 +47,6 @@ public class SaveManagement
 
     public void LoadSave()
     {
-
-        HasBeenLoaded = false;
         if (SaveName == "") return;
         string path = Application.persistentDataPath + "/Saves/" + SaveName + "/" + SaveName + ".IsoSave";
         if (!File.Exists(path)) return;
@@ -81,11 +78,10 @@ public class SaveManagement
                 
                 if (count > 0 && type > 0) inv.AddBlockAt(x, y, type, count);
             }
-
         }
 
-        _game.player.SaveLoaded(pos, rot, inv);
-        HasBeenLoaded = true;
+        Debug.Log($"Save data: {pos}, {rot}");
+        Game.Player.SaveLoaded(pos, rot, inv);
         file.Close();
     }
 }
