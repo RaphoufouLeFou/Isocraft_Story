@@ -21902,7 +21902,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 520568134}
         m_TargetAssemblyTypeName: NetworkManagement, Assembly-CSharp
-        m_MethodName: LeaveGameButtonClick
+        m_MethodName: LeaveGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

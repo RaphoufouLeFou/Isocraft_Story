@@ -51,7 +51,8 @@ public class MapHandler : NetworkBehaviour
     
     public void SaveChunks(Chunk chunk)
     {
-        if (Game.SaveManager.SaveName == "") return;
+        if (!SuperGlobals.StartedFromMainMenu) return;
+
         string dirPath = Application.persistentDataPath + "/Saves/" + Game.SaveManager.SaveName + "/Chunks/";
         string path = dirPath + chunk.name + ".Chunk";
         int[,,] blocks = chunk.Blocks;
@@ -78,7 +79,8 @@ public class MapHandler : NetworkBehaviour
     
     private int LoadChunksMesh(Chunk chunk)
     {
-        if (Game.SaveManager.SaveName == "") return 1;
+        if (!SuperGlobals.StartedFromMainMenu) return 1;
+
         string path = Application.persistentDataPath + "/Saves/" + Game.SaveManager.SaveName + "/Chunks/" + chunk.name + ".Chunk";
         if (!File.Exists(path)) return 1;
         
