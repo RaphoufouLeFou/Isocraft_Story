@@ -7,6 +7,7 @@ public class Player : NetworkBehaviour
 {
     private Camera _camera;
     public PlayerCamera playerCamera;
+    private float _health;
 
     [NonSerialized] public CustomRigidBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
@@ -16,17 +17,18 @@ public class Player : NetworkBehaviour
     private MapHandler _mapHandler;
     private InventoryUI _inventoryUI;
 
-    [NonSerialized] public float Health;
+    [NonSerialized] public bool IsLoaded;
 
     public Inventory Inventory;
     
     private void Start()
     {
-        if (isLocalPlayer) Game.Player = this;
+        if (!isLocalPlayer) return;
+        Game.Player = this;
+
         // camera
         _camera = GameObject.Find("Main Camera").GetComponent<Camera>();
         _camera.enabled = isLocalPlayer;
-        if (!isLocalPlayer) return;
 
         // set up other objects
         GameObject scripts = GameObject.Find("Scripts");
@@ -34,7 +36,7 @@ public class Player : NetworkBehaviour
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
         _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>();
         
-        Health = 1;
+        _health = 1;
         Inventory = new();
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
         _inventoryUI.SetPlayerInv(Inventory);
@@ -45,18 +47,22 @@ public class Player : NetworkBehaviour
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
         
-        if (!SuperGlobals.StartedFromMainMenu || SuperGlobals.IsNewSave) // spawn at 0, 0 if debugging
+        if (SuperGlobals.IsNewSave) // spawn at 0, 0 if debugging or new save
         {
-            Respawn();
+            if (SuperGlobals.StartedFromMainMenu) SetSpawn(new Vector3(0, 0, 0));
+            else _spawn = new Vector3(0, Chunk.Size, 0);
             tr.position = _spawn;
         }
-    }
 
+        IsLoaded = true;
+    }
+    
     public void SaveLoaded(Vector3 pos, Vector3 rot, Inventory inv)
     {
-        // save infos loaded: set position, rotation, inventory, respawn
+        // set variables once save infos are loaded
         SetSpawn(pos);
         playerCamera.GoalRot.y = MathF.Round(rot.y / 45) * 45;
+        playerCamera.GoToPlayer();
         Inventory = inv;
     }
     
@@ -66,6 +72,7 @@ public class Player : NetworkBehaviour
 
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
         _spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
+        
         if (MapHandler.Chunks != null && MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
         {
             int modX = (int)(pos.x - chunkX * Chunk.Size),
@@ -74,13 +81,16 @@ public class Player : NetworkBehaviour
             for (int offset = 0; offset < Chunk.Size << 1; offset++)
             {
                 float searchY = _spawn.y + (offset >> 1) * ((offset & 1) == 1 ? -1 : 1);
-                if (searchY is >= 0 and < Chunk.Size && chunk.Blocks[modX, (int)searchY, modZ] == 0)
+                if (searchY is >= 1 and < Chunk.Size
+                    && chunk.Blocks[modX, (int)searchY - 1, modZ] != 0
+                    && chunk.Blocks[modX, (int)searchY, modZ] == 0)
                 {
                     _spawn.y = searchY;
                     break;
                 }
             }
         }
+        
         else throw new ArgumentException("Cannot set spawn in unloaded chunk");
 
         _spawn.y++; // player needs to be one block above the ground
@@ -174,8 +184,6 @@ public class Player : NetworkBehaviour
     void Keys()
     {
         if (Input.GetKeyDown(Settings.KeyMap["Kill"])) Respawn();
-
-        // set spawn
         if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn(transform.position);
     }
     
@@ -186,7 +194,7 @@ public class Player : NetworkBehaviour
         Body.Update(Settings.IsPaused);
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
 
-        _healthImage.transform.localScale = new Vector3(Health,1 ,1);
+        _healthImage.transform.localScale = new Vector3(_health,1 ,1);
 
         bool invVisible = _inventoryUI.inventoryMenu.activeSelf;
         if (Input.GetKeyDown(Settings.KeyMap["Inventory"]))

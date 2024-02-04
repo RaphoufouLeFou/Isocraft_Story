@@ -79,9 +79,14 @@ public class PlayerCamera : MonoBehaviour
     
     private void Start()
     {
-        // force starting position to avoid clipping in ground
+        GoToPlayer();
+    }
+
+    public void GoToPlayer()
+    {
+        // start by looking down at the player
         _currentPos = player.transform.position + new Vector3(0, 3, 0);
-        _currentRot = new Vector3(45, 0, 0);
+        _currentRot = new Vector3(90, GoalRot.y, 0);
     }
 
     private void Update()

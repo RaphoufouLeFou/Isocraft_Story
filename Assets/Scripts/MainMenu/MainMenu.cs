@@ -65,15 +65,16 @@ public class MainMenu : MonoBehaviour
         mainParent.SetActive(false);
         joinGameParent.SetActive(true);
     }
+    
     public void ConnectGameButtonClick()
     {
-        SuperGlobals.IsLocalHost = _ipAddress.ToLower() == "localhost";
         Debug.Log($"Address = {_ipAddress}");
         SuperGlobals.Uri = new Uri($"kcp://{_ipAddress}:{_port}");
         SuperGlobals.IsMultiplayerGame = true;
         SuperGlobals.IsHost = false;
         SceneManager.LoadScene(mainSceneName);
     }
+    
     public void MultiPlayerButtonClick(GameObject save)
     {
         string saveName = save.GetComponent<TMP_InputField>().text;
@@ -98,6 +99,7 @@ public class MainMenu : MonoBehaviour
         string saveFile = Application.persistentDataPath + $"/Saves/{saveName}/{saveName}.IsoSave";
         if (!IsValidNewSaveName(saveName)) throw new ArgumentException("Save name is not valid");
         if (!File.Exists(saveFile) && !newSave) throw new ArgumentException("Save file not found in folder");
+
         SuperGlobals.IsNewSave = newSave;
         SuperGlobals.SaveName = saveName;
         SuperGlobals.Uri = new Uri($"kcp://{_ipAddress}:{_port}");

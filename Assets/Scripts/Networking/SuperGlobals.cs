@@ -6,7 +6,7 @@ public class SuperGlobals : MonoBehaviour
 {
     // data that gets sent through scenes
     public static bool StartedFromMainMenu;
-    public static bool IsNewSave;
+    public static bool IsNewSave = true; // overriden if started from main menu
     
     // deprecated once game is loaded
     [CanBeNull] private static string _saveName;
@@ -26,7 +26,6 @@ public class SuperGlobals : MonoBehaviour
     public static bool IsMultiplayerGame;
     public static bool IsHost;
     public static Uri Uri;
-    public static bool IsLocalHost;
 
     public static void BackToMenu()
     {

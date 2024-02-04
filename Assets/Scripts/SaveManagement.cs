@@ -5,6 +5,7 @@ using UnityEngine;
 public class SaveManagement
 {
     [NonSerialized] public string SaveName;
+
     private bool _isInit;
     
     public void SaveGame()

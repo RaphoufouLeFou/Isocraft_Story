@@ -38,27 +38,26 @@ public class NetworkManagement : MonoBehaviour
         }
         else
         {
-            if (SuperGlobals.IsLocalHost) _manager.StartClient();
-            else
-            {
-                _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
-                _manager.networkAddress = SuperGlobals.Uri.Host;
-                _manager.StartClient(SuperGlobals.Uri);
-            }
+            _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
+            _manager.networkAddress = SuperGlobals.Uri.Host;
+            _manager.StartClient(SuperGlobals.Uri);
         }
         
-        // starting server thing is asynchronous, so don't start Game here
+        // starting server is asynchronous, so don't StartGame here
     }
     
-    public void LeaveGameButtonClick()
+    public void LeaveGame()
     {
         Game.SaveManager.SaveGame();
+        Game.Player = null; // unload Player to load it again next time
+
         if (_isHost) _manager.StopHost();
         else _manager.StopClient();
-        SuperGlobals.IsLocalHost = false;
+        
         SuperGlobals.IsMultiplayerGame = false;
         SuperGlobals.StartedFromMainMenu = false;
         SuperGlobals.IsHost = false;
+        
         SceneManager.LoadScene(mainMenuSceneName);
     }
 
@@ -69,5 +68,10 @@ public class NetworkManagement : MonoBehaviour
     public void ChangePort(ushort port)
     {
         _manager.GetComponent<KcpTransport>().Port = port;
+    }
+
+    private void OnApplicationQuit()
+    {
+        Game.SaveManager.SaveGame();
     }
 }

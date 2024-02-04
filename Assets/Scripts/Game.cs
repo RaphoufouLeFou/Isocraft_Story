@@ -237,7 +237,8 @@ public class Game : MonoBehaviour
     private void StartGame()
     {
         mapHandler.StartMapHandle();
-        if (!SuperGlobals.IsNewSave) SaveManager.LoadSave();
+        if (SuperGlobals.IsNewSave) SaveManager.SaveGame(); // initial save
+        else SaveManager.LoadSave();
         Tick = 0;
         _prevTick = Time.time;
     }
@@ -245,7 +246,7 @@ public class Game : MonoBehaviour
     private void Update()
     {
         // wait for the player to start
-        if (!Started && Player is not null) // local player joined!
+        if (!Started && Player is not null && Player.IsLoaded) // local player joined!
         {
             StartGame();
             Started = true;
@@ -264,10 +265,5 @@ public class Game : MonoBehaviour
             _prevSave = Time.time;
             SaveManager.SaveGame();
         }
-    }
-
-    void OnApplicationQuit()
-    {
-        SaveManager.SaveGame();
     }
 }
