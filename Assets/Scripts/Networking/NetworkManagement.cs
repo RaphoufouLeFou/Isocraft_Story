@@ -26,17 +26,14 @@ public class NetworkManagement : MonoBehaviour
             SuperGlobals.IsHost = true;
             SuperGlobals.IsMultiplayerGame = true;
             SuperGlobals.Uri = new Uri("kcp://127.0.0.1:7777");
-            Game.SaveManager.SaveName = "";
         }
         
         bool isOnline = SuperGlobals.IsMultiplayerGame;
         _isHost = SuperGlobals.IsHost;
         _manager.maxConnections = isOnline ? 20 : 1;
-        Debug.Log("NetworkManagement start");
         if (_isHost)
         {
             if (isOnline) _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
-            Debug.Log("starting host");
             _manager.StartHost();
         }
         else

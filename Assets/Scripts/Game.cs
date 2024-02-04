@@ -232,14 +232,12 @@ public class Game : MonoBehaviour
         // set up SuperGlobals
         GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
         if (globals != null) SaveManager.SaveName = SuperGlobals.SaveName;
-        Debug.Log(SuperGlobals.StartedFromMainMenu + " " + SaveManager.SaveName);
     }
     
     private void StartGame()
     {
-        Debug.Log("StartGame");
         mapHandler.StartMapHandle();
-        if (SuperGlobals.IsExistingSave) SaveManager.LoadSave();
+        if (!SuperGlobals.IsNewSave) SaveManager.LoadSave();
         Tick = 0;
         _prevTick = Time.time;
     }
@@ -249,7 +247,6 @@ public class Game : MonoBehaviour
         // wait for the player to start
         if (!Started && Player is not null) // local player joined!
         {
-            Debug.Log("Found player");
             StartGame();
             Started = true;
         }

@@ -77,20 +77,28 @@ public class MainMenu : MonoBehaviour
     public void MultiPlayerButtonClick(GameObject save)
     {
         string saveName = save.GetComponent<TMP_InputField>().text;
-        StartGame(saveName, true, false);
+        StartGame(saveName, true, true);
     }
     
     public void SinglePlayerButtonClick(GameObject save)
     {
         string saveName = save.GetComponent<TMP_InputField>().text;
-        StartGame(saveName, false, false);
+        StartGame(saveName, false, true);
+    }
+
+    private bool IsValidNewSaveName(string saveName)
+    {
+        return Uri.IsWellFormedUriString(saveName, UriKind.Relative)
+               && !Directory.Exists($"/Saves/{saveName}/")
+               && !saveName.Contains("/") && !saveName.Contains("\\");
     }
     
-    private void StartGame(string saveName, bool multi, bool existingSave)
+    private void StartGame(string saveName, bool multi, bool newSave)
     {
-        string savePath = Application.persistentDataPath + $"/Saves/{saveName}/{saveName}.IsoSave";
-        if (saveName == "" || (!File.Exists(savePath) && existingSave)) return;
-        SuperGlobals.IsExistingSave = existingSave;
+        string saveFile = Application.persistentDataPath + $"/Saves/{saveName}/{saveName}.IsoSave";
+        if (!IsValidNewSaveName(saveName)) throw new ArgumentException("Save name is not valid");
+        if (!File.Exists(saveFile) && !newSave) throw new ArgumentException("Save file not found in folder");
+        SuperGlobals.IsNewSave = newSave;
         SuperGlobals.SaveName = saveName;
         SuperGlobals.Uri = new Uri($"kcp://{_ipAddress}:{_port}");
         SuperGlobals.IsMultiplayerGame = multi;
@@ -100,7 +108,7 @@ public class MainMenu : MonoBehaviour
 
     private void LoadGameButton(string saveName)
     {
-        StartGame(saveName, true, true);
+        StartGame(saveName, true, false);
     }
 
     public void RefreshSaveList(GameObject content)
@@ -128,7 +136,6 @@ public class MainMenu : MonoBehaviour
     private void DeleteSave(string saveName)
     {
         string path = Application.persistentDataPath + "/Saves/" + saveName + "/";
-        Debug.Log("Deleting save " + path);
         if (Directory.Exists(path)) Directory.Delete(path, true);
     }
 

@@ -9,49 +9,39 @@ public class SaveManagement
     
     public void SaveGame()
     {
-        CreateSaveFile();
+        if (!SuperGlobals.StartedFromMainMenu) return;
 
-        Debug.Log("SaveGame");
         Vector3 pos = Game.Player.transform.position;
         Vector3 rot = Game.Player.playerCamera.GoalRot;
-        Debug.Log(pos + " " + rot);
-        if (SaveName == "") return;
         string path = Application.persistentDataPath + $"/Saves/{SaveName}/{SaveName}.IsoSave";
+        if (!_isInit) CreateSaveFile(path);
+        _isInit = true;
+
         string text = $"PlayerX:{pos.x}\nPlayerY:{pos.y}\nPlayerZ:{pos.z}\nRotationY:{rot.y}\n";
 
         Inventory inv = Game.Player.Inventory;
         for (int j = 0; j < 4; j++)
         for (int i = 0; i < 9; i++)
-            text += "Inv" + i + "" + j + ":" + inv.GetCurrentBlock(i, j) +
-                    "." + inv.GetCurrentBlockCount(i, j) + "\n";
+            text += $"Inv{i}{j}:{inv.GetCurrentBlock(i, j)}.{inv.GetCurrentBlockCount(i, j)}\n";
         
         if (File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, text);
     }
     
-    public void CreateSaveFile()
+    private void CreateSaveFile(string path)
     {
-        // make sure the save file exists, used when creating a new game
-        Debug.Log("CreateSaveFile " + SaveName);
-        if (SaveName == "") return;
-        
-        string path = Application.persistentDataPath + "/Saves/" + SaveName + "/";
-        Directory.CreateDirectory(path);
-        
-        string mainSave = path + SaveName + ".IsoSave";
-        if (!File.Exists(mainSave)) File.WriteAllText(mainSave, "");
-        
-        string chunkSave = path + "Chunks/";
-        if (!Directory.Exists(chunkSave)) Directory.CreateDirectory(chunkSave);
+        string dir = Path.GetDirectoryName(path);
+        string chunkDir = dir + "/Chunks";
+
+        if (!Directory.Exists(dir) && dir is not null) Directory.CreateDirectory(dir);
+        if (!Directory.Exists(chunkDir)) Directory.CreateDirectory(chunkDir);
     }
 
     public void LoadSave()
     {
-        if (SaveName == "") return;
         string path = Application.persistentDataPath + "/Saves/" + SaveName + "/" + SaveName + ".IsoSave";
         if (!File.Exists(path)) return;
         
-        Debug.Log("Loading save " + SaveName);
         StreamReader file = new StreamReader(path);
 
         Inventory inv = new();
@@ -80,7 +70,6 @@ public class SaveManagement
             }
         }
 
-        Debug.Log($"Save data: {pos}, {rot}");
         Game.Player.SaveLoaded(pos, rot, inv);
         file.Close();
     }

@@ -22,6 +22,7 @@ public class MapHandler : NetworkBehaviour
         for (int x = -4; x < 5; x++)
         for (int z = -4; z < 5; z++)
             GenChunk(x, z);
+        if (SuperGlobals.IsNewSave) Game.Player.SetSpawn(new Vector3(0, Chunk.Size, 0));
     }
 
     private void GenChunk(int x, int z)

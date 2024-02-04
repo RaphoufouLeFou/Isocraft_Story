@@ -135,22 +135,19 @@ public class SettingsUI : MonoBehaviour
             { "Backwards", KeyCode.S },
             { "Left", KeyCode.A },
             { "Right", KeyCode.D },
-            { "CamLeft", KeyCode.Q },
-            { "CamRight", KeyCode.E },
-            { "Kill", KeyCode.K },
-            { "TopView", KeyCode.T },
-            { "Inventory", KeyCode.Tab },
-            { "Respawn", KeyCode.R },
-            { "Sprint", KeyCode.LeftControl },
             { "Jump", KeyCode.Space },
-            { "Chat", KeyCode.R }
+            { "Sprint", KeyCode.LeftControl },
+            { "Inventory", KeyCode.E },
+            { "Chat", KeyCode.T },
+            { "Kill", KeyCode.K },
+            { "Respawn", KeyCode.R }
         };
 
         string[] keys =
         {
-            "Ms", "Fps", "Coords", "Forwards", "Backwards", "Left", "Right", "CamLeft", "CamRight", "Kill", "TopView",
-            "Inventory", "Respawn", "Sprint", "Jump", "Chat"
-        }; // correct keys in save file
+            "Ms", "Fps", "Coords", "Forwards", "Backwards", "Left", "Right", "Jump", "Sprint", "Inventory", "Chat",
+            "Kill", "Respawn"
+        }; // accepted keys in save file
 
         // replace by existing settings in file
         if (File.Exists(_path))

@@ -6,7 +6,7 @@ public class SuperGlobals : MonoBehaviour
 {
     // data that gets sent through scenes
     public static bool StartedFromMainMenu;
-    public static bool IsExistingSave;
+    public static bool IsNewSave;
     
     // deprecated once game is loaded
     [CanBeNull] private static string _saveName;
@@ -32,6 +32,5 @@ public class SuperGlobals : MonoBehaviour
     {
         // reset cross-scene things like SaveName
         _saveName = "";
-        Debug.Log("Reset SuperGlobals");
     }
 }

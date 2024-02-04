@@ -44,20 +44,23 @@ public class Player : NetworkBehaviour
         // body settings
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
-        SetSpawn(new Vector3(0, Chunk.Size, 0));
-        tr.position = _spawn;
+        
+        if (!SuperGlobals.StartedFromMainMenu || SuperGlobals.IsNewSave) // spawn at 0, 0 if debugging
+        {
+            Respawn();
+            tr.position = _spawn;
+        }
     }
 
     public void SaveLoaded(Vector3 pos, Vector3 rot, Inventory inv)
     {
         // save infos loaded: set position, rotation, inventory, respawn
         SetSpawn(pos);
-        transform.position = _spawn;
         playerCamera.GoalRot.y = MathF.Round(rot.y / 45) * 45;
         Inventory = inv;
     }
     
-    private void SetSpawn(Vector3 pos)
+    public void SetSpawn(Vector3 pos)
     {
         int y = pos.y < 0 ? 0 : pos.y > Chunk.Size1 ? Chunk.Size1 : (int)pos.y;
 
@@ -81,6 +84,13 @@ public class Player : NetworkBehaviour
         else throw new ArgumentException("Cannot set spawn in unloaded chunk");
 
         _spawn.y++; // player needs to be one block above the ground
+        Respawn();
+    }
+
+    private void Respawn()
+    {
+        transform.position = _spawn;
+        Body.Movement = Vector3.zero;
     }
 
     [ClientRpc]
@@ -163,11 +173,7 @@ public class Player : NetworkBehaviour
 
     void Keys()
     {
-        if (Input.GetKeyDown(Settings.KeyMap["Kill"])) // kill
-        {
-            transform.position = _spawn;
-            Body.Movement = Vector3.zero;
-        }
+        if (Input.GetKeyDown(Settings.KeyMap["Kill"])) Respawn();
 
         // set spawn
         if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn(transform.position);
