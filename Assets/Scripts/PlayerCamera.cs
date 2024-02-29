@@ -91,6 +91,7 @@ public class PlayerCamera : MonoBehaviour
 
     private void Update()
     {
+        
         // change camera target with mouse movement
         if (Settings.Playing && Application.isFocused) MouseMovement();
 

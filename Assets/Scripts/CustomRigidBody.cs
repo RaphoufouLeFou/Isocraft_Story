@@ -45,6 +45,7 @@ public class CustomRigidBody
     
     void CheckCollisions(Vector3 pos)
     {
+        if(MapHandler.Chunks == null) return;
         OnFloor = false;
 
         Vector3 movement = pos - _transform.position;

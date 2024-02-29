@@ -6,7 +6,8 @@ using TMPro;
 public class Chat : NetworkBehaviour
 {
     // Start is called before the first frame update
-    [SerializeField] private List<GameObject> messages = new ();
+    private Queue<GameObject> _messages = new ();
+    
     public GameObject contentParent;
     public GameObject messagePrefab;
     public GameObject chatWindow;
@@ -25,7 +26,7 @@ public class Chat : NetworkBehaviour
     {
         GameObject msg = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, contentParent.transform);
         msg.GetComponent<TMP_Text>().text = $"{prefix} : {message}";
-        messages.Add(msg);
+        _messages.Enqueue(msg);
     }
     
     [Command(requiresAuthority = false)]
@@ -45,7 +46,7 @@ public class Chat : NetworkBehaviour
     {
         GameObject msg = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, contentParent.transform);
         msg.GetComponent<TMP_Text>().text = $"{message}";
-        messages.Add(msg);
+        _messages.Enqueue(msg);
     }
     
     [Command(requiresAuthority = false)]
@@ -64,15 +65,8 @@ public class Chat : NetworkBehaviour
         string msg = self.GetComponent<TMP_InputField>().text;
         SendMessagesFromUser(msg);
     }
-
-    public void ClearHistory()
-    {
-        foreach (GameObject msg in messages)
-        {
-            Destroy(msg);
-        }
-        messages.Clear();
-    }
+    
+    
 
     private void Update()
     {
@@ -82,5 +76,10 @@ public class Chat : NetworkBehaviour
             chatWindow.SetActive(true);
             Settings.Playing = false;
         }
+
+        if (Input.GetKeyDown(KeyCode.Return) && chatWindow.activeSelf)
+            SendMessageFromChatUI(transform.GetChild(0).gameObject);
+        
+        while (_messages.Count > 10) Destroy(_messages.Dequeue());
     }
 }

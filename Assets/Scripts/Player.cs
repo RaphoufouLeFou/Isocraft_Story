@@ -27,7 +27,7 @@ public class Player : NetworkBehaviour
         Game.Player = this;
 
         // camera
-        _camera = GameObject.Find("Main Camera").GetComponent<Camera>();
+        _camera = GetComponentInChildren<Camera>();
         _camera.enabled = isLocalPlayer;
 
         // set up other objects
@@ -46,13 +46,14 @@ public class Player : NetworkBehaviour
         // body settings
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
-        
+        /*
         if (SuperGlobals.IsNewSave) // spawn at 0, 0 if debugging or new save
         {
-            if (SuperGlobals.StartedFromMainMenu) SetSpawn(new Vector3(0, 0, 0));
+            if (SuperGlobals.StartedFromMainMenu) SetSpawn(new Vector3(0, Chunk.Size, 0));
             else _spawn = new Vector3(0, Chunk.Size, 0);
             tr.position = _spawn;
         }
+        */
 
         IsLoaded = true;
     }
@@ -68,6 +69,12 @@ public class Player : NetworkBehaviour
     
     public void SetSpawn(Vector3 pos)
     {
+        Debug.LogWarning($"Size = {MapHandler.Chunks.Count}");
+        foreach (KeyValuePair<string,Chunk> pair in MapHandler.Chunks)
+        {
+            Debug.LogWarning($"{pair.Key}, {pair.Value}");
+        }
+        
         int y = pos.y < 0 ? 0 : pos.y > Chunk.Size1 ? Chunk.Size1 : (int)pos.y;
 
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);

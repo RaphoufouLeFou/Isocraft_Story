@@ -260,7 +260,7 @@ public class Game : MonoBehaviour
         }
         
         // autoSave
-        if (Time.time - _prevSave > AutoSaveDelay)
+        if (Time.time - _prevSave > AutoSaveDelay && Player is not null)
         {
             _prevSave = Time.time;
             SaveManager.SaveGame();
