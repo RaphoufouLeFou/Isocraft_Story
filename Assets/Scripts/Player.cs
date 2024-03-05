@@ -23,13 +23,15 @@ public class Player : NetworkBehaviour
     
     private void Start()
     {
-        if (!isLocalPlayer) return;
-        Game.Player = this;
+
 
         // camera
         _camera = GetComponentInChildren<Camera>();
         _camera.enabled = isLocalPlayer;
 
+        if (!isLocalPlayer) return;
+        Game.Player = this;
+        
         // set up other objects
         GameObject scripts = GameObject.Find("Scripts");
         _inventoryUI = scripts.GetComponent<InventoryUI>();
@@ -70,6 +72,7 @@ public class Player : NetworkBehaviour
     public void SetSpawn(Vector3 pos)
     {
         Debug.LogWarning($"Size = {MapHandler.Chunks.Count}");
+        
         foreach (KeyValuePair<string,Chunk> pair in MapHandler.Chunks)
         {
             Debug.LogWarning($"{pair.Key}, {pair.Value}");

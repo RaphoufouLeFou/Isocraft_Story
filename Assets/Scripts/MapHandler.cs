@@ -21,19 +21,23 @@ public class MapHandler : NetworkBehaviour
         
         for (int x = -4; x < 5; x++)
         for (int z = -4; z < 5; z++)
-            GenChunk(x, z);
-        if (SuperGlobals.IsNewSave) Game.Player.SetSpawn(new Vector3(0, Chunk.Size, 0));
+        {
+            GenChunk(x, z, x == 4 && z == 4);
+        }
+           
+        
     }
 
-    private void GenChunk(int x, int z)
+    private void GenChunk(int x, int z, bool last)
     {
         if (!isServer)
         {
             int id = NetworkClient.localPlayer.GetInstanceID();
-            RequestChunk(x, z, id);
+            RequestChunk(x, z, id, last);
         }
         else
         {
+
             Vector3 pos = new Vector3(x, 0, z);
             GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
             chunkObject.name = pos.x + "." + pos.z;
@@ -107,18 +111,19 @@ public class MapHandler : NetworkBehaviour
     }
     
     [Command (requiresAuthority = false)]
-    private void RequestChunk(int x, int z, int id)
+    private void RequestChunk(int x, int z, int id, bool last) // running on the server
     {
         int[,,] blocks = GameObject.Find(x + "." + z).GetComponent<Chunk>().Blocks;
         int len = blocks.Length;
         int[] bytes = new int[len];
         Buffer.BlockCopy(blocks, 0, bytes, 0, len * 4);
         
-        SendChunk(bytes, x, z, id);
+        SendChunk(bytes, x, z, id, last);
+
     }
     
     [ClientRpc]
-    private void SendChunk(int[] bytes, int x, int z, int id)
+    private void SendChunk(int[] bytes, int x, int z, int id, bool last)   // running on the client
     {
         if (NetworkClient.localPlayer.GetInstanceID() != id) return;
         
@@ -134,8 +139,10 @@ public class MapHandler : NetworkBehaviour
         meshRenderer.material = material;
         
         chunk.Blocks = blocks;
-        
+
         Chunks.TryAdd(chunkObject.name, chunk);
         chunk.Init(pos, true);
+        
+        if (SuperGlobals.IsNewSave && last) Game.Player.SetSpawn(new Vector3(0, Chunk.Size, 0));
     }
 }
