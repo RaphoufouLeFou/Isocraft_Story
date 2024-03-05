@@ -41,6 +41,7 @@ public class Player : NetworkBehaviour
         _health = 1;
         Inventory = new();
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
+        
         _inventoryUI.SetPlayerInv(Inventory);
         
         HotBar.UpdateHotBarVisual(Inventory);
@@ -129,6 +130,9 @@ public class Player : NetworkBehaviour
     {
         int chunkX = Utils.Floor(pos.x / Chunk.Size),
             chunkZ = Utils.Floor(pos.z / Chunk.Size);
+
+        if (!MapHandler.Chunks.ContainsKey(chunkX + "." + chunkZ)) return -2; // chunk is not loaded 
+        
         Chunk chunk = MapHandler.Chunks[chunkX + "." + chunkZ];
 
         int x = Utils.Floor(pos.x) - chunkX * Chunk.Size,
@@ -145,6 +149,7 @@ public class Player : NetworkBehaviour
         }
         chunk.BuildMesh();
         
+        if (!_mapHandler) _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>(); // map handler was sometimes null
         if(isServer) _mapHandler.SaveChunks(chunk); //save the chunk when modified
 
         // update nearby chunks if placed on a chunk border

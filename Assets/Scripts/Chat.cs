@@ -46,6 +46,7 @@ public class Chat : NetworkBehaviour
     {
         GameObject msg = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, contentParent.transform);
         msg.GetComponent<TMP_Text>().text = $"{message}";
+        msg.GetComponent<TMP_Text>().color = Color.yellow;
         _messages.Enqueue(msg);
     }
     

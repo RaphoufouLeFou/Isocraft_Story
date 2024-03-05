@@ -77,7 +77,7 @@ public class MainMenu : MonoBehaviour
     
     public void MultiPlayerButtonClick(GameObject save)
     {
-        string saveName = save.GetComponent<TMP_InputField>().text;
+        string saveName = save.GetComponent<TMP_InputField>().text.Replace('_' ,' ');;
         StartGame(saveName, true, true);
     }
     
@@ -96,6 +96,7 @@ public class MainMenu : MonoBehaviour
     
     private void StartGame(string saveName, bool multi, bool newSave)
     {
+        saveName = saveName.Replace(' ', '_');
         string saveFile = Application.persistentDataPath + $"/Saves/{saveName}/{saveName}.IsoSave";
         if (!IsValidNewSaveName(saveName)) throw new ArgumentException("Save name is not valid");
         if (!File.Exists(saveFile) && !newSave) throw new ArgumentException("Save file not found in folder");
@@ -122,7 +123,7 @@ public class MainMenu : MonoBehaviour
         
         foreach (string dir in Directory.EnumerateDirectories(path))
         {
-            string saveName = new DirectoryInfo(dir).Name;
+            string saveName = new DirectoryInfo(dir).Name.Replace('_' ,' ');
             GameObject go = Instantiate(saveTextPrefab, Vector3.zero, Quaternion.identity, content.transform);
             go.GetComponentInChildren<TMP_Text>().text = saveName;
             
@@ -137,6 +138,7 @@ public class MainMenu : MonoBehaviour
 
     private void DeleteSave(string saveName)
     {
+        saveName = saveName.Replace(' ' ,'_');
         string path = Application.persistentDataPath + "/Saves/" + saveName + "/";
         if (Directory.Exists(path)) Directory.Delete(path, true);
     }

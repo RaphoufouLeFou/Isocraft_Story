@@ -22,7 +22,9 @@ public class Overlay : MonoBehaviour
         }
         
         string text = "";
-        Vector3 pos = Game.Player.transform.position;
+        Vector3 pos = Vector3.zero;
+        if (Game.Player != null)
+             pos = Game.Player.transform.position;
         if (Settings.Overlay.DisplayFps)
             text += Round(_displayFps, 1) + " FPS" + (Settings.Overlay.DisplayMs ? " " : "\n");
         if (Settings.Overlay.DisplayMs) text += $"(last: {Round(_displayMs, 1)}ms)\n";
