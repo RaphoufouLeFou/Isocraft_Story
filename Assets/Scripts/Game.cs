@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
 public class Structure
@@ -266,4 +267,6 @@ public class Game : MonoBehaviour
             SaveManager.SaveGame();
         }
     }
+
+
 }

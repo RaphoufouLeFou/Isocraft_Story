@@ -41,6 +41,8 @@ public class NetworkManagement : MonoBehaviour
             _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
             _manager.networkAddress = SuperGlobals.Uri.Host;
             _manager.StartClient(SuperGlobals.Uri);
+            
+
         }
         
         // starting server is asynchronous, so don't StartGame here
@@ -73,5 +75,10 @@ public class NetworkManagement : MonoBehaviour
     private void OnApplicationQuit()
     {
         Game.SaveManager.SaveGame();
+    }
+
+    private void Update()
+    {
+        if (_manager.isNetworkActive == false) SceneManager.LoadScene(mainMenuSceneName);
     }
 }

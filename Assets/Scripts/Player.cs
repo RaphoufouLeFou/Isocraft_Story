@@ -9,6 +9,8 @@ public class Player : NetworkBehaviour
     public PlayerCamera playerCamera;
     private float _health;
 
+    public int level = 0;
+
     [NonSerialized] public CustomRigidBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     private Vector3 _spawn;
@@ -16,6 +18,7 @@ public class Player : NetworkBehaviour
     private GameObject _healthImage;
     private MapHandler _mapHandler;
     private InventoryUI _inventoryUI;
+    private NetworkManagement _networkManagement;
 
     [NonSerialized] public bool IsLoaded;
 
@@ -23,10 +26,10 @@ public class Player : NetworkBehaviour
     
     private void Start()
     {
-
-
+        
         // camera
         _camera = GetComponentInChildren<Camera>();
+        GetComponentInChildren<AudioListener>().enabled = isLocalPlayer;
         _camera.enabled = isLocalPlayer;
 
         if (!isLocalPlayer) return;
@@ -37,6 +40,7 @@ public class Player : NetworkBehaviour
         _inventoryUI = scripts.GetComponent<InventoryUI>();
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
         _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>();
+        
         
         _health = 1;
         Inventory = new();
@@ -72,13 +76,7 @@ public class Player : NetworkBehaviour
     
     public void SetSpawn(Vector3 pos)
     {
-        Debug.LogWarning($"Size = {MapHandler.Chunks.Count}");
-        
-        foreach (KeyValuePair<string,Chunk> pair in MapHandler.Chunks)
-        {
-            Debug.LogWarning($"{pair.Key}, {pair.Value}");
-        }
-        
+
         int y = pos.y < 0 ? 0 : pos.y > Chunk.Size1 ? Chunk.Size1 : (int)pos.y;
 
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
@@ -204,6 +202,7 @@ public class Player : NetworkBehaviour
     
     void Update()
     {
+        transform.GetChild(1).gameObject.SetActive(isLocalPlayer || level == NetworkClient.localPlayer.gameObject.GetComponent<Player>().level);
         if (!isLocalPlayer) return; // don't update other players
 
         Body.Update(Settings.IsPaused);
@@ -226,5 +225,12 @@ public class Player : NetworkBehaviour
         HotBar.UpdateHotBar();
         DetectPlaceBreak();
         Keys();
+    }
+    
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        _networkManagement = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
+        _networkManagement.LeaveGame();
     }
 }
