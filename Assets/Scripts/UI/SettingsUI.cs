@@ -89,6 +89,11 @@ public class SettingsUI : MonoBehaviour
         overlayMenu.SetActive(menu == "Overlay");
         controlsMenu.SetActive(menu == "Controls");
         multiplayerMenu.SetActive(menu == "Multiplayer");
+        if (menu == "Multiplayer")
+        {
+            string Enc = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4());
+            GameObject.Find("GameCodeMulti").GetComponent<TMP_Text>().text = Enc;
+        }
         pressKeyText.SetActive(false);
     }
 

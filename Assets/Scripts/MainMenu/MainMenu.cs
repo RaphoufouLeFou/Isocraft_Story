@@ -17,10 +17,12 @@ public class MainMenu : MonoBehaviour
     public GameObject saveTextPrefab;
     
     public TMP_InputField addressInput;
+    public TMP_InputField codeInput;
     public TMP_InputField portInput;
     public TMP_InputField portNewGameInput;
 
     private string _ipAddress = "localhost";
+    private string _code = "";
     private string _port = "7777";
 
     void Start()
@@ -68,6 +70,12 @@ public class MainMenu : MonoBehaviour
     
     public void ConnectGameButtonClick()
     {
+        if (_code != "")
+        {
+            (string ip, int err) = NetworkManagement.DecodeIP(_code);
+            if(err != 0) return;
+            _ipAddress = ip;
+        }
         Debug.Log($"Address = {_ipAddress}");
         SuperGlobals.Uri = new Uri($"kcp://{_ipAddress}:{_port}");
         SuperGlobals.IsMultiplayerGame = true;
@@ -147,6 +155,11 @@ public class MainMenu : MonoBehaviour
     {
         _ipAddress = addressInput.text;
         Debug.Log($"Entered address = {_ipAddress}");
+    }
+    public void OnChangedGcode()
+    {
+        _code = codeInput.text;
+        Debug.Log($"Entered code = {_ipAddress}");
     }
     public void OnChangedPort()
     {
