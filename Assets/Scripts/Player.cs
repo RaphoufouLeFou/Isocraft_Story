@@ -248,6 +248,7 @@ public class Player : NetworkBehaviour
     public override void OnStopClient()
     {
         base.OnStopClient();
+        if (isServer) return;       // probably an issue when there is multiple clients !! TODO
         _networkManagement = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
         _networkManagement.LeaveGame();
     }

@@ -72,8 +72,13 @@ public class MainMenu : MonoBehaviour
     {
         if (_code != "")
         {
-            (string ip, int err) = NetworkManagement.DecodeIP(_code);
-            if(err != 0) return;
+            (string ip, int err) = NetworkManagement.DecodeIP(_code.ToUpper().Replace("\n", "").Replace(" ",""));
+            
+            if (err != 0)
+            {
+                Debug.LogError($"Error : {err}");
+                return;
+            }
             _ipAddress = ip;
         }
         Debug.Log($"Address = {_ipAddress}");
@@ -154,16 +159,17 @@ public class MainMenu : MonoBehaviour
     public void OnChangedAddress()
     {
         _ipAddress = addressInput.text;
-        Debug.Log($"Entered address = {_ipAddress}");
     }
     public void OnChangedGcode()
     {
         _code = codeInput.text;
-        Debug.Log($"Entered code = {_ipAddress}");
+        _code = _code.ToUpper();
+        codeInput.text = _code;
     }
     public void OnChangedPort()
     {
         _port = portInput.text;
+
     }
     
     public void OnChangedPortNewGame()

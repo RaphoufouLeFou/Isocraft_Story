@@ -76,22 +76,26 @@ public class Chat : NetworkBehaviour
         if (isServer) RcpClientReceiveMessage(message);
         else CommandReceiveMessage(message);
     }
+
+    private void SendCommand(string command)
+    {
+        // TODO
+    }
     
     public void SendMessageFromChatUI(GameObject self)
     {
         TMP_InputField inputField = self.GetComponent<TMP_InputField>();
         string msg = inputField.text;
-        if(msg.Length == 0) return;
+        if(msg == "") return;
         if (msg.Length == msg.Count(f => f == ' ')) return;
         inputField.text = "";
         _pastIndex = -1;
         _pastMessages.Add(msg);
         inputField.Select();
         inputField.ActivateInputField();
-        SendMessagesFromUser(msg);
+        if (msg[0] == '/') SendCommand(msg.Substring(1));  // command
+        else SendMessagesFromUser(msg);
     }
-    
-    
 
     private void Update()
     {

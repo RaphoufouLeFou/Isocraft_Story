@@ -72,12 +72,12 @@ public class NetworkManagement : MonoBehaviour
         if (encoded.Length != 8) return ("", 1);
         string res = "";
         for (int i = 0; i < 8; i+=2)
-        {
+        {   
             char h = encoded[i];
             char l = encoded[i + 1];
             byte high = (byte)(h - 'A');
             byte low = (byte)(l - 'A');
-            if(high >= 16 || low > 16) return ("", 2);
+            if(high >= 16 || low >= 16) return ("", 2);
             ushort n = (ushort)((high << 4) | low);
             res += i==6 ? $"{n}" : $"{n}.";
         }
