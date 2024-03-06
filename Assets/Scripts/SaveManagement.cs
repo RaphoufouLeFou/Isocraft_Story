@@ -11,7 +11,7 @@ public class SaveManagement
     public void SaveGame()
     {
         if (!SuperGlobals.StartedFromMainMenu) return;
-
+        
         Vector3 pos = Game.Player.transform.position;
         Vector3 rot = Game.Player.playerCamera.GoalRot;
         string path = Application.persistentDataPath + $"/Saves/{SaveName}/{SaveName}.IsoSave";
@@ -24,13 +24,14 @@ public class SaveManagement
         for (int j = 0; j < 4; j++)
         for (int i = 0; i < 9; i++)
             text += $"Inv{i}{j}:{inv.GetCurrentBlock(i, j)}.{inv.GetCurrentBlockCount(i, j)}\n";
-        
+        text += $"Health:{Game.Player.GetHealth()}";
         if (File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, text);
     }
     
     private void CreateSaveFile(string path)
     {
+        
         string dir = Path.GetDirectoryName(path);
         string chunkDir = dir + "/Chunks";
 
@@ -47,6 +48,7 @@ public class SaveManagement
 
         Inventory inv = new();
         Vector3 pos = new(), rot = new();
+        float health = 1;
         
         while (file.ReadLine() is { } line)
         {
@@ -69,9 +71,10 @@ public class SaveManagement
                 
                 if (count > 0 && type > 0) inv.AddBlockAt(x, y, type, count);
             }
+            else if (key == "Health") health = float.Parse(value);
         }
-
-        Game.Player.SaveLoaded(pos, rot, inv);
+        
+        Game.Player.SaveLoaded(pos, rot, inv, health);
         file.Close();
     }
 }

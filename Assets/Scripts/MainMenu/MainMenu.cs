@@ -77,7 +77,7 @@ public class MainMenu : MonoBehaviour
     
     public void MultiPlayerButtonClick(GameObject save)
     {
-        string saveName = save.GetComponent<TMP_InputField>().text.Replace('_' ,' ');;
+        string saveName = save.GetComponent<TMP_InputField>().text;
         StartGame(saveName, true, true);
     }
     

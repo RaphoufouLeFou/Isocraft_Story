@@ -44,6 +44,21 @@ public class Inventory
             }
         return -1;
     }
+    
+    public override string ToString()
+    {
+        string text = "";
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                text += $"{Inv[j,i,0]}:{Inv[j,i,0]} ";
+            }
+            text += "\n";
+        }
+
+        return text;
+    }
 
     // add multiple blocks
     public int AddBlock(int block, Sprite texture, int count)

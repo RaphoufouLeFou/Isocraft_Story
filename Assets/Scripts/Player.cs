@@ -23,6 +23,9 @@ public class Player : NetworkBehaviour
     [NonSerialized] public bool IsLoaded;
 
     public Inventory Inventory;
+
+    public bool printInv;       // debug
+    public float scale = 1f;    // debug
     
     private void Start()
     {
@@ -47,7 +50,6 @@ public class Player : NetworkBehaviour
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
         
         _inventoryUI.SetPlayerInv(Inventory);
-        
         HotBar.UpdateHotBarVisual(Inventory);
         
         // body settings
@@ -64,14 +66,19 @@ public class Player : NetworkBehaviour
 
         IsLoaded = true;
     }
-    
-    public void SaveLoaded(Vector3 pos, Vector3 rot, Inventory inv)
+
+
+
+    public void SaveLoaded(Vector3 pos, Vector3 rot, Inventory inv, float health)
     {
         // set variables once save infos are loaded
         SetSpawn(pos);
+        _health = health;
         playerCamera.GoalRot.y = MathF.Round(rot.y / 45) * 45;
         playerCamera.GoToPlayer();
         Inventory = inv;
+        _inventoryUI.SetPlayerInv(Inventory);
+        HotBar.UpdateHotBarVisual(Inventory);
     }
     
     public void SetSpawn(Vector3 pos)
@@ -199,12 +206,23 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(Settings.KeyMap["Kill"])) Respawn();
         if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn(transform.position);
     }
+
+    public float GetHealth()
+    {
+        return _health;
+    }
     
     void Update()
     {
         transform.GetChild(1).gameObject.SetActive(isLocalPlayer || level == NetworkClient.localPlayer.gameObject.GetComponent<Player>().level);
         if (!isLocalPlayer) return; // don't update other players
 
+        HotBar.SetScale(scale);
+        if (printInv)
+        {
+            Debug.Log(Inventory.ToString());       
+            printInv = false;
+        }
         Body.Update(Settings.IsPaused);
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
 

@@ -46,4 +46,10 @@ public static class HotBar
             }
         }
     }
+
+    public static void SetScale(float scale)
+    {
+        GameObject items = GameObject.Find("Hotbar");
+        items.transform.GetChild(0).localScale = new Vector3(scale, scale, scale);
+    }
 }
