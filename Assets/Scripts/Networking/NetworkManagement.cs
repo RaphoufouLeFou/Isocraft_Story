@@ -45,10 +45,13 @@ public class NetworkManagement : MonoBehaviour
             _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
             _manager.networkAddress = SuperGlobals.Uri.Host;
             _manager.StartClient(SuperGlobals.Uri);
+            
         }
 
         // starting server is asynchronous, so don't StartGame here
     }
+    
+    
 
     public static string EncodeIP(string IP)
     {

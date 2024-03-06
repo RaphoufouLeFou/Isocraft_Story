@@ -249,6 +249,8 @@ public class Game : MonoBehaviour
         // wait for the player to start
         if (!Started && Player is not null && Player.IsLoaded) // local player joined!
         {
+            // this code is called only one time, so tell rider to remove the expensive call warning
+            // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
             StartGame();
             Started = true;
         }

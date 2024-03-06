@@ -18,14 +18,16 @@ public class MapHandler : NetworkBehaviour
         _chunksParent = chunkParent.transform;
         Chunks = new Dictionary<string, Chunk>();
         transform.position = new Vector3(0, 0, 0);
-        
+        if (!isServer)
+            RequestGameName(NetworkClient.localPlayer.GetInstanceID());
+
         for (int x = -4; x < 5; x++)
         for (int z = -4; z < 5; z++)
         {
             GenChunk(x, z, x == 4 && z == 4);
         }
-           
-        
+
+    
     }
 
     private void GenChunk(int x, int z, bool last)
@@ -108,6 +110,22 @@ public class MapHandler : NetworkBehaviour
         }
         fs.Close();
         return 0;
+    }
+
+
+    [Command(requiresAuthority = false)]
+    private void RequestGameName(int id)
+    {
+        SendGameName(Game.SaveManager.SaveName, id);
+    }
+
+    [ClientRpc]
+    private void SendGameName(string gameName, int id)
+    {
+        if (NetworkClient.localPlayer.GetInstanceID() != id) return;
+        SuperGlobals.SaveName = gameName;
+        GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
+        if (globals != null) Game.SaveManager.SaveName = SuperGlobals.SaveName;
     }
     
     [Command (requiresAuthority = false)]
