@@ -24,7 +24,6 @@ public class SaveManagement
         _isInit = true;
 
         string text = $"PlayerX:{pos.x}\nPlayerY:{pos.y}\nPlayerZ:{pos.z}\nRotationY:{rot.y}\n";
-        string text = $"PlayerX:{pos.x}\nPlayerY:{pos.y}\nPlayerZ:{pos.z}\nRotationY:{rot.y}\n";
 
         Inventory inv = Game.Player.Inventory;
         for (int j = 0; j < 4; j++)
