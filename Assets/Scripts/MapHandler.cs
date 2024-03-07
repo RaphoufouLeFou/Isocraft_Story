@@ -18,16 +18,22 @@ public class MapHandler : NetworkBehaviour
         _chunksParent = chunkParent.transform;
         Chunks = new Dictionary<string, Chunk>();
         transform.position = new Vector3(0, 0, 0);
-        if (!isServer)
-            RequestGameName(NetworkClient.localPlayer.GetInstanceID());
+
 
         for (int x = -4; x < 5; x++)
         for (int z = -4; z < 5; z++)
         {
             GenChunk(x, z, x == 4 && z == 4);
         }
-
-    
+        
+        if (!isServer)
+            RequestGameName(NetworkClient.localPlayer.GetInstanceID());
+        else
+        {
+            Game.SaveManager.IsHost = true;
+            if (SuperGlobals.IsNewSave) Game.SaveManager.SaveGame(); // initial save
+            else Game.SaveManager.LoadSave();
+        }
     }
 
     private void GenChunk(int x, int z, bool last)
@@ -39,7 +45,6 @@ public class MapHandler : NetworkBehaviour
         }
         else
         {
-
             Vector3 pos = new Vector3(x, 0, z);
             GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
             chunkObject.name = pos.x + "." + pos.z;
@@ -58,7 +63,7 @@ public class MapHandler : NetworkBehaviour
     public void SaveChunks(Chunk chunk)
     {
         if (!SuperGlobals.StartedFromMainMenu) return;
-
+        
         string dirPath = Application.persistentDataPath + "/Saves/" + Game.SaveManager.SaveName + "/Chunks/";
         string path = dirPath + chunk.name + ".Chunk";
         int[,,] blocks = chunk.Blocks;
@@ -86,8 +91,9 @@ public class MapHandler : NetworkBehaviour
     private int LoadChunksMesh(Chunk chunk)
     {
         if (!SuperGlobals.StartedFromMainMenu) return 1;
-
+        
         string path = Application.persistentDataPath + "/Saves/" + Game.SaveManager.SaveName + "/Chunks/" + chunk.name + ".Chunk";
+
         if (!File.Exists(path)) return 1;
         
         int size = Chunk.Size;
@@ -112,7 +118,6 @@ public class MapHandler : NetworkBehaviour
         return 0;
     }
 
-
     [Command(requiresAuthority = false)]
     private void RequestGameName(int id)
     {
@@ -124,8 +129,11 @@ public class MapHandler : NetworkBehaviour
     {
         if (NetworkClient.localPlayer.GetInstanceID() != id) return;
         SuperGlobals.SaveName = gameName;
-        GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
-        if (globals != null) Game.SaveManager.SaveName = SuperGlobals.SaveName;
+        Game.SaveManager.SaveName = gameName;
+        Game.SaveManager.IsHost = false;
+        string path = Application.persistentDataPath + $"/Saves/{ "CLIENT__" + gameName}/{ "CLIENT__" + gameName}.IsoSave";
+        if (!File.Exists(path)) Game.SaveManager.SaveGame(); // initial save
+        else Game.SaveManager.LoadSave();
     }
     
     [Command (requiresAuthority = false)]

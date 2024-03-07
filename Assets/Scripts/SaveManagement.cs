@@ -2,22 +2,28 @@ using System;
 using System.IO;
 using UnityEngine;
 
-public class SaveManagement
+public class SaveManagement 
 {
     [NonSerialized] public string SaveName;
 
     private bool _isInit;
-    
+    public bool IsHost = true;
+
+
     public void SaveGame()
     {
         if (!SuperGlobals.StartedFromMainMenu) return;
         
+        
         Vector3 pos = Game.Player.transform.position;
         Vector3 rot = Game.Player.playerCamera.GoalRot;
-        string path = Application.persistentDataPath + $"/Saves/{SaveName}/{SaveName}.IsoSave";
+        string usableSaveName = IsHost ? SaveName : "CLIENT__" + SaveName;
+
+        string path = Application.persistentDataPath + $"/Saves/{usableSaveName}/{usableSaveName}.IsoSave";
         if (!_isInit) CreateSaveFile(path);
         _isInit = true;
 
+        string text = $"PlayerX:{pos.x}\nPlayerY:{pos.y}\nPlayerZ:{pos.z}\nRotationY:{rot.y}\n";
         string text = $"PlayerX:{pos.x}\nPlayerY:{pos.y}\nPlayerZ:{pos.z}\nRotationY:{rot.y}\n";
 
         Inventory inv = Game.Player.Inventory;
@@ -25,13 +31,15 @@ public class SaveManagement
         for (int i = 0; i < 9; i++)
             text += $"Inv{i}{j}:{inv.GetCurrentBlock(i, j)}.{inv.GetCurrentBlockCount(i, j)}\n";
         text += $"Health:{Game.Player.GetHealth()}";
-        if (File.Exists(path)) File.Delete(path);
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
         File.WriteAllText(path, text);
     }
     
     private void CreateSaveFile(string path)
     {
-        
         string dir = Path.GetDirectoryName(path);
         string chunkDir = dir + "/Chunks";
 
@@ -41,7 +49,9 @@ public class SaveManagement
     
     public void LoadSave()
     {
-        string path = Application.persistentDataPath + "/Saves/" + SaveName + "/" + SaveName + ".IsoSave";
+        string usableSaveName = IsHost ? SaveName : "CLIENT__" + SaveName;
+       
+        string path = Application.persistentDataPath + "/Saves/" + usableSaveName + "/" + usableSaveName + ".IsoSave";
         if (!File.Exists(path)) return;
         
         StreamReader file = new StreamReader(path);

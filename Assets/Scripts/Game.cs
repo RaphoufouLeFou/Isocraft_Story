@@ -214,7 +214,7 @@ public class Game : MonoBehaviour
     {
         // start some things very early
         Started = false;
-        SaveManager = new();
+        
         InvSprites = sprites;
         HotBar.InitImages();
         Inventory.Init();
@@ -230,6 +230,7 @@ public class Game : MonoBehaviour
             Structs.TryAdd(type, s);
         }
 
+        SaveManager = new();
         // set up SuperGlobals
         GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
         if (globals != null) SaveManager.SaveName = SuperGlobals.SaveName;
@@ -238,8 +239,7 @@ public class Game : MonoBehaviour
     private void StartGame()
     {
         mapHandler.StartMapHandle();
-        if (SuperGlobals.IsNewSave) SaveManager.SaveGame(); // initial save
-        else SaveManager.LoadSave();
+
         Tick = 0;
         _prevTick = Time.time;
     }

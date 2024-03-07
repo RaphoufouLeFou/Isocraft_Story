@@ -103,6 +103,7 @@ public class MainMenu : MonoBehaviour
     private bool IsValidNewSaveName(string saveName)
     {
         return Uri.IsWellFormedUriString(saveName, UriKind.Relative)
+               && !saveName.StartsWith("CLIENT__")
                && !Directory.Exists($"/Saves/{saveName}/")
                && !saveName.Contains("/") && !saveName.Contains("\\");
     }
@@ -136,7 +137,10 @@ public class MainMenu : MonoBehaviour
         
         foreach (string dir in Directory.EnumerateDirectories(path))
         {
-            string saveName = new DirectoryInfo(dir).Name.Replace('_' ,' ');
+
+            string saveName = new DirectoryInfo(dir).Name;
+            if(saveName.StartsWith("CLIENT__")) continue;
+            saveName = saveName.Replace('_' ,' ');
             GameObject go = Instantiate(saveTextPrefab, Vector3.zero, Quaternion.identity, content.transform);
             go.GetComponentInChildren<TMP_Text>().text = saveName;
             
