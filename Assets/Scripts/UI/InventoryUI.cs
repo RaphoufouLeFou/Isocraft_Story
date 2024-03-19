@@ -74,6 +74,7 @@ public class InventoryUI : MonoBehaviour
         {
             _isMovingItem = false;
             Destroy(_movingItemImage);
+            
         }
         inventoryMenu.SetActive(false);
         Settings.Playing = true;
@@ -122,6 +123,7 @@ public class InventoryUI : MonoBehaviour
             _movingItemImage.GetComponent<Image>().sprite = Game.InvSprites[_movingItem.Item1];
             _movingItemImage.GetComponentInChildren<TMP_Text>().text = _movingItem.Item2.ToString();
             _isMovingItem = true;
+            //_movingItemPos = new Vector2(x, y);
         }
 
         UpdateInventory();

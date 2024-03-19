@@ -171,6 +171,12 @@ public class CustomRigidBody
             if (backwards) z--;
             if (Input.GetKey(Settings.KeyMap["Left"])) x--;
             if (Input.GetKey(Settings.KeyMap["Right"])) x++;
+/*
+            if (forwards || backwards)
+            {
+                Animator anim = _transform.gameObject.GetComponentInChildren<Animator>();
+                anim.Play("New Animation");
+            }*/
 
             if (Input.GetKey(Settings.KeyMap["Sprint"])) _sprinting = true;
             if (!forwards || backwards) _sprinting = false;

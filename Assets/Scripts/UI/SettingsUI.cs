@@ -214,7 +214,8 @@ public class SettingsUI : MonoBehaviour
                     )
                 {
                     pauseMenu.SetActive(false);
-                    inventoryMenu.SetActive(false);
+                    GameObject scripts = GameObject.Find("Scripts");
+                    scripts.GetComponent<InventoryUI>().HideInventory();
                     chatWindow.SetActive(false);
                     Settings.Playing = true;
                     Settings.IsPaused = false;
