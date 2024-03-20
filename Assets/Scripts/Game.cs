@@ -93,7 +93,7 @@ public static class Utils
 public class Tile
 {
     public readonly Vector2[] UVs;
-    private readonly int _texWidth = 4, _texHeight = 3;
+    private readonly int _texWidth = 4, _texHeight = 4;
     private readonly float _offset = 0.5f / 32f; // prevent texture bleeding
 
     public Tile(Vector2 pos)
@@ -166,22 +166,28 @@ public class Game : MonoBehaviour
 
     // structures info
     public static readonly Dictionary<string, Structure> Structs = new();
-    private static readonly string[] StructNames = { "Tree", "Trunk", "Bush", "Penis" };
+    private static readonly string[] StructNames = { "Tree", "Trunk", "Bush" };
     [NonSerialized] public static int MaxStructSize; // how many blocks out can structures be searched for
 
     static class Tiles
     {
         public static readonly Tile
-            Bedrock = new(new Vector2(0, 2)),
-            Cobblestone = new(new Vector2(1, 2)),
-            DesertLeaves = new(new Vector2(2, 2)),
-            DesertLog = new(new Vector2(3, 2)),
-            DesertLogTop = new(new Vector2(0, 1)),
-            RedSand = new(new Vector2(1, 1)),
-            SandstoneSide = new(new Vector2(2, 1)),
-            SandstoneTop = new(new Vector2(3, 1)),
-            SandSide = new(new Vector2(0, 0)),
-            SandTop = new(new Vector2(1, 0));
+            Bedrock = new(new Vector2(0, 3)),
+            BokaBoom = new(new Vector2(1, 3)),
+            BokaBrick = new(new Vector2(2, 3)),
+            BokaConquer = new(new Vector2(3, 3)),
+            BokaFear = new(new Vector2(0, 2)),
+            BokaHome = new(new Vector2(1, 2)),
+            BokaBeast = new(new Vector2(2, 2)),
+            Cobblestone = new(new Vector2(3, 2)),
+            DesertLeaves = new(new Vector2(0, 1)),
+            DesertLog = new(new Vector2(1, 1)),
+            DesertLogTop = new(new Vector2(2, 1)),
+            RedSand = new(new Vector2(3, 1)),
+            SandstoneSide = new(new Vector2(0, 0)),
+            SandstoneTop = new(new Vector2(1, 0)),
+            SandSide = new(new Vector2(2, 0)),
+            SandTop = new(new Vector2(3, 0));
     }
 
     public static class Blocks
@@ -195,7 +201,12 @@ public class Game : MonoBehaviour
             Bedrock = 4,
             Cobblestone = 5,
             DesertLog = 6,
-            DesertLeaves = 7;
+            DesertLeaves = 7,
+            BokaBrick = 8,
+            BokaConquer = 9,
+            BokaFear = 10,
+            BokaBoom = 11,
+            BokaHome = 12;
 
         public static readonly Dictionary<int, Block> FromId = new()
         {
@@ -206,7 +217,12 @@ public class Game : MonoBehaviour
             {Bedrock, new Block(Bedrock, Tiles.Bedrock)},
             {Cobblestone, new Block(Cobblestone, Tiles.Cobblestone)},
             {DesertLog, new Block(DesertLog, Tiles.DesertLogTop, Tiles.DesertLog, Tiles.DesertLogTop)},
-            {DesertLeaves, new Block(DesertLeaves, Tiles.DesertLeaves)}
+            {DesertLeaves, new Block(DesertLeaves, Tiles.DesertLeaves)},
+            {BokaBrick, new Block(BokaBrick, Tiles.BokaBrick)},
+            {BokaConquer, new Block(BokaConquer, Tiles.BokaBrick, Tiles.BokaConquer, Tiles.BokaBrick)},
+            {BokaFear, new Block(BokaFear, Tiles.BokaBrick, Tiles.BokaFear, Tiles.BokaBrick)},
+            {BokaBoom, new Block(BokaBoom, Tiles.BokaBrick, Tiles.BokaBoom, Tiles.BokaBrick)},
+            {BokaHome, new Block(BokaHome, Tiles.BokaBrick, Tiles.BokaHome, Tiles.BokaBrick)}
         };
     }
 

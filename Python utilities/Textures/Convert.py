@@ -10,8 +10,8 @@ def format_name(src, ext):
 
     dst = ''
     for i, c in enumerate(src):
-        if not i or src[i-1] == '_': dst += c.upper()
-        elif c != '_': dst += c
+        if not i or src[i-1] in '_ ': dst += c.upper()
+        elif c not in '_ ': dst += c
     return dst
 
 RES = 32 # texture resolution
@@ -44,7 +44,7 @@ pygame.image.save(texmap, TEXMAP)
 
 # generate cs code
 # tile positions
-print('\n/!\ Don\'t forget to use .png images')
+print('\n/!\ Don\'t forget to use .png images\n\nPlace these instructions inside Game.cs:')
 code = '\nprivate readonly int _texWidth = %s, _texHeight = %s;' %(w, h)
 code += '\n\npublic static readonly Tile'
 for i, name in zip(range(l), images):

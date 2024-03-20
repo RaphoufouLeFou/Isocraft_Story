@@ -44,10 +44,14 @@ public class Player : NetworkBehaviour
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
         _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>();
         
-        
         _health = 1;
         Inventory = new();
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
+        Inventory.AddBlock(Game.Blocks.BokaBrick, Game.InvSprites[Game.Blocks.Cobblestone], 10);
+        Inventory.AddBlock(Game.Blocks.BokaFear, Game.InvSprites[Game.Blocks.Cobblestone], 10);
+        Inventory.AddBlock(Game.Blocks.BokaConquer, Game.InvSprites[Game.Blocks.Cobblestone], 10);
+        Inventory.AddBlock(Game.Blocks.BokaBoom, Game.InvSprites[Game.Blocks.Cobblestone], 10);
+        Inventory.AddBlock(Game.Blocks.BokaHome, Game.InvSprites[Game.Blocks.Cobblestone], 10);
         
         _inventoryUI.SetPlayerInv(Inventory);
         HotBar.UpdateHotBarVisual(Inventory);

@@ -41,7 +41,7 @@ public static class HotBar
 
             if (type > 0 && count > 0)
             {
-                images.sprite = Game.InvSprites[type];
+                images.sprite = Game.InvSprites[Mathf.Min(type, Game.InvSprites.Length - 1)];
                 tmpText.text = count.ToString();
             }
         }

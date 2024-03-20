@@ -58,7 +58,7 @@ public static class NoiseGen
         if (p < 0.05)
         {
             float type = _noise.GetNoise(((long)Game.Seed ^ x) << 5, z << 5) / 2 + 0.5f;
-            Structure s = Game.Structs[type < 0.05 ? "Penis" : type < 0.15 ? "Trunk" : type < 0.4 ? "Tree" : "Bush"];
+            Structure s = Game.Structs[type < 0.15 ? "Trunk" : type < 0.4 ? "Tree" : "Bush"];
             int y = (int)GetHeight(x + s.Offset.x, z + s.Offset.z);
             return (y + s.Offset.y, s);
         }
