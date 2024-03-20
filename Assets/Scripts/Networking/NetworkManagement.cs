@@ -5,6 +5,7 @@ using kcp2k;
 using UnityEngine;
 using Mirror;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public class NetworkManagement : MonoBehaviour
 {
@@ -55,6 +56,7 @@ public class NetworkManagement : MonoBehaviour
 
     public static string EncodeIP(string IP)
     {
+        Debug.Log(IP);
         string res = "";
         string[] ints = IP.Split('.');
         foreach (string s in ints)
@@ -90,6 +92,15 @@ public class NetworkManagement : MonoBehaviour
     {
         return new WebClient().DownloadString("http://icanhazip.com");
     }
+
+    public static string GetLocalIPv4L()
+    {
+        return Dns.GetHostEntry(Dns.GetHostName())
+        .AddressList.First(
+        f => f.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+        .ToString();
+    }
+
     public void LeaveGame()
     {
         Game.SaveManager.SaveGame();

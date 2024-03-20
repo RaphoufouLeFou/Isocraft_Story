@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Mirror;
 
 public static class Settings
 {       
@@ -91,8 +92,10 @@ public class SettingsUI : MonoBehaviour
         multiplayerMenu.SetActive(menu == "Multiplayer");
         if (menu == "Multiplayer")
         {
-            string Enc = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4());
-            GameObject.Find("GameCodeMulti").GetComponent<TMP_Text>().text = Enc;
+            string EncP = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4());
+            string EncL = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4L());
+            GameObject.Find("GameCodeMultiP").GetComponent<TMP_Text>().text = "Public : " + EncP;
+            GameObject.Find("GameCodeMultiL").GetComponent<TMP_Text>().text = "Lan : " + EncL;
         }
         pressKeyText.SetActive(false);
     }
