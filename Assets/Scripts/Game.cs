@@ -206,7 +206,8 @@ public class Game : MonoBehaviour
             BokaConquer = 9,
             BokaFear = 10,
             BokaBoom = 11,
-            BokaHome = 12;
+            BokaHome = 12,
+            BokaBeast = 13;
 
         public static readonly Dictionary<int, Block> FromId = new()
         {
@@ -222,7 +223,8 @@ public class Game : MonoBehaviour
             {BokaConquer, new Block(BokaConquer, Tiles.BokaBrick, Tiles.BokaConquer, Tiles.BokaBrick)},
             {BokaFear, new Block(BokaFear, Tiles.BokaBrick, Tiles.BokaFear, Tiles.BokaBrick)},
             {BokaBoom, new Block(BokaBoom, Tiles.BokaBrick, Tiles.BokaBoom, Tiles.BokaBrick)},
-            {BokaHome, new Block(BokaHome, Tiles.BokaBrick, Tiles.BokaHome, Tiles.BokaBrick)}
+            {BokaHome, new Block(BokaHome, Tiles.BokaBrick, Tiles.BokaHome, Tiles.BokaBrick)},
+            {BokaBeast, new Block(BokaBeast, Tiles.BokaBrick, Tiles.BokaBeast, Tiles.BokaBrick)}
         };
     }
 

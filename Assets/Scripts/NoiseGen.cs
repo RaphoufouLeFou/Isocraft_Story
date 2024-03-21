@@ -51,7 +51,7 @@ public static class NoiseGen
     public static (int, Structure) GetStruct(int x, int z)
     {
         // if there is a structure in this column,
-        // returns (spawn height, structure), otherwise (-1, whatever, dummy structure)
+        // returns (spawn height, structure), otherwise (-1, dummy structure)
 
         float p = _noise.GetNoise(((long)Game.Seed ^ x) << 10, (long)z << 10) / 2 + 0.5f;
 

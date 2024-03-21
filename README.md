@@ -4,6 +4,7 @@ this is a good game
 
 ## Links
 
+- [Website](https://d-002.github.io/isocraft-story/)
 - [Google drive][drive]
 - [Trello todo list](https://trello.com/b/w8ktY6gF/isocraft-story)
 
