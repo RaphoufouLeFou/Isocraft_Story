@@ -19,7 +19,7 @@ public static class NoiseGen
 
     public static IEnumerable<int> GetColumn(int x, int z)
     {
-        if (Game.Level == 0)
+        if (Game.Player.Level == 0)
         {
             for (int y = 0; y < Chunk.Size; y++)
             {
@@ -34,7 +34,7 @@ public static class NoiseGen
             yield break;
         }
 
-        throw new ArgumentException("Incorrect level: " + Game.Level);
+        throw new ArgumentException("Incorrect level: " + Game.Player.Level);
     }
 
     private const int A = 8765179, B = 3579547, C = 2468273;

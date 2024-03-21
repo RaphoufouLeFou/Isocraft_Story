@@ -26,32 +26,12 @@ public class Overlay : MonoBehaviour
         if (Game.Player != null)
              pos = Game.Player.transform.position;
         if (Settings.Overlay.DisplayFps)
-            text += Round(_displayFps, 1) + " FPS" + (Settings.Overlay.DisplayMs ? " " : "\n");
-        if (Settings.Overlay.DisplayMs) text += $"(last: {Round(_displayMs, 1)}ms)\n";
+            text += $"{_displayFps:F1} FPS {(Settings.Overlay.DisplayMs ? " " : "\n")}";
+        if (Settings.Overlay.DisplayMs) text += $"(last: {_displayMs:F1}ms)\n";
         if (Settings.Overlay.DisplayCoords)
-            text += $"[{Round(pos.x, 3)}, {Round(pos.y, 3)}, {Round(pos.z, 3)}]\n";
+            text += $"[{pos.x:F3}, {pos.y:F3}, {pos.z:F3}]\n";
         if (Settings.Overlay.DisplaySaveName)
             text += "Name: " + (SuperGlobals.StartedFromMainMenu ? Game.SaveManager.SaveName : "[debug mode]");
         textData.text = text;
-    }
-    
-    string Round(float n, int digits)
-    {
-        if (digits == 0) return (int)n + "";
-        string s = (int)Math.Abs(n) + ".";
-
-        if (n < 0)
-        {
-            s = "-" + s;
-            n = -n;
-        }
-        for (int i = 0; i < digits; i++)
-        {
-            n -= (int)n;
-            n *= 10;
-            s += (int)n;
-        }
-
-        return s;
     }
 }

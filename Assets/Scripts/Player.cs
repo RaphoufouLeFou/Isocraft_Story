@@ -9,7 +9,7 @@ public class Player : NetworkBehaviour
     public PlayerCamera playerCamera;
     private float _health;
 
-    [NonSerialized] public int level = 0;
+    [NonSerialized] public int Level = 0;
 
     [NonSerialized] public CustomRigidBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
@@ -29,7 +29,6 @@ public class Player : NetworkBehaviour
     
     private void Start()
     {
-        
         // camera
         _camera = GetComponentInChildren<Camera>();
         GetComponentInChildren<AudioListener>().enabled = isLocalPlayer;
@@ -64,10 +63,10 @@ public class Player : NetworkBehaviour
         */
 
         IsLoaded = true;
+        // activate camera if needed
+        playerCamera.cam.gameObject.SetActive(isLocalPlayer || Level == NetworkClient.localPlayer.gameObject.GetComponent<Player>().Level);
     }
-
-
-
+    
     public void SaveLoaded(Vector3 pos, Vector3 rot, Inventory inv, float health)
     {
         // set variables once save infos are loaded
@@ -135,7 +134,7 @@ public class Player : NetworkBehaviour
         int chunkX = Utils.Floor(pos.x / Chunk.Size),
             chunkZ = Utils.Floor(pos.z / Chunk.Size);
 
-        if (!MapHandler.Chunks.ContainsKey(chunkX + "." + chunkZ)) return -2; // chunk is not loaded 
+        if (!MapHandler.Chunks.ContainsKey(chunkX + "." + chunkZ)) return -1; // chunk is not loaded 
         
         Chunk chunk = MapHandler.Chunks[chunkX + "." + chunkZ];
 
@@ -151,10 +150,13 @@ public class Player : NetworkBehaviour
             result = chunk.Blocks[x, y, z];
             chunk.Blocks[x, y, z] = 0;
         }
+
+        if (!isPlacing && result == Game.Blocks.Bedrock) return -1; // can't break bedrock
+        
         chunk.BuildMesh();
         
         if (!_mapHandler) _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>(); // map handler was sometimes null
-        if(isServer) _mapHandler.SaveChunks(chunk); //save the chunk when modified
+        if (isServer) _mapHandler.SaveChunks(chunk); //save the chunk when modified
 
         // update nearby chunks if placed on a chunk border
         List<string> toCheck = new();
@@ -185,13 +187,12 @@ public class Player : NetworkBehaviour
                     int count = Inventory.GetCurrentBlockCount(HotBar.SelectedIndex, 3);
                     if (count <= 0) return;
                     int res = PlaceBreak(hit.point, currentBlock, true); // place the block for this instance
-                    if (res != -1) Inventory.RemoveBlock(HotBar.SelectedIndex, 3, Game.InvSprites[0]);
+                    if (res >= 0) Inventory.RemoveBlock(HotBar.SelectedIndex, 3, Game.InvSprites[0]);
                 }
                 else
                 {
                     int res = PlaceBreak(hit.point, currentBlock, false); // place the block for this instance
                     if (res > 0) Inventory.AddBlock(res, Game.InvSprites[res]); // fixed collecting air
-
                 }
 
                 if (isServer) ServerPlaceBreak(hit.point, currentBlock, right); // server tells clients to place the block
@@ -213,7 +214,6 @@ public class Player : NetworkBehaviour
     
     void Update()
     {
-        transform.GetChild(1).gameObject.SetActive(isLocalPlayer || level == NetworkClient.localPlayer.gameObject.GetComponent<Player>().level);
         if (!isLocalPlayer) return; // don't update other players
 
         HotBar.SetScale(scale);

@@ -9,7 +9,6 @@ public class SaveManagement
     private bool _isInit;
     public bool IsHost = true;
 
-
     public void SaveGame()
     {
         if (!SuperGlobals.StartedFromMainMenu) return;

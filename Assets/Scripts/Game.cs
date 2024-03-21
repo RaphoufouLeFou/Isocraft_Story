@@ -148,7 +148,6 @@ public class Game : MonoBehaviour
 {
     [NonSerialized] public static float TickRate = 20;
     [NonSerialized] public static int Tick;
-    [NonSerialized] public static int Level = 0;
     [NonSerialized] public static int Seed;
     [NonSerialized] public static bool Started;
     
