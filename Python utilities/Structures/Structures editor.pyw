@@ -1,8 +1,86 @@
 import pygame
 from os.path import exists
 from tkinter import *
-from tkinter.filedialog import askopenfilename, asksaveasfilename
+from tkinter.filedialog import *
 from pygame.locals import *
+from threading import Thread
+
+class Blocks:
+    def __init__(self):
+        self.tex = {} # 3 block sides
+        self.zoom = {} # zoom at which the textures had been generated
+        self.threads = [] # avoid launching multiple threads per texture
+        self._tex = [] # base texture
+        self.names = []
+
+        # sorry gotta add those manually and in order for now
+        self.names = ['sand_side', 'red_sand', 'sandstone_side', 'bedrock',
+                      'cobblestone', 'desert_log', 'desert_leaves',
+                      'boka brick', 'boka conquer', 'boka fear', 'boka boom',
+                      'boka home', 'boka beast']
+
+        for i, name in enumerate(self.names):
+            # load texture for later
+            n = '../Textures/%s.png' %name
+            if not exists(n): raise Exception('%s does not exist' %n)
+            self._tex.append(
+                pygame.transform.scale(
+                    pygame.image.load(n).convert_alpha(),
+                    (32, 32)
+                )
+            )
+
+            # edit the name in a C# way
+            s = ''
+            for j, c in enumerate(name.replace('side', '').replace('top', '')):
+                if j == 0 or name[j-1] == '_': s += c.upper()
+                elif c != '_': s += c
+            self.names[i] = s
+
+    def make_tex(self, block):
+        # make 3 texture sides for this newly encountered block
+        if block: tex = self._tex[block-1]
+        else: r = g = b = a = 255
+
+        zoom = struct.zoom
+
+        x2, y0 = struct.get2d(1, 1, 0)
+        x1, y1 = struct.get2d(1, 1, 1)
+        x0, y2 = struct.get2d(0, 0, 1)
+
+        dx0, dy0 = x1-x0, y2-y1
+        dx1, dy1 = x1-x0, y1-y0
+        dx2, dy2 = x2-x1, y2-y1
+        front = pygame.Surface((dx0, dy0), SRCALPHA)
+        top = pygame.Surface((x2-x0, dy1), SRCALPHA)
+        right = pygame.Surface((dx2, y2-y0), SRCALPHA)
+
+        for i, dx, dy in [(0, dx0, dy0), (1, dx1, dy1), (2, dx2, dy2)]:
+            for x in range(dx):
+                for y in range(dy):
+                    if block: r, g, b, a = tex.get_at((int(x*32/dx), int(y*32/dy)))
+                    if i == 0: front.set_at((x, y), (r*0.7, g*0.7, b*0.7, a))
+                    elif i == 1: top.set_at((x + int((1 - y/dy)*(x2-x1)), y), (r, g, b, a))
+                    else: right.set_at((x, y + int((1 - x/dx)*(y1-y0))), (r*0.9, g*0.9, b*0.9, a))
+
+        self.zoom[block] = zoom
+        self.tex[block] = (front, top, right)
+        self.threads.remove(block)
+
+    def get_tex(self, block):
+        if block not in self.tex or self.zoom[block] != struct.zoom:
+            if block:
+                if block and block not in self.threads: # make texture in thread
+                    self.threads.append(block)
+                    Thread(target=self.make_tex, args=(block,)).start()
+
+                # get or make air texture while calculating if no other texture is available
+                if block not in self.tex: return self.get_tex(0)
+            else:
+                self.threads.append(0)
+                self.make_tex(0)
+
+        return self.tex[block]
 
 class Button:
     def __init__(self, x, text, f):
@@ -98,7 +176,7 @@ class Ui:
         self.inputs = (Input(254, ' x=', 0, 1, 100),
                        Input(316, ' y=', 1, 1, 100),
                        Input(378, ' z=', 2, 1, 100),
-                       Input(440, 'ID:', -1, 0, len(colors)),
+                       Input(440, 'ID:', -1, 0, len(blocks.names)),
                        Input(702, 'x0=', -2, 0, 100),
                        Input(764, 'dy=', -3, -16, 100, True),
                        Input(826, 'z0=', -4, 0, 100))
@@ -124,8 +202,8 @@ class Ui:
             i.update(events)
 
         # show current block name
-        if self.inputs[3].n > len(blocks_names): name = '[unknown]'
-        elif self.inputs[3].n: name = '(%s)' %blocks_names[self.inputs[3].n-1]
+        if self.inputs[3].n > len(blocks.names): name = '[unknown]'
+        elif self.inputs[3].n: name = '(%s)' %blocks.names[self.inputs[3].n-1]
         else: name = '[Air]'
         screen.blit(font.render(name, 1, BLACK), (512, 12))
 
@@ -171,6 +249,9 @@ class Structure:
             # refresh inputs
             for i in ui.inputs:
                 i.refresh_ip()
+
+            # spawn on top of loaded structure
+            self.layer = self.size[1]-1
         tk.destroy()
 
     def save(self):
@@ -243,29 +324,17 @@ class Structure:
         x, z = x*self.zoom, z*self.zoom
         m = 1/self.size[2] if self.size[0] < self.size[2] else 1/self.size[0]
         return int(20 + 710*x*m + 150*(1-z*m)), \
-               int(60 + 420*z*m + 300*m*(self.layer-y+1)*self.zoom)
+               int(60 + 420*z*m + 400*m*(self.layer-y+1)*self.zoom)
 
-    def draw_cube(self, x, y, z, col, alpha):
-        R, G, B = col
-
-        p = [self.get2d(_x, _y, _z) for _x in (x, x+1)
-             for _y in (y, y+1) for _z in (z, z+1)]
-        x0, y0 = p[1][0], p[2][1]
-        p = [(p[0]-x0, p[1]-y0) for p in p]
-
-        surf = pygame.Surface((p[4][0], p[1][1]), SRCALPHA)
-        for i, indices in enumerate(self.face_indices):
-            a, b, c, d = indices
-            if (i == 0 and x < self.size[0]-1 and self.data[x+1][y][z] != -1) \
-                or (i == 1 and y < self.size[1]-1
-                    and self.data[x][y+1][z] != -1 and y != self.layer) \
-                or (i == 2 and z < self.size[2]-1
-                    and self.data[x][y][z+1] != -1):
-                continue
-            m = (0.7, 1, 0.9)[i]
-            col = int(R*m), int(G*m), int(B*m)
-            pygame.draw.polygon(surf, col, (p[a], p[b], p[c], p[d]))
-
+    def draw_cube(self, x, y, z, block, alpha):
+        x2, y0 = self.get2d(x+1, y+1, z)
+        x1, y1 = self.get2d(x+1, y+1, z+1)
+        x0, y2 = self.get2d(x, y, z+1)
+        a, b, c = blocks.get_tex(block)
+        surf = pygame.Surface((x2-x0, y2-y0), SRCALPHA)
+        surf.blit(a, (0, y1-y0))
+        surf.blit(b, (1, 0))
+        surf.blit(c, (x1-x0, 0))
         surf.set_alpha(alpha)
         screen.blit(surf, (x0, y0))
 
@@ -289,9 +358,7 @@ class Structure:
                         elif y < self.layer: alpha = 230
                         else: alpha = 30
 
-                        if b == 0: col, alpha = WHITE, alpha*0.3
-                        else: col = colors[b-1]
-                        self.draw_cube(x, y, z, col, alpha)
+                        self.draw_cube(x, y, z, b, alpha)
 
         # selection grid
         y = self.layer+1
@@ -313,35 +380,6 @@ def mkwin():
     tk.wm_attributes('-alpha', 0)
     return tk
 
-def load_textures():
-    # sorry gotta add them manually e.g. for blocks order
-    global blocks_names, colors
-    blocks_names = ['sand_side', 'red_sand', 'sandstone_side', 'bedrock',
-                    'cobblestone', 'desert_log', 'desert_leaves',
-                    'boka brick', 'boka conquer', 'boka fear', 'boka boom',
-                    'boka home', 'boka beast']
-    colors = []
-
-    for i, name in enumerate(blocks_names):
-        n = '../Textures/%s.png' %name
-        if not exists(n): raise Exception('%s does not exist' %n)
-        surf = pygame.image.load(n).convert_alpha()
-        surf = pygame.transform.scale(surf, (32, 32)) # just to make sure
-        r = g = b = 0
-        for x in range(32):
-            for y in range(32):
-                _r, _g, _b, a = surf.get_at((x, y))
-                a /= 255
-                r, g, b = r + _r*a, g + _g*a, b + _b*a
-        colors.append((r/1024, g/1024, b/1024))
-
-        # also edit the name in a C# way
-        s = ''
-        for j, c in enumerate(name.replace('side', '').replace('top', '')):
-            if j == 0 or name[j-1] == '_': s += c.upper()
-            elif c != '_': s += c
-        blocks_names[i] = s
-
 BLACK, DGRAY, LGRAY, WHITE, CYAN, GRID1, GRID2 = \
                              (0,   0,   0  ), (100, 100, 100), \
                              (200, 200, 200), (255, 255, 255), \
@@ -350,11 +388,11 @@ BLACK, DGRAY, LGRAY, WHITE, CYAN, GRID1, GRID2 = \
 
 pygame.init()
 pygame.display.set_caption('Schematic editor')
-screen = pygame.display.set_mode((900, 500))
+screen = pygame.display.set_mode((900, 550))
 font = pygame.font.SysFont('consolas', 16)
 clock = pygame.time.Clock()
 
-load_textures()
+blocks = Blocks()
 struct = Structure()
 ui = Ui()
 
