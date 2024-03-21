@@ -83,7 +83,7 @@ class Input:
         self.refreshed = True
 
         if self.i == -1: return
-        if self.i > 0:
+        if self.i >= 0:
             # resize map according to the input's value
             struct.size[self.i] = self.n
             struct.init_data()
@@ -202,23 +202,34 @@ class Structure:
                 else:
                     self.layer = min(max(self.layer+event.y, 0), self.size[1]-1)
             elif event.type == MOUSEBUTTONDOWN:
+                # find the 3d position of clicked point
                 x = y = 0
                 _x, _y = event.pos
                 ok = 0
                 while not ok:
-                    if x < 0 or y < 0 or x == self.size[0] or y == self.size[2]:
+                    if y < 0 or y >= self.size[2]:
                         ok = False
                         break
-                    x0, y0 = self.get2d(x, self.layer+1, y)
-                    x1 = self.get2d(x+1, self.layer+1, y)[0]
-                    y1 = self.get2d(x+1, self.layer+1, y+1)[1]
-                    ok = 3
-                    if _x < x0: x -= 1
-                    elif _x > x1: x += 1
-                    else: ok -= 1
+                    x0 = self.get2d(x, self.layer+1, y)[0]
+                    x1, y0 = self.get2d(x+1, self.layer+1, y)
+                    x02, y1 = self.get2d(x, self.layer+1, y+1)
+                    # update boundaries since the collision box is not a rectangle
+                    dx, t = x02-x0, (_y-y0)/(y1-y0)
+                    x0, x1 = x0 + dx*t, x1 + dx*t
+                    
+                    ok = 3 # both X and Z conditions are needed, use bitwise operations
                     if _y < y0: y -= 1
                     elif _y > y1: y += 1
-                    else: ok -= 2
+                    else:
+                        ok -= 2
+                        
+                        if _x < x0: x -= 1
+                        elif _x > x1: x += 1
+                        else: ok -= 1
+
+                        if x < 0 or x >= self.size[0]:
+                            ok = False
+                            break # x boundaries change as Z changes, only check after Z is ok
                     ok = not ok
                 if ok:
                     if event.button == 1:
@@ -306,7 +317,9 @@ def load_textures():
     # sorry gotta add them manually e.g. for blocks order
     global blocks_names, colors
     blocks_names = ['sand_side', 'red_sand', 'sandstone_side', 'bedrock',
-                    'cobblestone', 'desert_log', 'desert_leaves']
+                    'cobblestone', 'desert_log', 'desert_leaves',
+                    'boka brick', 'boka conquer', 'boka fear', 'boka boom',
+                    'boka home', 'boka beast']
     colors = []
 
     for i, name in enumerate(blocks_names):
