@@ -3,18 +3,31 @@ using System.Collections.Generic;
 
 public static class NoiseGen
 {
-    private static FastNoiseLite _noise;
+    private static FastNoiseLite _simplex;
+    private static FastNoiseLite _value;
+    private static readonly Structure Empty = new Structure();
 
     public static void Init()
     {
-        _noise = new FastNoiseLite();
-        _noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        _noise.SetSeed(Game.Seed);
+        _simplex = new FastNoiseLite();
+        _simplex.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2S);
+        _simplex.SetSeed(Game.Seed);
+        _simplex.SetFractalType(FastNoiseLite.FractalType.FBm);
+        _simplex.SetFractalOctaves(2);
+
+        _value = new FastNoiseLite();
+        _value.SetNoiseType(FastNoiseLite.NoiseType.Value);
+        _value.SetSeed(Game.Seed);
+        _value.SetFrequency(0.1f);
     }
 
     private static float GetHeight(int x, int z)
     {
-        return _noise.GetNoise(x, z) * 2 + 5 + _noise.GetNoise(x * 10 + 1000, z * 10 + 1000) / 2;
+        switch (Game.Player.Level)
+        {
+            case 1: return _simplex.GetNoise(x, z) * 2 + 5;
+            default: throw new ArgumentException("Incorrect level: " + Game.Player.Level);
+        }
     }
 
     public static IEnumerable<int> GetColumn(int x, int z)
@@ -30,39 +43,29 @@ public static class NoiseGen
                 else if (y + 3 < height) yield return Game.Blocks.Sandstone;
                 else yield return Game.Blocks.RedSand;
             }
-
-            yield break;
         }
-
-        throw new ArgumentException("Incorrect level: " + Game.Player.Level);
     }
 
-    private const int A = 8765179, B = 3579547, C = 2468273;
-    private static int Prng(int seed)
+    public static float Value(int x, int y, int z)
     {
-        return Utils.Mod(A + B * seed, C); 
-    }
-
-    public static float PrngPos(int x, int y, int z)
-    {
-        return Prng(Game.Seed + Prng(29 * x ^ 31 * y ^ 37 * z)) / (float)C;
+        return _value.GetNoise(x, y, z);
     }
 
     public static (int, Structure) GetStruct(int x, int z)
     {
-        // if there is a structure in this column,
-        // returns (spawn height, structure), otherwise (-1, dummy structure)
+        // if a structure spawns in this column,
+        // returns (spawn height, structure), otherwise (-1, empty structure)
 
-        float p = _noise.GetNoise(((long)Game.Seed ^ x) << 10, (long)z << 10) / 2 + 0.5f;
+        float p = _value.GetNoise(((long)Game.Seed ^ x) << 10, (long)z << 10) / 2 + 0.5f;
 
         if (p < 0.05)
         {
-            float type = _noise.GetNoise(((long)Game.Seed ^ x) << 5, z << 5) / 2 + 0.5f;
+            float type = _value.GetNoise(((long)Game.Seed ^ x) << 5, z << 5) / 2 + 0.5f;
             Structure s = Game.Structs[type < 0.15 ? "Trunk" : type < 0.4 ? "Tree" : "Bush"];
             int y = (int)GetHeight(x + s.Offset.x, z + s.Offset.z);
             return (y + s.Offset.y, s);
         }
         
-        return (-1, new Structure());
+        return (-1, Empty);
     }
 }

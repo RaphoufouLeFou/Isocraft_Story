@@ -39,7 +39,7 @@ public class SaveManagement
     private void CreateSaveFile(string path)
     {
         string dir = Path.GetDirectoryName(path);
-        string chunkDir = dir + "/Chunks";
+        string chunkDir = $"{dir}/Chunks";
 
         if (!Directory.Exists(dir) && dir is not null) Directory.CreateDirectory(dir);
         if (!Directory.Exists(chunkDir)) Directory.CreateDirectory(chunkDir);
@@ -49,8 +49,8 @@ public class SaveManagement
     {
         string usableSaveName = IsHost ? SaveName : "CLIENT__" + SaveName;
        
-        string path = Application.persistentDataPath + "/Saves/" + usableSaveName + "/" + usableSaveName + ".IsoSave";
-        if (!File.Exists(path)) return;
+        string path = $"{Application.persistentDataPath}/Saves/{usableSaveName}/{usableSaveName}.IsoSave";
+        if (!File.Exists(path)) throw new FileNotFoundException("No save file found");
         
         StreamReader file = new StreamReader(path);
 

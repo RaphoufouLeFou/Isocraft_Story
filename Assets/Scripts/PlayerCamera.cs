@@ -38,7 +38,7 @@ public class PlayerCamera : MonoBehaviour
         bool change = false;
         if (_mouseOffset > 0) _mouseOffset -= Time.deltaTime * 3; // add hysteresis
         else _mouseOffset = 0;
-        if (x < 0.2f)
+        if (x < 0.1f)
         {
             if (pos.x + 1.5f < _prevMousePos.x && debounce)
             {
@@ -48,7 +48,7 @@ public class PlayerCamera : MonoBehaviour
 
             _mouseOffset = 1;
         }
-        else if (x > 0.8f)
+        else if (x > 0.9f)
         {
             if (pos.x - 1.5f > _prevMousePos.x && debounce)
             {
@@ -59,15 +59,15 @@ public class PlayerCamera : MonoBehaviour
             _mouseOffset = 1;
         }
 
-        if (y < 0.3f) _targetAbove = true;
-        else if (y > 0.8f) _targetAbove = false;
+        if (y < 0.2f) _targetAbove = true;
+        else if (y > 0.9f) _targetAbove = false;
 
         if (change) _startMouseShift = Time.time;
         
         // move the mouse towards the center if needed
         if (_mouseOffset > 0)
         {
-            float goalX = x < 0.5f ? w * 0.3f : w * 0.7f;
+            float goalX = x < 0.5f ? w * 0.2f : w * 0.8f;
             if ((x < 0.5f) ^ (pos.x < goalX)) _mouseOffset = 0; // stop animation early if moved back to the center
             float fps = Time.deltaTime == 0 ? 10e6f : _rotDelay / Time.deltaTime;
             pos.x = (pos.x * (fps - 1) + goalX) / fps;

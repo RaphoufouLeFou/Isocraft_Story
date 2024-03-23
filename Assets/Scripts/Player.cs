@@ -16,7 +16,6 @@ public class Player : NetworkBehaviour
     private Vector3 _spawn;
 
     private GameObject _healthImage;
-    private MapHandler _mapHandler;
     private InventoryUI _inventoryUI;
     private NetworkManagement _networkManagement;
 
@@ -38,11 +37,10 @@ public class Player : NetworkBehaviour
         GameObject scripts = GameObject.Find("Scripts");
         _inventoryUI = scripts.GetComponent<InventoryUI>();
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
-        _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>();
         _networkManagement = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
         
         _health = 1;
-        Inventory = new();
+        Inventory = new Inventory();
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
         
         _inventoryUI.SetPlayerInv(Inventory);
@@ -220,6 +218,8 @@ public class Player : NetworkBehaviour
     
     void Update()
     {
+        if (Body == null) throw new NullReferenceException("Player body is null, check Start()");
+
         if (!isLocalPlayer) return; // don't update other players
         
         Body.Update(Settings.IsPaused);

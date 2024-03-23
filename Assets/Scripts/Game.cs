@@ -60,7 +60,7 @@ public class Structure
         int b = _blocks[dx, dy, dz];
         if (_type == "Tree")
             if (dx != 1 && dy == 5 && dz != 1 && b == -1)
-                return NoiseGen.PrngPos(x + dx, y + dy, z + dz) < 0.5f ? Game.Blocks.DesertLeaves : Game.Blocks.None;
+                return NoiseGen.Value(x + dx, y + dy, z + dz) < 0.5f ? Game.Blocks.DesertLeaves : Game.Blocks.None;
         return b;
     }
 }
@@ -235,7 +235,7 @@ public class Game : MonoBehaviour
         HotBar.InitImages();
         Inventory.Init();
         System.Random rand = new System.Random();
-        Seed = (int)rand.NextDouble();
+        Seed = (int)(rand.NextDouble() * (1L << 16));
         NoiseGen.Init();
         
         // initialize structures
@@ -255,10 +255,8 @@ public class Game : MonoBehaviour
     private void StartGame()
     {
         mapHandler.StartMapHandle();
-        if (SuperGlobals.IsNewSave) // players hasn't been spawned by map handler
-        {
-            Player.SetSpawn(Player.transform.position);
-        }
+        // local player hasn't been spawned by map handler
+        if (SuperGlobals.IsNewSave) Player.SetSpawn(Player.transform.position);
 
         Tick = 0;
         _prevTick = Time.time;

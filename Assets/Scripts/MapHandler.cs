@@ -22,14 +22,14 @@ public class MapHandler : NetworkBehaviour
         for (int x = -4; x < 5; x++)
             for (int z = -4; z < 5; z++)
                 GenChunk(x, z);
-        
-        if (!isServer) RequestGameName(NetworkClient.localPlayer.GetInstanceID());
-        else
+
+        if (isServer)
         {
             Game.SaveManager.IsHost = true;
             if (SuperGlobals.IsNewSave) Game.SaveManager.SaveGame(); // initial save
             else Game.SaveManager.LoadSave();
         }
+        else RequestGameName(NetworkClient.localPlayer.GetInstanceID());
     }
 
     private void GenChunk(int x, int z)
