@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using Mirror;
 using UnityEngine;
 
 public class Structure
@@ -256,6 +255,10 @@ public class Game : MonoBehaviour
     private void StartGame()
     {
         mapHandler.StartMapHandle();
+        if (SuperGlobals.IsNewSave) // players hasn't been spawned by map handler
+        {
+            Player.SetSpawn(Player.transform.position);
+        }
 
         Tick = 0;
         _prevTick = Time.time;
@@ -264,10 +267,8 @@ public class Game : MonoBehaviour
     private void Update()
     {
         // wait for the player to start
-        if (!Started && Player is not null && Player.IsLoaded) // local player joined!
+        if (!Started && Player is not null && Player.IsLoaded) // local player has been fully loaded
         {
-            // this code is called only one time, so tell rider to remove the expensive call warning
-            // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
             StartGame();
             Started = true;
         }
@@ -284,8 +285,7 @@ public class Game : MonoBehaviour
         {
             _prevSave = Time.time;
             SaveManager.SaveGame();
+            MapHandler.SaveAllChunks();
         }
     }
-
-
 }

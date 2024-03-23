@@ -23,9 +23,6 @@ public class Player : NetworkBehaviour
     [NonSerialized] public bool IsLoaded;
 
     public Inventory Inventory;
-
-    public bool printInv; // debug
-    public float scale = 1; // debug
     
     private void Start()
     {
@@ -42,6 +39,7 @@ public class Player : NetworkBehaviour
         _inventoryUI = scripts.GetComponent<InventoryUI>();
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
         _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>();
+        _networkManagement = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
         
         _health = 1;
         Inventory = new();
@@ -59,12 +57,15 @@ public class Player : NetworkBehaviour
             if (SuperGlobals.StartedFromMainMenu) SetSpawn(new Vector3(0, Chunk.Size, 0));
             else _spawn = new Vector3(0, Chunk.Size, 0);
             tr.position = _spawn;
-        }
+        } TODO
         */
 
-        IsLoaded = true;
+        tr.position = new Vector3(0, Chunk.Size, 0);
+        
         // activate camera if needed
         playerCamera.cam.gameObject.SetActive(isLocalPlayer || Level == NetworkClient.localPlayer.gameObject.GetComponent<Player>().Level);
+        
+        IsLoaded = true;
     }
     
     public void SaveLoaded(Vector3 pos, Vector3 rot, Inventory inv, float health)
@@ -117,57 +118,65 @@ public class Player : NetworkBehaviour
         Body.Movement = Vector3.zero;
     }
 
-    [ClientRpc]
-    private void ServerPlaceBreak(Vector3 pos, int type, bool isPlacing)
-    {
-        PlaceBreak(pos, type, isPlacing);
-    }
-
-    [Command]
-    private void ClientPlaceBreak(Vector3 pos, int type, bool isPlacing)
-    {
-        ServerPlaceBreak(pos, type, isPlacing);
-    }
-
     private int PlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
         int chunkX = Utils.Floor(pos.x / Chunk.Size),
             chunkZ = Utils.Floor(pos.z / Chunk.Size);
 
-        if (!MapHandler.Chunks.ContainsKey(chunkX + "." + chunkZ)) return -1; // chunk is not loaded 
-        
-        Chunk chunk = MapHandler.Chunks[chunkX + "." + chunkZ];
+        // chunk is not loaded, current player cannot edit
+        string chunkName = chunkX + "." + chunkZ;
+        if (!MapHandler.Chunks.ContainsKey(chunkName)) return -1;
+        Chunk chunk = MapHandler.Chunks[chunkName];
 
         int x = Utils.Floor(pos.x) - chunkX * Chunk.Size,
             y = Utils.Floor(pos.y),
             z = Utils.Floor(pos.z) - chunkZ * Chunk.Size;
 
-        int result = type; // for inventory management
-        if (y < 0 || y >= Chunk.Size) return -1; // outside of world height
-        if (isPlacing) chunk.Blocks[x, y, z] = type;
-        else
-        {
-            result = chunk.Blocks[x, y, z];
-            chunk.Blocks[x, y, z] = 0;
-        }
+        if (y is < 0 or >= Chunk.Size) return -1; // outside of world
+        
+        // the slight position change makes the action replace a block or break air
+        int result = chunk.Blocks[x, y, z]; // for inventory management
+        if (isPlacing ^ chunk.Blocks[x, y, z] == Game.Blocks.Air) return -1;
 
         if (!isPlacing && result == Game.Blocks.Bedrock) return -1; // can't break bedrock
-        
-        chunk.BuildMesh();
-        
-        if (!_mapHandler) _mapHandler = GameObject.Find("MapHandler").GetComponent<MapHandler>(); // map handler was sometimes null
-        if (isServer) _mapHandler.SaveChunks(chunk); //save the chunk when modified
 
-        // update nearby chunks if placed on a chunk border
-        List<string> toCheck = new();
-        if (x == 0) toCheck.Add(chunkX - 1 + "." + chunkZ);
-        else if (x == Chunk.Size1) toCheck.Add(chunkX + 1 + "." + chunkZ);
-        if (z == 0) toCheck.Add(chunkX + "." + (chunkZ - 1));
-        else if (z == Chunk.Size1) toCheck.Add(chunkX + "." + (chunkZ + 1));
-        foreach (string chunkName in toCheck)
-            if (MapHandler.Chunks.ContainsKey(chunkName))
-                MapHandler.Chunks[chunkName].BuildMesh();
-        return result;
+        List<string> update = new List<string> { chunkName };
+        if (x == 0) update.Add(chunkX - 1 + "." + chunkZ);
+        else if (x == Chunk.Size1) update.Add(chunkX + 1 + "." + chunkZ);
+        if (z == 0) update.Add(chunkX + "." + (chunkZ - 1));
+        else if (z == Chunk.Size1) update.Add(chunkX + "." + (chunkZ + 1));
+
+        if (isServer)
+        {
+            RpcPlaceBreak(update, x, y, z, type, isPlacing);
+            foreach (string chunkName2 in update) MapHandler.SaveChunk(MapHandler.Chunks[chunkName2]);
+        }
+        else CmdPlaceBreak(update, x, y, z, type, isPlacing);
+        
+        return isPlacing ? type : result;
+    }
+
+    [ClientRpc]
+    private void RpcPlaceBreak(List<string> update, int x, int y, int z, int type, bool isPlacing)
+    {
+        if (!MapHandler.Chunks.ContainsKey(update[0])) return; // map edit isn't visible for this player
+        Chunk chunk = MapHandler.Chunks[update[0]];
+        
+        // update block in chunk
+        if (isPlacing) chunk.Blocks[x, y, z] = type;
+        else chunk.Blocks[x, y, z] = Game.Blocks.Air;
+       
+        // update current chunk, and also nearby chunks if placed on a chunk border
+        foreach (string chunkName2 in update)
+            if (MapHandler.Chunks.ContainsKey(chunkName2))
+                MapHandler.Chunks[chunkName2].BuildMesh();
+    }
+    
+    [Command]
+    private void CmdPlaceBreak(List<string> update, int x, int y, int z, int type, bool isPlacing)
+    {
+        RpcPlaceBreak(update, x, y, z, type, isPlacing);
+        foreach (string chunkName2 in update) MapHandler.SaveChunk(MapHandler.Chunks[chunkName2]);
     }
 
     void DetectPlaceBreak()
@@ -179,7 +188,7 @@ public class Player : NetworkBehaviour
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 // move into or out of the block to get the right targeted block
-                hit.point += 0.01f * (right ? 1 : -1) * hit.normal;
+                hit.point += (right ? 0.01f : -0.01f) * hit.normal;
 
                 int currentBlock = Inventory.GetCurrentBlock(HotBar.SelectedIndex, 3);
                 if (right)
@@ -192,11 +201,8 @@ public class Player : NetworkBehaviour
                 else
                 {
                     int res = PlaceBreak(hit.point, currentBlock, false); // place the block for this instance
-                    if (res > 0) Inventory.AddBlock(res, Game.InvSprites[res]); // fixed collecting air
+                    if (res >= 0) Inventory.AddBlock(res, Game.InvSprites[res]);
                 }
-
-                if (isServer) ServerPlaceBreak(hit.point, currentBlock, right); // server tells clients to place the block
-                else ClientPlaceBreak(hit.point, currentBlock, right); // client tells the server to place the block
             }
         }
     }
@@ -215,13 +221,7 @@ public class Player : NetworkBehaviour
     void Update()
     {
         if (!isLocalPlayer) return; // don't update other players
-
-        HotBar.SetScale(scale);
-        if (printInv)
-        {
-            Debug.Log(Inventory.ToString());       
-            printInv = false;
-        }
+        
         Body.Update(Settings.IsPaused);
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
 
@@ -247,8 +247,7 @@ public class Player : NetworkBehaviour
     public override void OnStopClient()
     {
         base.OnStopClient();
-        if (isServer) return;       // probably an issue when there is multiple clients !! TODO
-        _networkManagement = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
+        if (isServer) return; // probably an issue when there are multiple clients !! TODO
         _networkManagement.LeaveGame();
     }
 }

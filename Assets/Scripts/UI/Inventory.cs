@@ -29,8 +29,10 @@ public class Inventory
     }
     
     // add one block in the inventory where possible
-    public int AddBlock(int block, Sprite texture)
+    public void AddBlock(int block, Sprite texture)
     {
+        if (block == Game.Blocks.Air) return;
+        
         for (int j = 3; j >= 0; j--) for (int i = 0; i < 9; i++)
             if ((Inv[i, j, 0] == block && Inv[i, j, 1] < 64) || Inv[i, j, 1] == 0)
             {
@@ -40,9 +42,26 @@ public class Inventory
                     Images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
                     TmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
                 }
-                return Inv[i, j, 1]; // return the updated block count
+
+                return;
             }
-        return -1;
+    }
+
+    // add multiple blocks
+    public void AddBlock(int block, Sprite texture, int count)
+    {
+        for (int j = 3; j >= 0; j--) for (int i = 0; i < 9; i++)
+            if ((Inv[i, j, 0] == block && Inv[i, j, 1] + count <= 64) || Inv[i, j, 1] == 0) 
+            {
+                Inv[i, j, 0] = block; // set the inventory cell block id to the given id
+                Inv[i, j, 1] += count; // increment the inventory cell block count by the given count
+                if (j == 3)
+                {
+                    Images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
+                    TmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
+                }
+                return;
+            }
     }
     
     public override string ToString()
@@ -58,24 +77,6 @@ public class Inventory
         }
 
         return text;
-    }
-
-    // add multiple blocks
-    public int AddBlock(int block, Sprite texture, int count)
-    {
-        for (int j = 3; j >= 0; j--) for (int i = 0; i < 9; i++)
-            if ((Inv[i, j, 0] == block && Inv[i, j, 1] + count <= 64) || Inv[i, j, 1] == 0) 
-            {
-                Inv[i, j, 0] = block; // set the inventory cell block id to the given id
-                Inv[i, j, 1] += count; // increment the inventory cell block count by the given count
-                if (j == 3)
-                {
-                    Images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
-                    TmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
-                }
-                return Inv[i, j, 1]; //return the updated block count
-            }
-        return -1;
     }
     
     public int AddBlockAt(int x, int y, int block, int count, Sprite texture)

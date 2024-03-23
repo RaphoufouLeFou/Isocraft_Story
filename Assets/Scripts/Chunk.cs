@@ -36,13 +36,13 @@ public class Chunk : MonoBehaviour
     private MeshCollider _meshCollider;
     private readonly FaceUtils _faceUtils = new();
 
-    public void Init(Vector3 pos, bool loadedMesh)
+    public void Init(int x, int z, bool loadedMesh)
     {
         _meshFilter = GetComponent<MeshFilter>();
         _meshCollider = GetComponent<MeshCollider>();
 
-        _pos = new Vector2(pos.x, pos.z);
-        transform.position = pos * Size;
+        _pos = new Vector2(x, z);
+        transform.position = new Vector3(x * Size, 0, z * Size);
         
         if (!loadedMesh)
             GenerateBlocks();

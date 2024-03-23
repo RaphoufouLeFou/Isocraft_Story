@@ -13,7 +13,7 @@ public class SaveManagement
     {
         if (!SuperGlobals.StartedFromMainMenu) return;
         
-        
+        // save player data
         Vector3 pos = Game.Player.transform.position;
         Vector3 rot = Game.Player.playerCamera.GoalRot;
         string usableSaveName = IsHost ? SaveName : "CLIENT__" + SaveName;
@@ -29,11 +29,11 @@ public class SaveManagement
         for (int i = 0; i < 9; i++)
             text += $"Inv{i}{j}:{inv.GetCurrentBlock(i, j)}.{inv.GetCurrentBlockCount(i, j)}\n";
         text += $"Health:{Game.Player.GetHealth()}";
-        if (File.Exists(path))
-        {
-            File.Delete(path);
-        }
+        if (File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, text);
+        
+        // save chunks
+        MapHandler.SaveAllChunks();
     }
     
     private void CreateSaveFile(string path)
