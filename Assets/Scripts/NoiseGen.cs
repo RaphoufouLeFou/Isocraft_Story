@@ -5,27 +5,28 @@ public static class NoiseGen
 {
     private static FastNoiseLite _simplex;
     private static FastNoiseLite _value;
-    private static readonly Structure Empty = new Structure();
+    private static readonly Structure Empty = new();
 
     public static void Init()
     {
         _simplex = new FastNoiseLite();
         _simplex.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2S);
         _simplex.SetSeed(Game.Seed);
+        _simplex.SetFrequency(0.05f);
         _simplex.SetFractalType(FastNoiseLite.FractalType.FBm);
         _simplex.SetFractalOctaves(2);
 
         _value = new FastNoiseLite();
         _value.SetNoiseType(FastNoiseLite.NoiseType.Value);
         _value.SetSeed(Game.Seed);
-        _value.SetFrequency(0.1f);
+        _value.SetFrequency(10);
     }
 
     private static float GetHeight(int x, int z)
     {
         switch (Game.Player.Level)
         {
-            case 1: return _simplex.GetNoise(x, z) * 2 + 5;
+            case 0: return _simplex.GetNoise(x, z) * 2 + 5;
             default: throw new ArgumentException("Incorrect level: " + Game.Player.Level);
         }
     }
@@ -56,11 +57,11 @@ public static class NoiseGen
         // if a structure spawns in this column,
         // returns (spawn height, structure), otherwise (-1, empty structure)
 
-        float p = _value.GetNoise(((long)Game.Seed ^ x) << 10, (long)z << 10) / 2 + 0.5f;
+        float p = _value.GetNoise(x, z) / 2 + 0.5f;
 
-        if (p < 0.05)
+        if (p < 0.01)
         {
-            float type = _value.GetNoise(((long)Game.Seed ^ x) << 5, z << 5) / 2 + 0.5f;
+            float type = _simplex.GetNoise(x, z) / 2 + 0.5f;
             Structure s = Game.Structs[type < 0.15 ? "Trunk" : type < 0.4 ? "Tree" : "Bush"];
             int y = (int)GetHeight(x + s.Offset.x, z + s.Offset.z);
             return (y + s.Offset.y, s);

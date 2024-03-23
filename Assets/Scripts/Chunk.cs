@@ -36,7 +36,7 @@ public class Chunk : MonoBehaviour
     private MeshCollider _meshCollider;
     private readonly FaceUtils _faceUtils = new();
 
-    public void Init(int x, int z, bool loadedMesh)
+    public void Init(int x, int z, bool generateBlocks, bool buildMesh)
     {
         _meshFilter = GetComponent<MeshFilter>();
         _meshCollider = GetComponent<MeshCollider>();
@@ -44,43 +44,35 @@ public class Chunk : MonoBehaviour
         _pos = new Vector2(x, z);
         transform.position = new Vector3(x * Size, 0, z * Size);
         
-        if (!loadedMesh)
-            GenerateBlocks();
-        
-        BuildMesh(true);
+        if (generateBlocks) GenerateBlocks();
+        if (buildMesh) BuildMesh(true);
     }
     
-    void GenerateBlocks()
+    public void GenerateBlocks()
     {
         // generate blocks and structures from NoiseGen
 
         // blocks
+        Vector3 pos = transform.position;
         for (int x = 0; x < Size; x++)
         for (int z = 0; z < Size; z++)
         {
             int y = 0;
-            Vector3 pos = transform.position;
             foreach (int block in NoiseGen.GetColumn((int)pos.x + x, (int)pos.z + z))
                 Blocks[x, y++, z] = block;
         }
 
-        // get intersecting structures
-        int size = Game.MaxStructSize;
-        for (int x = -size; x < Size; x++) for(int z = -size; z < Size; z++)
+        // get intersecting structures by searching around
+        for (int x = -Game.MaxStructSize; x < Size + Game.MaxStructSize; x++)
+        for (int z = -Game.MaxStructSize; z < Size + Game.MaxStructSize; z++)
         {
             (int y, Structure s) = NoiseGen.GetStruct((int)_pos.x * Size + x, (int)_pos.y * Size + z);
-            if (y != -1)
-            {
-                for(int dx = 0; dx < s.X; dx++) for(int dy = 0; dy < s.Y; dy++)
-                for (int dz = 0; dz < s.Z; dz++)
+            if (y != -1) for(int dx = 0; dx < s.X; dx++) for(int dy = 0; dy < s.Y; dy++) for (int dz = 0; dz < s.Z; dz++)
+                if (x + dx is >= 0 and < Size && y + dy is >= 0 and < Size && z + dz is >= 0 and < Size)
                 {
-                    if (x+dx is >= 0 and < Size && y+dy is >= 0 and < Size && z+dz is >= 0 and < Size)
-                    {
-                        int b = s.GetBlock(x, y, z, dx, dy, dz);
-                        if (b != -1) Blocks[x + dx, y + dy, z + dz] = b;
-                    }
+                    int b = s.GetBlock(x, y, z, dx, dy, dz);
+                    if (b != -1) Blocks[x + dx, y + dy, z + dz] = b;
                 }
-            }
         }
     }
 

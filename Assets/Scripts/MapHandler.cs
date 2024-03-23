@@ -29,7 +29,7 @@ public class MapHandler : NetworkBehaviour
             if (SuperGlobals.IsNewSave) Game.SaveManager.SaveGame(); // initial save
             else Game.SaveManager.LoadSave();
         }
-        else RequestGameName(NetworkClient.localPlayer.GetInstanceID());
+        else CmdRequestGameName(NetworkClient.localPlayer.GetInstanceID());
     }
 
     private void GenChunk(int x, int z)
@@ -44,14 +44,13 @@ public class MapHandler : NetworkBehaviour
             meshRenderer.material = material;
             Chunks.TryAdd(chunkObject.name, chunk);
             
-            int res = LoadChunksMesh(chunk);
-            chunk.Init(x, z, res == 0);
+            chunk.Init(x, z, !LoadBlocks(chunk.Blocks, chunk.name), true);
             SaveChunk(chunk);
         }
         else
         {
             int id = NetworkClient.localPlayer.GetInstanceID();
-            RequestChunk(x, z, id);
+            CmdRequestBlocks(x, z, id);
         }
     }
 
@@ -70,31 +69,27 @@ public class MapHandler : NetworkBehaviour
         int size = Chunk.Size;
         if (File.Exists(path)) File.Delete(path);
         if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-        FileStream fs = new FileStream(path, FileMode.Create);
         
+        FileStream fs = new FileStream(path, FileMode.Create);
         for (int i = 0; i < size; i++) for (int j = 0; j < size; j++)
         for (int k = 0; k < size; k++)
             fs.WriteByte((byte)(blocks[i, j, k] & 0xFF));
         fs.Close();
     }
-    
-    private static int LoadChunksMesh(Chunk chunk)
+
+    private static bool LoadBlocks(int[,,] blocks, string chunkName)
     {
-        if (!SuperGlobals.StartedFromMainMenu) return 1;
+        // returns false if couldn't find file, meaning the blocks have to be generated next
+
+        if (!SuperGlobals.StartedFromMainMenu) return false;
         
-        string path = Application.persistentDataPath + "/Saves/" + Game.SaveManager.SaveName + "/Chunks/" + chunk.name + ".Chunk";
-        
-        if (!File.Exists(path)) return 1;
-        
-        int size = Chunk.Size;
-        
-        int[,,] blocks = chunk.Blocks;
+        string path = $"{Application.persistentDataPath}/Saves/{Game.SaveManager.SaveName}/Chunks/{chunkName}.Chunk";
+        if (!File.Exists(path)) return false;
         
         FileStream fs = new FileStream(path, FileMode.OpenOrCreate);
         
-        for (int i = 0; i < size; i++)
-        for (int j = 0; j < size; j++)
-        for (int k = 0; k < size; k++)
+        for (int i = 0; i < Chunk.Size; i++) for (int j = 0; j < Chunk.Size; j++)
+        for (int k = 0; k < Chunk.Size; k++)
         {
             int currBlock = 0;
             
@@ -103,46 +98,67 @@ public class MapHandler : NetworkBehaviour
         }
         
         fs.Close();
-        return 0;
+        return true;
     }
 
-    [Command(requiresAuthority = false)]
-    private void RequestGameName(int id)
+    [Command (requiresAuthority = false)]
+    private void CmdRequestGameName(int id)
     {
-        SendGameName(Game.SaveManager.SaveName, id);
+        RpcSendGameName(Game.SaveManager.SaveName, id);
     }
 
     [ClientRpc]
-    private void SendGameName(string gameName, int id)
+    private void RpcSendGameName(string gameName, int id)
     {
         if (NetworkClient.localPlayer.GetInstanceID() != id) return;
+        
         SuperGlobals.SaveName = gameName;
         Game.SaveManager.SaveName = gameName;
         Game.SaveManager.IsHost = false;
         string clientName = "CLIENT__" + gameName;
         string path = Application.persistentDataPath + $"/Saves/{clientName}/{clientName}.IsoSave";
+        
         if (!File.Exists(path)) Game.SaveManager.SaveGame(); // initial save
         else Game.SaveManager.LoadSave();
     }
     
     [Command (requiresAuthority = false)]
-    private void RequestChunk(int x, int z, int id) // running on the server
+    private void CmdRequestBlocks(int x, int z, int id)
     {
-        int[,,] blocks = GameObject.Find(x + "." + z).GetComponent<Chunk>().Blocks;
+        // prepare a chunk, or load it, to send its blocks to a client
+
+        int[,,] blocks = new int[Chunk.Size, Chunk.Size, Chunk.Size];
+        string chunkName = x + "." + z;
+        Chunk chunk;
+        if (Chunks.TryGetValue(chunkName, out chunk)) blocks = chunk.Blocks;
+        else
+        {
+            if (!LoadBlocks(blocks, chunkName)) // chunk doesn't exist yet
+            {
+                GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
+                chunk = chunkObject.GetComponent<Chunk>();
+                chunk.GenerateBlocks();
+                
+                blocks = chunk.Blocks;
+            }
+        }
+        
         int len = blocks.Length;
         int[] bytes = new int[len];
         Buffer.BlockCopy(blocks, 0, bytes, 0, len * 4);
         
-        SendChunk(bytes, x, z, id);
+        RpcSendBlocks(bytes, x, z, id);
     }
     
     [ClientRpc]
-    private void SendChunk(int[] bytes, int x, int z, int id) // running on the client
+    private void RpcSendBlocks(int[] bytes, int x, int z, int id)
     {
-        if (NetworkClient.localPlayer.GetInstanceID() != id) return;
+        // this is where a chunk is generated on the client
+
+        if (NetworkClient.localPlayer.GetInstanceID() != id) return; // only send to a specific client
         
         int[,,] blocks = new int[Chunk.Size,Chunk.Size,Chunk.Size];
-        Buffer.BlockCopy(bytes, 0, blocks, 0, bytes.Length*4);
+        Buffer.BlockCopy(bytes, 0, blocks, 0, bytes.Length * 4);
         
         GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
         chunkObject.name = x + "." + z;
@@ -154,6 +170,6 @@ public class MapHandler : NetworkBehaviour
         chunk.Blocks = blocks;
 
         Chunks.TryAdd(chunkObject.name, chunk);
-        chunk.Init(x, z, true);
+        chunk.Init(x, z, true, true);
     }
 }

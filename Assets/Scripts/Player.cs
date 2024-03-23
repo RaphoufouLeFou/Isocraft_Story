@@ -170,7 +170,7 @@ public class Player : NetworkBehaviour
                 MapHandler.Chunks[chunkName2].BuildMesh();
     }
     
-    [Command]
+    [Command (requiresAuthority = false)]
     private void CmdPlaceBreak(List<string> update, int x, int y, int z, int type, bool isPlacing)
     {
         RpcPlaceBreak(update, x, y, z, type, isPlacing);
