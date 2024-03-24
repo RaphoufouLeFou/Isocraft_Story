@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 public static class NoiseGen
 {
-    private static FastNoiseLite _simplex;
-    private static FastNoiseLite _value;
+    private static FastNoiseLite _simplex, _value, _value2;
     private static readonly Structure Empty = new();
 
     public static void Init()
     {
+        // *primarily* for map generation
         _simplex = new FastNoiseLite();
         _simplex.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2S);
         _simplex.SetSeed(Game.Seed);
@@ -16,10 +16,17 @@ public static class NoiseGen
         _simplex.SetFractalType(FastNoiseLite.FractalType.FBm);
         _simplex.SetFractalOctaves(2);
 
+        // for structures spawning, and anything that needs white noise
         _value = new FastNoiseLite();
         _value.SetNoiseType(FastNoiseLite.NoiseType.Value);
         _value.SetSeed(Game.Seed);
         _value.SetFrequency(10);
+        
+        // for decoration spawning likeliness
+        _value2 = new FastNoiseLite();
+        _value2.SetNoiseType(FastNoiseLite.NoiseType.Value);
+        _value2.SetSeed(Game.Seed + 1);
+        _value2.SetFrequency(0.1f);
     }
 
     private static float GetHeight(int x, int z)
@@ -33,12 +40,25 @@ public static class NoiseGen
 
     public static IEnumerable<int> GetColumn(int x, int z)
     {
+        int levelY = Game.Player.Level << 7;
+        float deco = _value2.GetNoise(x, levelY, z) / 2 + 0.5f; // does decoration spawn?
+        float decoType = Value(x, levelY, z) / 2 + 0.5f; // in this case, which type?
+        
         if (Game.Player.Level == 0)
         {
+            int? decoration = null;
+            decoType *= deco * deco;
+            if (decoType < 0.001f && Value(x, -100, z) < 0.5f)
+            {
+                decoType *= 1000;
+                decoration = decoType < 0.5f ? Game.Blocks.DeadPlant : Game.Blocks.DeadBush;
+            }
+            
             for (int y = 0; y < Chunk.Size; y++)
             {
                 float height = GetHeight(x, z);
                 if (y == 0) yield return Game.Blocks.Bedrock;
+                else if (y - 1 <= height && y > height && decoration != null) yield return (int)decoration;
                 else if (y > height) yield return Game.Blocks.Air;
                 else if (y + 1 > height) yield return Game.Blocks.Sand;
                 else if (y + 3 < height) yield return Game.Blocks.Sandstone;
@@ -57,16 +77,24 @@ public static class NoiseGen
         // if a structure spawns in this column,
         // returns (spawn height, structure), otherwise (-1, empty structure)
 
-        float p = _value.GetNoise(x, z) / 2 + 0.5f;
+        float p = Value(x, Game.Player.Level << 7, z) / 2 + 0.5f;
 
-        if (p < 0.01)
+        Structure s = Empty;
+        switch (Game.Player.Level)
         {
-            float type = _simplex.GetNoise(x, z) / 2 + 0.5f;
-            Structure s = Game.Structs[type < 0.15 ? "Trunk" : type < 0.4 ? "Tree" : "Bush"];
-            int y = (int)GetHeight(x + s.Offset.x, z + s.Offset.z);
-            return (y + s.Offset.y, s);
+            case 0:
+                break;
+            case 1:
+                if (p < 0.01f)
+                {
+                    float type = _simplex.GetNoise(x, Game.Player.Level << 7, z) / 2 + 0.5f;
+                    s = Game.Structs[type < 0.15f ? "Trunk" : type < 0.4f ? "Tree" : "Bush"];
+                }
+                break;
         }
-        
-        return (-1, Empty);
+
+        if (s == Empty) return (-1, s);
+        int y = (int)GetHeight(x + s.Offset.x, z + s.Offset.z);
+        return (y + s.Offset.y, s);
     }
 }

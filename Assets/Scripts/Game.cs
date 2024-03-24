@@ -92,17 +92,17 @@ public static class Utils
 public class Tile
 {
     public readonly Vector2[] UVs;
-    private readonly int _texWidth = 4, _texHeight = 4;
+    private const int TexWidth = 5, TexHeight = 4;
     private readonly float _offset = 0.5f / 32f; // prevent texture bleeding
 
     public Tile(Vector2 pos)
     {
         UVs = new Vector2[]
         {
-            new((pos.x + _offset) / _texWidth, (pos.y + _offset) / _texHeight),
-            new((pos.x + _offset) / _texWidth, (pos.y + 1 - _offset) / _texHeight),
-            new((pos.x + 1 - _offset) / _texWidth, (pos.y + 1 - _offset) / _texHeight),
-            new((pos.x + 1 - _offset) / _texWidth, (pos.y + _offset) / _texHeight)
+            new((pos.x + _offset) / TexWidth, (pos.y + _offset) / TexHeight),
+            new((pos.x + _offset) / TexWidth, (pos.y + 1 - _offset) / TexHeight),
+            new((pos.x + 1 - _offset) / TexWidth, (pos.y + 1 - _offset) / TexHeight),
+            new((pos.x + 1 - _offset) / TexWidth, (pos.y + _offset) / TexHeight)
         };
     }
 }
@@ -143,6 +143,13 @@ public class Block
     }
 }
 
+public class Cross : Block
+{
+    private float _sqrt22 = Mathf.Sqrt(2) / 2;
+
+    public Cross(int id, Tile allFaces) : base(id, allFaces) { }
+}
+
 public class Game : MonoBehaviour
 {
     [NonSerialized] public static float TickRate = 20;
@@ -171,21 +178,23 @@ public class Game : MonoBehaviour
     {
         public static readonly Tile
             Bedrock = new(new Vector2(0, 3)),
-            BokaBoom = new(new Vector2(1, 3)),
-            BokaBrick = new(new Vector2(2, 3)),
-            BokaConquer = new(new Vector2(3, 3)),
+            BokaBeast = new(new Vector2(1, 3)),
+            BokaBoom = new(new Vector2(2, 3)),
+            BokaBrick = new(new Vector2(3, 3)),
+            BokaConquer = new(new Vector2(4, 3)),
             BokaFear = new(new Vector2(0, 2)),
             BokaHome = new(new Vector2(1, 2)),
-            BokaBeast = new(new Vector2(2, 2)),
-            Cobblestone = new(new Vector2(3, 2)),
+            Cobblestone = new(new Vector2(2, 2)),
+            DeadBush = new(new Vector2(3, 2)),
+            DeadPlant = new(new Vector2(4, 2)),
             DesertLeaves = new(new Vector2(0, 1)),
             DesertLog = new(new Vector2(1, 1)),
             DesertLogTop = new(new Vector2(2, 1)),
             RedSand = new(new Vector2(3, 1)),
-            SandstoneSide = new(new Vector2(0, 0)),
-            SandstoneTop = new(new Vector2(1, 0)),
-            SandSide = new(new Vector2(2, 0)),
-            SandTop = new(new Vector2(3, 0));
+            SandstoneSide = new(new Vector2(4, 1)),
+            SandstoneTop = new(new Vector2(0, 0)),
+            SandSide = new(new Vector2(1, 0)),
+            SandTop = new(new Vector2(2, 0));
     }
 
     public static class Blocks
@@ -205,7 +214,9 @@ public class Game : MonoBehaviour
             BokaFear = 10,
             BokaBoom = 11,
             BokaHome = 12,
-            BokaBeast = 13;
+            BokaBeast = 13,
+            DeadBush = 14,
+            DeadPlant = 15;
 
         public static readonly Dictionary<int, Block> FromId = new()
         {
@@ -222,7 +233,9 @@ public class Game : MonoBehaviour
             {BokaFear, new Block(BokaFear, Tiles.BokaBrick, Tiles.BokaFear, Tiles.BokaBrick)},
             {BokaBoom, new Block(BokaBoom, Tiles.BokaBrick, Tiles.BokaBoom, Tiles.BokaBrick)},
             {BokaHome, new Block(BokaHome, Tiles.BokaBrick, Tiles.BokaHome, Tiles.BokaBrick)},
-            {BokaBeast, new Block(BokaBeast, Tiles.BokaBrick, Tiles.BokaBeast, Tiles.BokaBrick)}
+            {BokaBeast, new Block(BokaBeast, Tiles.BokaBrick, Tiles.BokaBeast, Tiles.BokaBrick)},
+            {DeadBush, new Cross(DeadBush, Tiles.DeadBush)},
+            {DeadPlant, new Cross(DeadPlant, Tiles.DeadPlant)}
         };
     }
 

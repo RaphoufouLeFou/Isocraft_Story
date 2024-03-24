@@ -45,7 +45,7 @@ pygame.image.save(texmap, TEXMAP)
 # generate cs code
 # tile positions
 print('\n/!\ Don\'t forget to use .png images\n\nPlace these instructions inside Game.cs:')
-code = '\nprivate readonly int _texWidth = %s, _texHeight = %s;' %(w, h)
+code = '\nprivate const int TexWidth = %d, TexHeight = %d;' %(w, h)
 code += '\n\npublic static readonly Tile'
 for i, name in zip(range(l), images):
     code += '\n    %s = new(new Vector2(%d, %d)),' %(name, i%w, h-1-i//w)
