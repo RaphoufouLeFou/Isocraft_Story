@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -16547,7 +16547,8 @@ MonoBehaviour:
   syncInterval: 0.1
   chunkPlane: {fileID: 9217093936871528207, guid: 591103caefeb4be45b8ccc5a163c3fea, type: 3}
   chunkParent: {fileID: 851175655}
-  material: {fileID: 2100000, guid: 2ab6f5017e40bab4e9471e78e35c7f31, type: 2}
+  opaque: {fileID: 2100000, guid: 2ab6f5017e40bab4e9471e78e35c7f31, type: 2}
+  transparent: {fileID: 2100000, guid: 2787f7703ef95024eb0bdfc6ed40cf54, type: 2}
 --- !u!4 &1070619968
 Transform:
   m_ObjectHideFlags: 0

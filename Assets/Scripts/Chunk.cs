@@ -36,7 +36,7 @@ public class Chunk : MonoBehaviour
     private MeshCollider _meshCollider;
     private readonly FaceUtils _faceUtils = new();
 
-    public void Init(int x, int z, bool generateBlocks, bool buildMesh)
+    public void Init(int x, int z)
     {
         _meshFilter = GetComponent<MeshFilter>();
         _meshCollider = GetComponent<MeshCollider>();
@@ -44,8 +44,7 @@ public class Chunk : MonoBehaviour
         _pos = new Vector2(x, z);
         transform.position = new Vector3(x * Size, 0, z * Size);
         
-        if (generateBlocks) GenerateBlocks();
-        if (buildMesh) BuildMesh(true);
+        BuildMesh(true);
     }
     
     public void GenerateBlocks()

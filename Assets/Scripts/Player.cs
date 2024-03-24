@@ -14,6 +14,7 @@ public class Player : NetworkBehaviour
     [NonSerialized] public CustomRigidBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     private Vector3 _spawn;
+    private bool _spawnSuccess = true;
 
     private GameObject _healthImage;
     private InventoryUI _inventoryUI;
@@ -80,12 +81,11 @@ public class Player : NetworkBehaviour
     
     public void SetSpawn(Vector3 pos)
     {
-
         int y = pos.y < 0 ? 0 : pos.y > Chunk.Size1 ? Chunk.Size1 : (int)pos.y;
 
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
         _spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
-        
+
         if (MapHandler.Chunks != null && MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
         {
             int modX = (int)(pos.x - chunkX * Chunk.Size),
@@ -102,12 +102,18 @@ public class Player : NetworkBehaviour
                     break;
                 }
             }
+            
+            _spawn.y++; // player needs to be one block above the ground
+            _spawnSuccess = true;
+            Respawn();
         }
-        
-        else throw new ArgumentException("Cannot set spawn in unloaded chunk");
 
-        _spawn.y++; // player needs to be one block above the ground
-        Respawn();
+        else // couldn't find the chunk to spawn in, just wait until it's spawned
+        {
+            _spawn = pos;
+            _spawnSuccess = false;
+            Debug.Log("waiting for chunk to set spawn");
+        }
     }
 
     private void Respawn()
@@ -219,6 +225,12 @@ public class Player : NetworkBehaviour
     void Update()
     {
         if (Body == null) throw new NullReferenceException("Player body is null, check Start()");
+        
+        // if couldn't spawn before, retry
+        if (!_spawnSuccess)
+        {
+            SetSpawn(_spawn);
+        }
 
         if (!isLocalPlayer) return; // don't update other players
         

@@ -259,7 +259,7 @@ public class Game : MonoBehaviour
             Structs.TryAdd(type, s);
         }
 
-        SaveManager = new();
+        SaveManager = new SaveManagement();
         // set up SuperGlobals
         GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
         if (globals != null) SaveManager.SaveName = SuperGlobals.SaveName;
