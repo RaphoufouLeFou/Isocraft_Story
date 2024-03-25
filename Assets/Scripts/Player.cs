@@ -226,10 +226,7 @@ public class Player : NetworkBehaviour
         if (Body == null) throw new NullReferenceException("Player body is null, check Start()");
         
         // if couldn't spawn before, retry
-        if (!_spawnSuccess)
-        {
-            SetSpawn(_spawn);
-        }
+        if (!_spawnSuccess) SetSpawn(_spawn);
 
         if (!isLocalPlayer) return; // don't update other players
         

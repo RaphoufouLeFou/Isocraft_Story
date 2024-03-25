@@ -145,8 +145,6 @@ public class Block
 
 public class Cross : Block
 {
-    private float _sqrt22 = Mathf.Sqrt(2) / 2;
-
     public Cross(int id, Tile allFaces) : base(id, allFaces) { }
 }
 

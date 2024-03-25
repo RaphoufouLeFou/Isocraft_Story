@@ -10,6 +10,10 @@ public class MapHandler : NetworkBehaviour
     public GameObject chunkParent;
     private Transform _chunksParent;
 
+    private readonly Queue<(GameObject, int, int, int[,,])> _chunkQueue = new();
+    
+    private const int ChunkUpdatesPerFrame = 4;
+    
     private int? _id;
     private int Id
     {
@@ -51,7 +55,7 @@ public class MapHandler : NetworkBehaviour
         if (!SuperGlobals.StartedFromMainMenu) return;
         
         string dirPath = $"{Application.persistentDataPath}/Saves/{Game.SaveManager.SaveName}/Chunks/";
-        string path = $"{dirPath}{chunk.Name}.Chunk";
+        string path = $"{dirPath}{chunk.name}.Chunk";
         int[,,] blocks = chunk.Blocks;
         int size = Chunk.Size;
         if (File.Exists(path)) File.Delete(path);
@@ -139,11 +143,18 @@ public class MapHandler : NetworkBehaviour
         int[,,] blocks = new int[Chunk.Size,Chunk.Size,Chunk.Size];
         Buffer.BlockCopy(bytes, 0, blocks, 0, bytes.Length * 4);
         
-        GameObject plane = Instantiate(chunkPlane, _chunksParent);
-        Chunk chunk = plane.GetComponent<Chunk>();
-        chunk.Init(cx, cz, blocks);
+        _chunkQueue.Enqueue((Instantiate(chunkPlane, _chunksParent), cx, cz, blocks));
+    }
 
-        Chunks.TryAdd(chunk.Name, chunk);
-        SaveChunk(chunk);
+    private void Update()
+    {
+        // update chunks queue, don't load them asynchronously from each other (would mess with neighbors checking)
+        int count = 0;
+        while (_chunkQueue.Count != 0 && count++ < ChunkUpdatesPerFrame)
+        {
+            (GameObject plane, int cx, int cz, int[,,] blocks) = _chunkQueue.Dequeue();
+            Chunk chunk = plane.GetComponent<Chunk>();
+            chunk.Init(cx, cz, blocks);
+        }
     }
 }
