@@ -8,6 +8,7 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Tick;
     [NonSerialized] public static int Seed;
     [NonSerialized] public static bool Started;
+    [NonSerialized] public static bool FastGraphics;
     
     // static variables, get initialized from their serialized variables
     [NonSerialized] public static Sprite[] InvSprites;
@@ -49,22 +50,22 @@ public class Game : MonoBehaviour
 
         public static readonly Dictionary<int, Block> FromId = new()
         {
-            { Air, new Block(Air, null, new[] { Tag.Transparent, Tag.NoCollide }) },
-            { Sand, new Block(Sand, Tiles.SandTop, Tiles.SandSide, Tiles.SandTop) },
-            { RedSand, new Block(RedSand, Tiles.RedSand) },
-            { Sandstone, new Block(Sandstone, Tiles.SandstoneTop, Tiles.SandstoneSide, Tiles.SandstoneTop) },
-            { Bedrock, new Block(Bedrock, Tiles.Bedrock, new[] { Tag.Unbreakable }) },
-            { Cobblestone, new Block(Cobblestone, Tiles.Cobblestone) },
-            { DesertLog, new Block(DesertLog, Tiles.DesertLogTop, Tiles.DesertLog, Tiles.DesertLogTop) },
-            { DesertLeaves, new Block(DesertLeaves, Tiles.DesertLeaves) },
-            { BokaBrick, new Block(BokaBrick, Tiles.BokaBrick) },
-            { BokaConquer, new Block(BokaConquer, Tiles.BokaBrick, Tiles.BokaConquer, Tiles.BokaBrick) },
-            { BokaFear, new Block(BokaFear, Tiles.BokaBrick, Tiles.BokaFear, Tiles.BokaBrick) },
-            { BokaBoom, new Block(BokaBoom, Tiles.BokaBrick, Tiles.BokaBoom, Tiles.BokaBrick) },
-            { BokaHome, new Block(BokaHome, Tiles.BokaBrick, Tiles.BokaHome, Tiles.BokaBrick) },
-            { BokaBeast, new Block(BokaBeast, Tiles.BokaBrick, Tiles.BokaBeast, Tiles.BokaBrick) },
-            { DeadBush, new Block(DeadBush, Tiles.DeadBush, new[] { Tag.Is2D, Tag.NoCollide }) },
-            { DeadPlant, new Block(DeadPlant, Tiles.DeadPlant, new[] { Tag.Is2D, Tag.NoCollide }) }
+            { Air, new Block(null, new[] { Tag.NoTexture, Tag.NoCollide }) },
+            { Sand, new Block(Tiles.SandTop, Tiles.SandSide, Tiles.SandTop) },
+            { RedSand, new Block(Tiles.RedSand) },
+            { Sandstone, new Block(Tiles.SandstoneTop, Tiles.SandstoneSide, Tiles.SandstoneTop) },
+            { Bedrock, new Block(Tiles.Bedrock, new[] { Tag.Unbreakable }) },
+            { Cobblestone, new Block(Tiles.Cobblestone) },
+            { DesertLog, new Block(Tiles.DesertLogTop, Tiles.DesertLog, Tiles.DesertLogTop) },
+            { DesertLeaves, new Block(Tiles.DesertLeaves, new[] { Tag.Transparent }) },
+            { BokaBrick, new Block(Tiles.BokaBrick) },
+            { BokaConquer, new Block(Tiles.BokaBrick, Tiles.BokaConquer, Tiles.BokaBrick) },
+            { BokaFear, new Block(Tiles.BokaBrick, Tiles.BokaFear, Tiles.BokaBrick) },
+            { BokaBoom, new Block(Tiles.BokaBrick, Tiles.BokaBoom, Tiles.BokaBrick) },
+            { BokaHome, new Block(Tiles.BokaBrick, Tiles.BokaHome, Tiles.BokaBrick) },
+            { BokaBeast, new Block(Tiles.BokaBrick, Tiles.BokaBeast, Tiles.BokaBrick) },
+            { DeadBush, new Block(Tiles.DeadBush, new[] { Tag.Is2D, Tag.Transparent, Tag.NoCollide }) },
+            { DeadPlant, new Block(Tiles.DeadPlant, new[] { Tag.Is2D, Tag.Transparent, Tag.NoCollide }) }
         };
     }
 
@@ -96,6 +97,7 @@ public class Game : MonoBehaviour
     
     private void StartGame()
     {
+        // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
         mapHandler.StartMapHandle();
         // local player hasn't been spawned by map handler
         if (SuperGlobals.IsNewSave) Player.SetSpawn(Player.transform.position);
@@ -127,5 +129,15 @@ public class Game : MonoBehaviour
             SaveManager.SaveGame();
             MapHandler.SaveAllChunks();
         }
+    }
+
+    public static void QuitGame()
+    {
+        // quit game, even if in editor
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        Debug.Log("Game quit in editor");
+#endif
+        Application.Quit();
     }
 }

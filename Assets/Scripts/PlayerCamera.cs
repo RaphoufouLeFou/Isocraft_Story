@@ -91,7 +91,6 @@ public class PlayerCamera : MonoBehaviour
 
     private void Update()
     {
-        
         // change camera target with mouse movement
         if (Settings.Playing && Application.isFocused) MouseMovement();
 
@@ -99,7 +98,7 @@ public class PlayerCamera : MonoBehaviour
 
         Transform tr = transform;
         Vector3 pPos = player.transform.position;
-        pPos.y = _lastPlayerY;
+        pPos.y = _lastPlayerY < 0 ? 0 : _lastPlayerY;
         Vector3 m = player.Body.Movement;
 
         // only update target height if the player is falling or on the ground

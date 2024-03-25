@@ -125,9 +125,9 @@ public class CustomRigidBody
                     if (MathF.Abs(corr.z) > MathF.Abs(correction.z)) correction.z = corr.z;
                     _sprinting = false;
                 }
-                else throw new ColliderException("Way too much correction, gotta be an error somewhere");
+                else throw new PlayerException("Way too much correction, gotta be an error somewhere");
             }
-
+            
             // move by final collision
             if (correction.x != 0)
             {

@@ -223,7 +223,11 @@ public class Player : NetworkBehaviour
     
     void Update()
     {
-        if (Body == null) throw new NullReferenceException("Player body is null, check Start()");
+        if (Body == null)
+        {
+            // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
+            throw new PlayerException("Player body is null, check game start for errors");
+        }
         
         // if couldn't spawn before, retry
         if (!_spawnSuccess) SetSpawn(_spawn);

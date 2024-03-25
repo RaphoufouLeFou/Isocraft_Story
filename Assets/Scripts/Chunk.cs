@@ -10,7 +10,7 @@ public class Chunk : MonoBehaviour
 
     private int _cx, _cz; // in chunk space 
     private MeshFilter _meshFilter1, _meshFilter2;
-    private MeshCollider _collider;
+    private MeshCollider _collider1, _collider2;
 
     public void Init(int cx, int cz, int[,,] blocks)
     {
@@ -25,7 +25,8 @@ public class Chunk : MonoBehaviour
         
         _meshFilter1 = opaquePlane.GetComponent<MeshFilter>();
         _meshFilter2 = transparentPlane.GetComponent<MeshFilter>();
-        _collider = GetComponent<MeshCollider>();
+        _collider1 = opaquePlane.GetComponent<MeshCollider>();
+        _collider2 = transparentPlane.GetComponent<MeshCollider>();
         
         BuildMesh(true);
     }
@@ -62,11 +63,11 @@ public class Chunk : MonoBehaviour
         // build mesh from blocks
         // update the neighboring chunks that need to be updated
 
-        Mesh mesh = new Mesh();
-        List<Vector3> vertices = new List<Vector3>();
-        List<int> triangles = new List<int>();
-        List<Vector2> uvs = new List<Vector2>();
-        int nFaces = 0;
+        Mesh mesh1 = new(), mesh2 = new();
+        List<Vector3> vertices1 = new(), vertices2 = new();
+        List<int> triangles1 = new(), triangles2 = new();
+        List<Vector2> uvs1 = new(), uvs2 = new();
+        int n1 = 0, n2 = 0;
         
         // get neighboring chunks
         Dictionary<int, Chunk> neighbors = new ();
@@ -86,15 +87,15 @@ public class Chunk : MonoBehaviour
             {
                 for (int face = 0; face < 4; face++)
                 {
-                    for (int j = 0; j < 4; j++) vertices.Add(pos + FaceUtils.CrossOffsets[face][j]);
+                    for (int j = 0; j < 4; j++) vertices2.Add(pos + FaceUtils.CrossOffsets[face][j]);
                     
-                    int n = nFaces << 2;
-                    triangles.AddRange(new[] { n, n + 1, n + 2, n, n + 2, n + 3 });
-                    uvs.AddRange(blockObj.GetUVs(face));
-                    nFaces++;
+                    triangles2.AddRange(new[] { n2, n2 + 1, n2 + 2, n2, n2 + 2, n2 + 3 });
+                    uvs2.AddRange(blockObj.GetUVs(face));
+                    n2 += 4;
                 }
             }
-            else if (!blockObj.Transparent) // full block: display face by face if visible
+            
+            else if (!blockObj.NoTexture) // full block: display face by face under certain conditions
             {
                 for (int face = 0; face < 6; face++)
                 {
@@ -156,28 +157,43 @@ public class Chunk : MonoBehaviour
                                 [(int)otherPos.x, (int)otherPos.y, (int)otherPos.z] // block is in neighboring chunk
                             : Game.Blocks.Bedrock; // block in unloaded chunk: avoid rendering useless faces
                     Block otherObj = Game.Blocks.FromId[otherId];
-                    if (otherObj.Transparent || otherObj.Is2D)
+                    
+                    // draw solid blocks faces next to transparent blocks
+                    if (!blockObj.Transparent && otherObj.Transparent)
                     {
-                        // face visible to the player
-                        for (int j = 0; j < 4; j++) vertices.Add(pos + FaceUtils.FacesOffsets[face][j]);
+                        for (int j = 0; j < 4; j++) vertices1.Add(pos + FaceUtils.FacesOffsets[face][j]);
 
-                        int n = nFaces << 2;
-                        triangles.AddRange(new[] { n, n + 1, n + 2, n, n + 2, n + 3 });
-                        uvs.AddRange(blockObj.GetUVs(face));
-                        nFaces++;
+                        triangles1.AddRange(new[] { n1, n1 + 1, n1 + 2, n1, n1 + 2, n1 + 3 });
+                        uvs1.AddRange(blockObj.GetUVs(face));
+                        n1 += 4;
+                    }
+                    // draw transparent blocks faces next to NoTexture ones, or transparent ones except in fast graphics
+                    else if (blockObj.Transparent && (otherObj.Transparent && !Game.FastGraphics || otherObj.NoTexture))
+                    {
+                        for (int j = 0; j < 4; j++) vertices2.Add(pos + FaceUtils.FacesOffsets[face][j]);
+
+                        triangles2.AddRange(new[] { n2, n2 + 1, n2 + 2, n2, n2 + 2, n2 + 3 });
+                        uvs2.AddRange(blockObj.GetUVs(face));
+                        n2 += 4;
                     }
                 }
             }
         }
         
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.uv = uvs.ToArray();
-
-        mesh.RecalculateNormals();
-        _meshFilter1.mesh = mesh;
-        _collider.sharedMesh = mesh;
+        mesh1.vertices = vertices1.ToArray();
+        mesh1.triangles = triangles1.ToArray();
+        mesh1.uv = uvs1.ToArray();
+        mesh1.RecalculateNormals();
+        _meshFilter1.mesh = mesh1;
+        _collider1.sharedMesh = mesh1;
         
+        mesh2.vertices = vertices2.ToArray();
+        mesh2.triangles = triangles2.ToArray();
+        mesh2.uv = uvs2.ToArray();
+        mesh2.RecalculateNormals();
+        _collider2.sharedMesh = mesh2;
+        _meshFilter2.mesh = mesh2;
+
         // add to mapHandler, and update neighbors (remove side faces if needed) if newly created chunk
         if (newChunk)
         {

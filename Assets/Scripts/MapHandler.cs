@@ -120,10 +120,11 @@ public class MapHandler : NetworkBehaviour
 
         int[,,] blocks = new int[Chunk.Size, Chunk.Size, Chunk.Size];
         string chunkName = $"{cx}.{cz}";
+        
         // chunk is loaded on the server
         if (Chunks.TryGetValue(chunkName, out Chunk chunk)) blocks = chunk.Blocks;
-        else // chunk isn't loaded
-        if (!LoadBlocks(blocks, chunkName)) // try to get blocks from save, otherwise generate
+        // chunk isn't loaded
+        else if (!LoadBlocks(blocks, chunkName)) // try to get blocks from save, otherwise generate
             Chunk.GenerateBlocks(blocks, cx * Chunk.Size, cz * Chunk.Size);
         
         int len = blocks.Length;
@@ -137,7 +138,6 @@ public class MapHandler : NetworkBehaviour
     private void RpcGetBlocks(int[] bytes, int cx, int cz, int id)
     {
         // clients generate chunks here
-
         if (NetworkClient.localPlayer.GetInstanceID() != id) return; // only send to a specific client
         
         int[,,] blocks = new int[Chunk.Size,Chunk.Size,Chunk.Size];
