@@ -76,25 +76,21 @@ public class Chat : NetworkBehaviour
         if (isServer) RcpClientReceiveMessage(message);
         else CommandReceiveMessage(message);
     }
-
-    private void SendCommand(string command)
-    {
-        // TODO
-    }
     
     public void SendMessageFromChatUI(GameObject self)
     {
         TMP_InputField inputField = self.GetComponent<TMP_InputField>();
         string msg = inputField.text;
-        if(msg == "") return;
+        if (msg == "") return;
         if (msg.Length == msg.Count(f => f == ' ')) return;
         inputField.text = "";
         _pastIndex = -1;
         _pastMessages.Add(msg);
         inputField.Select();
         inputField.ActivateInputField();
-        if (msg[0] == '/') SendCommand(msg.Substring(1));  // command
+        if (msg[0] == '/') Commands.ExecuteCommand(msg.Substring(1));  // command
         else SendMessagesFromUser(msg);
+        chatWindow.SetActive(false);
     }
 
     private void Update()
@@ -105,7 +101,6 @@ public class Chat : NetworkBehaviour
             chatWindow.SetActive(true);
             chatWindow.GetComponentInChildren<TMP_InputField>().Select();
             chatWindow.GetComponentInChildren<TMP_InputField>().ActivateInputField();
-            Settings.IsPaused = true;
             Settings.Playing = false;
         }
 

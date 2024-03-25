@@ -8,7 +8,6 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Tick;
     [NonSerialized] public static int Seed;
     [NonSerialized] public static bool Started;
-    [NonSerialized] public static bool FastGraphics;
     
     // static variables, get initialized from their serialized variables
     [NonSerialized] public static Sprite[] InvSprites;
@@ -20,7 +19,6 @@ public class Game : MonoBehaviour
     
     private float _prevTick;
     private float _prevSave;
-    private const int AutoSaveDelay = 15;
 
     // structures info
     public static readonly Dictionary<string, Structure> Structs = new();
@@ -97,7 +95,6 @@ public class Game : MonoBehaviour
     
     private void StartGame()
     {
-        // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
         mapHandler.StartMapHandle();
         // local player hasn't been spawned by map handler
         if (SuperGlobals.IsNewSave) Player.SetSpawn(Player.transform.position);
@@ -123,7 +120,7 @@ public class Game : MonoBehaviour
         }
         
         // autoSave
-        if (Time.time - _prevSave > AutoSaveDelay && Player is not null)
+        if (Time.time - _prevSave > Settings.Game.AutoSaveDelay && Player is not null)
         {
             _prevSave = Time.time;
             SaveManager.SaveGame();

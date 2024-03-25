@@ -168,7 +168,7 @@ public class Chunk : MonoBehaviour
                         n1 += 4;
                     }
                     // draw transparent blocks faces next to NoTexture ones, or transparent ones except in fast graphics
-                    else if (blockObj.Transparent && (otherObj.Transparent && !Game.FastGraphics || otherObj.NoTexture))
+                    else if (blockObj.Transparent && (otherObj.Transparent && !Settings.Game.FastGraphics || otherObj.NoTexture))
                     {
                         for (int j = 0; j < 4; j++) vertices2.Add(pos + FaceUtils.FacesOffsets[face][j]);
 

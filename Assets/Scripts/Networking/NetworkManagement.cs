@@ -49,16 +49,14 @@ public class NetworkManagement : MonoBehaviour
             
         }
 
-        // starting server is asynchronous, so don't StartGame here
+        // server start is asynchronous, so don't StartGame here
     }
     
-    
-
-    public static string EncodeIP(string IP)
+    public static string EncodeIP(string ip)
     {
-        Debug.Log(IP);
+        Debug.Log(ip);
         string res = "";
-        string[] ints = IP.Split('.');
+        string[] ints = ip.Split('.');
         foreach (string s in ints)
         {
             byte b = byte.Parse(s);
@@ -76,18 +74,19 @@ public class NetworkManagement : MonoBehaviour
     {
         if (encoded.Length != 8) return ("", 1);
         string res = "";
-        for (int i = 0; i < 8; i+=2)
+        for (int i = 0; i < 8; i += 2)
         {   
             char h = encoded[i];
             char l = encoded[i + 1];
             byte high = (byte)(h - 'A');
             byte low = (byte)(l - 'A');
-            if(high >= 16 || low >= 16) return ("", 2);
+            if (high >= 16 || low >= 16) return ("", 2);
             ushort n = (ushort)((high << 4) | low);
-            res += i==6 ? $"{n}" : $"{n}.";
+            res += i == 6 ? n : $"{n}.";
         }
         return (res, 0);
     }
+    
     public static string GetLocalIPv4()
     {
         return new WebClient().DownloadString("http://icanhazip.com");

@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerCamera : MonoBehaviour
 {
-    public Player player;
     public Camera cam;
     private const float MoveDelay = 0.5f, RotDelay = 0.1f, Zoom = 4, DebounceTime = 0.25f;
     private float _currentRotDelay; // different possible rotation speeds
@@ -85,28 +84,27 @@ public class PlayerCamera : MonoBehaviour
     public void GoToPlayer()
     {
         // start by looking down at the player
-        _currentPos = player.transform.position + new Vector3(0, 3, 0);
+        _currentPos = Game.Player.transform.position + new Vector3(0, 3, 0);
         _currentRot = new Vector3(90, GoalRot.y, 0);
     }
 
     private void Update()
     {
         // change camera target with mouse movement
-        if (Settings.Playing && Application.isFocused) MouseMovement();
-
-        if (player.Body == null) return; // if this is not the current player, skip 
+        if (Settings.Playing && Application.isFocused) MouseMovement(); 
 
         Transform tr = transform;
-        Vector3 pPos = player.transform.position;
+        Transform pTr = Game.Player.transform;
+        Vector3 pPos = pTr.position;
         pPos.y = _lastPlayerY < 0 ? 0 : _lastPlayerY;
-        Vector3 m = player.Body.Movement;
+        Vector3 m = Game.Player.Body.Movement;
 
         // only update target height if the player is falling or on the ground
-        if (m.y == 0 || (m.y < 0 && pPos.y < player.GroundedHeight)) _lastPlayerY = player.transform.position.y;
+        if (m.y == 0 || (m.y < 0 && pPos.y < Game.Player.GroundedHeight)) _lastPlayerY = pTr.position.y;
 
         // edit target position: use last Y, move camera when walking up/down, rotate when walking left/right
-        pPos.y = _lastPlayerY + player.Body.MoveRelative.z * (m.x * m.x + m.z * m.z) * 3;
-        float goalRotY = GoalRot.y + player.Body.MoveRelative.x * 5;
+        pPos.y = _lastPlayerY + Game.Player.Body.MoveRelative.z * (m.x * m.x + m.z * m.z) * 3;
+        float goalRotY = GoalRot.y + Game.Player.Body.MoveRelative.x * 5;
 
         float fps = Time.deltaTime == 0 ? 10e6f : 1 / Time.deltaTime;
         float posFps = MoveDelay * fps, rotFps = RotDelay * (1 + _lastPlayerY / 8) * fps;

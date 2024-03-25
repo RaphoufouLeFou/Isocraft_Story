@@ -7,11 +7,12 @@ public class Player : NetworkBehaviour
 {
     private Camera _camera;
     public PlayerCamera playerCamera;
-    private float _health;
-
+    
     [NonSerialized] public int Level = 0;
+    [NonSerialized] public float Health;
+    [NonSerialized] public bool IsLoaded;
 
-    [NonSerialized] public CustomRigidBody Body;
+    public CustomRigidBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     private Vector3 _spawn;
     private bool _spawnSuccess = true;
@@ -19,9 +20,6 @@ public class Player : NetworkBehaviour
     private GameObject _healthImage;
     private InventoryUI _inventoryUI;
     private NetworkManagement _networkManagement;
-
-    [NonSerialized] public bool IsLoaded;
-
     public Inventory Inventory;
     
     private void Start()
@@ -38,9 +36,10 @@ public class Player : NetworkBehaviour
         GameObject scripts = GameObject.Find("Scripts");
         _inventoryUI = scripts.GetComponent<InventoryUI>();
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
+        Health = 1;
+        DealDamage(0); // update health bar at the start
         _networkManagement = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
         
-        _health = 1;
         Inventory = new Inventory();
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
         
@@ -50,14 +49,6 @@ public class Player : NetworkBehaviour
         // body settings
         Transform tr = transform;
         Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
-        /*
-        if (SuperGlobals.IsNewSave) // spawn at 0, 0 if debugging or new save
-        {
-            if (SuperGlobals.StartedFromMainMenu) SetSpawn(new Vector3(0, Chunk.Size, 0));
-            else _spawn = new Vector3(0, Chunk.Size, 0);
-            tr.position = _spawn;
-        } TODO
-        */
 
         tr.position = new Vector3(0, Chunk.Size, 0);
         
@@ -71,7 +62,7 @@ public class Player : NetworkBehaviour
     {
         // set variables once save infos are loaded
         SetSpawn(pos);
-        _health = health;
+        Health = health;
         playerCamera.GoalRot.y = MathF.Round(rot.y / 45) * 45;
         playerCamera.GoToPlayer();
         Inventory = inv;
@@ -121,13 +112,19 @@ public class Player : NetworkBehaviour
         Body.Movement = Vector3.zero;
     }
 
+    public void DealDamage(float amount)
+    {
+        Health = amount < Health ? Health - amount : 0;
+        _healthImage.transform.localScale = new Vector3(Health,1 ,1);
+    }
+    
     private int PlaceBreak(Vector3 pos, int type, bool isPlacing)
     {
         int chunkX = Utils.Floor(pos.x / Chunk.Size),
             chunkZ = Utils.Floor(pos.z / Chunk.Size);
 
         // chunk is not loaded, current player cannot edit
-        string chunkName = chunkX + "." + chunkZ;
+        string chunkName = $"{chunkX}.{chunkZ}";
         if (!MapHandler.Chunks.ContainsKey(chunkName)) return -1;
         Chunk chunk = MapHandler.Chunks[chunkName];
 
@@ -215,19 +212,10 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(Settings.KeyMap["Kill"])) Respawn();
         if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn(transform.position);
     }
-
-    public float GetHealth()
-    {
-        return _health;
-    }
     
     void Update()
     {
-        if (Body == null)
-        {
-            // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
-            throw new PlayerException("Player body is null, check game start for errors");
-        }
+        if (Body == null) throw new PlayerException("Player body is null, check game start for errors");
         
         // if couldn't spawn before, retry
         if (!_spawnSuccess) SetSpawn(_spawn);
@@ -237,8 +225,6 @@ public class Player : NetworkBehaviour
         Body.Update(Settings.IsPaused);
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
 
-        _healthImage.transform.localScale = new Vector3(_health,1 ,1);
-
         bool invVisible = _inventoryUI.inventoryMenu.activeSelf;
         if (Input.GetKeyDown(Settings.KeyMap["Inventory"]))
         {
@@ -246,7 +232,7 @@ public class Player : NetworkBehaviour
             else if (!Settings.IsPaused) _inventoryUI.DisplayInventory();
         }
         
-        // warning: player rotation may be down into the ground
+        // warning: the tilted camera rotation can make the player look down
         transform.rotation = Quaternion.Euler(playerCamera.GoalRot);
 
         // update the following if in-game
@@ -259,7 +245,11 @@ public class Player : NetworkBehaviour
     public override void OnStopClient()
     {
         base.OnStopClient();
-        if (isServer) return; // probably an issue when there are multiple clients !! TODO
+        if (isServer)
+        {
+            Debug.LogWarning("probably an issue when there are multiple clients !! TODO");
+            return;
+        }
         _networkManagement.LeaveGame();
     }
 }

@@ -5,23 +5,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Mirror;
-
-public static class Settings
-{       
-    public static bool IsPaused;
-    public static bool Playing; // true only if no popup is open
-    public static Dictionary<string, KeyCode> KeyMap; // key: input name, value: keycode
-
-    public struct OverlayStruct // overlay info struct
-    {
-        public bool DisplayFps; // displayed FPS
-        public bool DisplayMs; // displayed ms per frame
-        public bool DisplayCoords; //player coordinates
-        public bool DisplaySaveName; //displayed save name
-    }
-    public static OverlayStruct Overlay; // overlay infos to be displayed
-}
 
 public class SettingsUI : MonoBehaviour
 {
@@ -92,10 +75,10 @@ public class SettingsUI : MonoBehaviour
         multiplayerMenu.SetActive(menu == "Multiplayer");
         if (menu == "Multiplayer")
         {
-            string EncP = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4());
-            string EncL = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4L());
-            GameObject.Find("GameCodeMultiP").GetComponent<TMP_Text>().text = "Public : " + EncP;
-            GameObject.Find("GameCodeMultiL").GetComponent<TMP_Text>().text = "Lan : " + EncL;
+            string encP = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4());
+            string encL = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4L());
+            GameObject.Find("GameCodeMultiP").GetComponent<TMP_Text>().text = $"Public : {encP}";
+            GameObject.Find("GameCodeMultiL").GetComponent<TMP_Text>().text = $"Lan : {encL}";
         }
         pressKeyText.SetActive(false);
     }
@@ -136,6 +119,9 @@ public class SettingsUI : MonoBehaviour
         Settings.Overlay.DisplayFps = true;
         Settings.Overlay.DisplayCoords = true;
         Settings.Overlay.DisplaySaveName = true;
+
+        Settings.Game.FastGraphics = false;
+        Settings.Game.AutoSaveDelay = 15;
 
         Settings.KeyMap = new Dictionary<string, KeyCode>
         {

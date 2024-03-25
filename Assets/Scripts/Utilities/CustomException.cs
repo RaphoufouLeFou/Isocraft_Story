@@ -10,7 +10,7 @@ public class CustomException : Exception
 
 public class PlayerException : CustomException
 {
-    public PlayerException(string message = "Collider exception") : base(message) { }
+    public PlayerException(string message = "Player exception") : base(message) { }
 }
 
 public class BlockException : CustomException
@@ -21,4 +21,9 @@ public class BlockException : CustomException
 public class GenerationException : CustomException
 {
     public GenerationException(string message = "Generation exception") : base(message) { }
+}
+
+public class CommandException : Exception
+{
+    public CommandException(string message = "Invalid command syntax") : base(message) { }
 }
