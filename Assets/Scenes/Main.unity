@@ -16547,8 +16547,6 @@ MonoBehaviour:
   syncInterval: 0.1
   chunkPlane: {fileID: 9217093936871528207, guid: 591103caefeb4be45b8ccc5a163c3fea, type: 3}
   chunkParent: {fileID: 851175655}
-  opaque: {fileID: 2100000, guid: 2ab6f5017e40bab4e9471e78e35c7f31, type: 2}
-  transparent: {fileID: 2100000, guid: 2787f7703ef95024eb0bdfc6ed40cf54, type: 2}
 --- !u!4 &1070619968
 Transform:
   m_ObjectHideFlags: 0

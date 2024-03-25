@@ -8,7 +8,6 @@ public class MapHandler : NetworkBehaviour
 {
     public GameObject chunkPlane;
     public GameObject chunkParent;
-    public Material opaque, transparent;
     private Transform _chunksParent;
 
     private int? _id;
@@ -52,7 +51,7 @@ public class MapHandler : NetworkBehaviour
         if (!SuperGlobals.StartedFromMainMenu) return;
         
         string dirPath = $"{Application.persistentDataPath}/Saves/{Game.SaveManager.SaveName}/Chunks/";
-        string path = $"{dirPath}{chunk.name}.Chunk";
+        string path = $"{dirPath}{chunk.Name}.Chunk";
         int[,,] blocks = chunk.Blocks;
         int size = Chunk.Size;
         if (File.Exists(path)) File.Delete(path);
@@ -111,34 +110,27 @@ public class MapHandler : NetworkBehaviour
     }
     
     [Command (requiresAuthority = false)]
-    private void CmdGenChunk(int x, int z, int id)
+    private void CmdGenChunk(int cx, int cz, int id)
     {
         // prepare a chunk, or load it, to send its blocks to a client
 
         int[,,] blocks = new int[Chunk.Size, Chunk.Size, Chunk.Size];
-        string chunkName = x + "." + z;
+        string chunkName = $"{cx}.{cz}";
+        // chunk is loaded on the server
         if (Chunks.TryGetValue(chunkName, out Chunk chunk)) blocks = chunk.Blocks;
-        else
-        {
-            if (!LoadBlocks(blocks, chunkName)) // chunk doesn't exist yet
-            {
-                GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
-                chunk = chunkObject.GetComponent<Chunk>();
-                chunk.GenerateBlocks();
-                
-                blocks = chunk.Blocks;
-            }
-        }
+        else // chunk isn't loaded
+        if (!LoadBlocks(blocks, chunkName)) // try to get blocks from save, otherwise generate
+            Chunk.GenerateBlocks(blocks, cx * Chunk.Size, cz * Chunk.Size);
         
         int len = blocks.Length;
         int[] bytes = new int[len];
         Buffer.BlockCopy(blocks, 0, bytes, 0, len * 4);
         
-        RpcGetBlocks(bytes, x, z, id);
+        RpcGetBlocks(bytes, cx, cz, id);
     }
     
     [ClientRpc]
-    private void RpcGetBlocks(int[] bytes, int x, int z, int id)
+    private void RpcGetBlocks(int[] bytes, int cx, int cz, int id)
     {
         // clients generate chunks here
 
@@ -147,16 +139,11 @@ public class MapHandler : NetworkBehaviour
         int[,,] blocks = new int[Chunk.Size,Chunk.Size,Chunk.Size];
         Buffer.BlockCopy(bytes, 0, blocks, 0, bytes.Length * 4);
         
-        GameObject chunkObject = Instantiate(chunkPlane, _chunksParent);
-        chunkObject.name = x + "." + z;
-        
-        Chunk chunk = chunkObject.GetComponent<Chunk>();
-        MeshRenderer meshRenderer = chunkObject.GetComponent<MeshRenderer>();
-        meshRenderer.material = opaque;
-        chunk.Blocks = blocks;
-        chunk.Init(x, z);
-        
-        Chunks.TryAdd(chunkObject.name, chunk);
+        GameObject plane = Instantiate(chunkPlane, _chunksParent);
+        Chunk chunk = plane.GetComponent<Chunk>();
+        chunk.Init(cx, cz, blocks);
+
+        Chunks.TryAdd(chunk.Name, chunk);
         SaveChunk(chunk);
     }
 }

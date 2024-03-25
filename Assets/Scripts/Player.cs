@@ -112,7 +112,6 @@ public class Player : NetworkBehaviour
         {
             _spawn = pos;
             _spawnSuccess = false;
-            Debug.Log("waiting for chunk to set spawn");
         }
     }
 

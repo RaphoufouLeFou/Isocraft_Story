@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-class FaceUtils
+public static class FaceUtils
 {
     // front, back, top, bottom, right, left
-    private readonly int[,] _facesIndices =
+    private static readonly int[,] FacesIndices =
         { { 5, 7, 6, 4 }, { 0, 2, 3, 1 }, { 2, 6, 7, 3 }, { 4, 0, 1, 5 }, { 1, 3, 7, 5 }, { 4, 6, 2, 0 } };
-    public readonly List<Vector3[]> FacesOffsets = new();
+    public static readonly List<Vector3[]> FacesOffsets = new();
 
-    public FaceUtils()
+    static FaceUtils()
     {
         // initialize vertex lists
         List<Vector3> vertexOffset = new List<Vector3>();
@@ -17,10 +17,10 @@ class FaceUtils
         for (int face = 0; face < 6; face++)
             FacesOffsets.Add(new[]
             {
-                vertexOffset[_facesIndices[face, 0]],
-                vertexOffset[_facesIndices[face, 1]],
-                vertexOffset[_facesIndices[face, 2]],
-                vertexOffset[_facesIndices[face, 3]]
+                vertexOffset[FacesIndices[face, 0]],
+                vertexOffset[FacesIndices[face, 1]],
+                vertexOffset[FacesIndices[face, 2]],
+                vertexOffset[FacesIndices[face, 3]]
             });
     }
 }
@@ -29,48 +29,53 @@ public class Chunk : MonoBehaviour
 {
     [NonSerialized] public const int Size = 16;
     [NonSerialized] public const int Size1 = Size - 1;
-    [NonSerialized] public int[,,] Blocks = new int[Size, Size, Size];
+    [NonSerialized] public int[,,] Blocks;
 
-    private Vector2 _pos; 
-    private MeshFilter _meshFilter;
-    private MeshCollider _meshCollider;
-    private readonly FaceUtils _faceUtils = new();
+    [NonSerialized] public string Name;
 
-    public void Init(int x, int z)
+    private int _x, _z; // in block space
+    private int _cx, _cz; // in chunk space 
+    private MeshFilter _meshFilter1, _meshFilter2;
+
+    public void Init(int cx, int cz, int[,,] blocks)
     {
-        _meshFilter = GetComponent<MeshFilter>();
-        _meshCollider = GetComponent<MeshCollider>();
+        (_x, _z, _cx, _cz) = (cx, cz, cx * Size, cz * Size);
+        transform.position = new Vector3(cx * Size, 0, cz * Size);
+        Name = $"{cx}.{cz}";
+        Blocks = blocks;
 
-        _pos = new Vector2(x, z);
-        transform.position = new Vector3(x * Size, 0, z * Size);
+        GameObject opaquePlane = transform.Find("Opaque").gameObject;
+        GameObject transparentPlane = transform.Find("Transparent").gameObject;
+        
+        _meshFilter1 = opaquePlane.GetComponent<MeshFilter>();
+        _meshFilter2 = transparentPlane.GetComponent<MeshFilter>();
         
         BuildMesh(true);
     }
     
-    public void GenerateBlocks()
+    public static void GenerateBlocks(int[,,] blocks, int posX, int posZ)
     {
-        // generate blocks and structures from NoiseGen
+        // generate blocks and structures from NoiseGen into an int[,,] array
 
         // blocks
-        Vector3 pos = transform.position;
         for (int x = 0; x < Size; x++)
         for (int z = 0; z < Size; z++)
         {
             int y = 0;
-            foreach (int block in NoiseGen.GetColumn((int)pos.x + x, (int)pos.z + z))
-                Blocks[x, y++, z] = block;
+            foreach (int block in NoiseGen.GetColumn(posX + x, posZ + z))
+                blocks[x, y++, z] = block;
         }
 
         // get intersecting structures by searching around
         for (int x = -Game.MaxStructSize; x < Size + Game.MaxStructSize; x++)
         for (int z = -Game.MaxStructSize; z < Size + Game.MaxStructSize; z++)
         {
-            (int y, Structure s) = NoiseGen.GetStruct((int)_pos.x * Size + x, (int)_pos.y * Size + z);
+            (int y, Structure s) = NoiseGen.GetStruct(posX + x, posZ + z);
             if (y != -1) for(int dx = 0; dx < s.X; dx++) for(int dy = 0; dy < s.Y; dy++) for (int dz = 0; dz < s.Z; dz++)
                 if (x + dx is >= 0 and < Size && y + dy is >= 0 and < Size && z + dz is >= 0 and < Size)
                 {
                     int b = s.GetBlock(x, y, z, dx, dy, dz);
-                    if (b != -1) Blocks[x + dx, y + dy, z + dz] = b;
+                    if (b != -1) blocks[x + dx, y + dy, z + dz] = b;
                 }
         }
     }
@@ -90,8 +95,8 @@ public class Chunk : MonoBehaviour
         Dictionary<int, Chunk> neighbors = new ();
         for (int i = 0; i < 4; i++)
         {
-            if (MapHandler.Chunks.TryGetValue(_pos.x + (i < 2 ? i * 2 - 1 : 0) + "." +
-                                              (_pos.y + (i > 1 ? i * 2 - 5 : 0)), out Chunk chunk))
+            if (MapHandler.Chunks.TryGetValue(_cx + (i < 2 ? i * 2 - 1 : 0) + "." +
+                                              (_cz + (i > 1 ? i * 2 - 5 : 0)), out Chunk chunk))
                 neighbors.Add(i, chunk);
         }
 
@@ -145,7 +150,7 @@ public class Chunk : MonoBehaviour
                         if (other == 0)
                         {
                             // visible face
-                            for (int j = 0; j < 4; j++) vertices.Add(pos + _faceUtils.FacesOffsets[face][j]);
+                            for (int j = 0; j < 4; j++) vertices.Add(pos + FaceUtils.FacesOffsets[face][j]);
 
                             int n = nFaces << 2;
                             triangles.AddRange(new[] { n, n + 1, n + 2, n, n + 2, n + 3 });
@@ -160,8 +165,7 @@ public class Chunk : MonoBehaviour
         mesh.uv = uvs.ToArray();
 
         mesh.RecalculateNormals();
-        _meshFilter.mesh = mesh;
-        _meshCollider.sharedMesh = mesh;
+        _meshFilter1.mesh = mesh;
         
         // update neighbors (remove side faces if needed) if newly created chunk
         if (newChunk)
