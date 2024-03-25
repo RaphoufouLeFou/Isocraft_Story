@@ -8,18 +8,22 @@ public class Chunk : MonoBehaviour
     [NonSerialized] public const int Size1 = Size - 1;
     [NonSerialized] public int[,,] Blocks;
 
-    private int _cx, _cz; // in chunk space 
+    private int _x, _z, _cx, _cz; // in chunk space 
     private MeshFilter _meshFilter1, _meshFilter2;
     private MeshCollider _collider1, _collider2;
+    
+    private Dictionary<(int x, int y, int z), BlockEntity> _models = new();
 
     public void Init(int cx, int cz, int[,,] blocks)
     {
+        _x = cx * Size;
+        _z = cz * Size;
         _cx = cx;
         _cz = cz;
-        transform.position = new Vector3(cx * Size, 0, cz * Size);
         name = $"{cx}.{cz}";
         Blocks = blocks;
-
+        
+        transform.position = new Vector3(_x, 0, _z);
         GameObject opaquePlane = transform.Find("Opaque").gameObject;
         GameObject transparentPlane = transform.Find("Transparent").gameObject;
         
@@ -83,7 +87,16 @@ public class Chunk : MonoBehaviour
             Block blockObj = Game.Blocks.FromId[blockId];
             Vector3 pos = new Vector3(x, y, z);
 
-            if (blockObj.Is2D) // cross-shaped block: display all cross faces
+            if (blockObj.IsModel) // 3D model: add model to children
+            {
+                BlockEntity blockEntity = new BlockEntity(blockId);
+                GameObject go = blockEntity.GetBaseObject();
+                go = Instantiate(go, transform);
+                blockEntity.SetObject(go, new Vector3(_x + x, y, _z + z));
+                _models[(x, y, z)] = blockEntity;
+            }
+
+            else if (blockObj.Is2D) // cross-shaped block: display all cross faces
             {
                 for (int face = 0; face < 4; face++)
                 {
@@ -167,8 +180,8 @@ public class Chunk : MonoBehaviour
                         uvs1.AddRange(blockObj.GetUVs(face));
                         n1 += 4;
                     }
-                    // draw transparent blocks faces next to NoTexture ones, or transparent ones except in fast graphics
-                    else if (blockObj.Transparent && (otherObj.Transparent && !Settings.Game.FastGraphics || otherObj.NoTexture))
+                    // handle transparent blocks faces
+                    else if (blockObj.Transparent && (otherObj.Transparent && !Settings.Game.FastGraphics || otherObj.NoTexture) && !(blockObj.IsFluid && otherObj.IsFluid))
                     {
                         for (int j = 0; j < 4; j++) vertices2.Add(pos + FaceUtils.FacesOffsets[face][j]);
 

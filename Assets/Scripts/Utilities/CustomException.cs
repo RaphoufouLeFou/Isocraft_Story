@@ -8,6 +8,11 @@ public class CustomException : Exception
     }
 }
 
+public class NullExceptionCrash : CustomException
+{
+    public NullExceptionCrash(string message = "Null exception") : base(message) { }
+}
+
 public class PlayerException : CustomException
 {
     public PlayerException(string message = "Player exception") : base(message) { }

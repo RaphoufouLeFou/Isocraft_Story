@@ -126,11 +126,12 @@ public class NetworkManagement : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        Game.SaveManager.SaveGame();
+        if (Game.SaveManager is not null) Game.SaveManager.SaveGame();
     }
 
     private void Update()
     {
+        if (_manager is null) throw new NullExceptionCrash("Game probably failed to load");
         if (_manager.isNetworkActive == false) SceneManager.LoadScene(mainMenuSceneName);
     }
 }

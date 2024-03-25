@@ -1,13 +1,17 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public enum Tag
 {
     Transparent = 0,
     Unbreakable = 1,
     Is2D = 2,
-    NoCollide = 3,
-    NoTexture = 4,
-    CanInteract = 5
+    IsModel = 3,
+    NoCollide = 4,
+    NoTexture = 5,
+    IsFluid = 6,
+    HasInfo = 7,
+    CanInteract = 8
 }
 
 public class Block
@@ -16,15 +20,24 @@ public class Block
     public readonly bool Transparent;
     public readonly bool Unbreakable;
     public readonly bool Is2D;
+    public readonly bool IsModel;
     public readonly bool NoCollide;
     public readonly bool NoTexture;
+    public readonly bool IsFluid;
+    public readonly bool HasInfo;
     public readonly bool CanInteract;
+
+    public readonly Tag[] Tags; // deprecated, use individual properties instead
+
+    public readonly Dictionary<string, int> Info;
 
     private readonly Tiles.Tile _top, _sides, _bottom;
 
     private Block(Tag[] tags = null)
     {
-        if (tags != null) foreach(Tag tag in tags)
+        Tags = tags;
+        
+        if (tags != null) foreach (Tag tag in tags)
             switch (tag)
             {
                 case Tag.Transparent:
@@ -35,6 +48,7 @@ public class Block
                     break;
                 case Tag.Is2D:
                     Is2D = true;
+                    Transparent = true;
                     break;
                 case Tag.NoCollide:
                     NoCollide = true;
@@ -44,13 +58,23 @@ public class Block
                     Transparent = true;
                     NoTexture = true;
                     break;
+                case Tag.IsFluid:
+                    IsFluid = true;
+                    break;
+                case Tag.IsModel:
+                    IsModel = true;
+                    Transparent = true;
+                    break;
+                case Tag.HasInfo:
+                    HasInfo = true;
+                    break;
                 case Tag.CanInteract:
                     CanInteract = true;
                     break;
                 default: throw new BlockException($"Unknown tag name: {tag}");
             }
 
-        if (Is2D && !Transparent) throw new BlockException("2D blocks must be transparent");
+        if (HasInfo) Info = new Dictionary<string, int>();
     }
 
     public Block(Tiles.Tile allFaces, Tag[] tags = null) : this(tags)
@@ -80,7 +104,7 @@ public class Block
                 }
             throw new BlockException($"Trying to access texture from block of ID: {id ?? "[unknown]"}");
         }
-
+        
         switch (faceIndex)
         {
             case 2: return _top.UVs;

@@ -1,5 +1,4 @@
 using System;
-using JetBrains.Annotations;
 using UnityEngine;
 
 public class SuperGlobals : MonoBehaviour
@@ -9,7 +8,7 @@ public class SuperGlobals : MonoBehaviour
     public static bool IsNewSave = true; // overriden if started from main menu
     
     // deprecated once game is loaded
-    [CanBeNull] private static string _saveName;
+    private static string _saveName;
     public static string SaveName
     {
         get

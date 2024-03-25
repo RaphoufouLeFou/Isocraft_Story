@@ -122,6 +122,7 @@ public class SettingsUI : MonoBehaviour
 
         Settings.Game.FastGraphics = false;
         Settings.Game.AutoSaveDelay = 15;
+        Settings.Game.RenderDistance = 5;
 
         Settings.KeyMap = new Dictionary<string, KeyCode>
         {

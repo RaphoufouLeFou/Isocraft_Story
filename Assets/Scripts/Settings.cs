@@ -20,6 +20,7 @@ public static class Settings
     {
         public bool FastGraphics;
         public int AutoSaveDelay;
+        public int RenderDistance;
     }
 
     public static GameStruct Game;

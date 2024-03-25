@@ -17,6 +17,21 @@ public class Game : MonoBehaviour
     public Sprite[] sprites;
     public MapHandler mapHandler;
     
+    public GameObject[] models;
+
+    private static Game _object; // non-static Game object, available after InitGameUtils
+
+    public static Game Object
+    {
+        get
+        {
+            if (_object is null)
+                throw new NullExceptionCrash("Attempt at getting Game.Object before initialization");
+            return Object;
+        }
+        private set => _object = value;
+    }
+    
     private float _prevTick;
     private float _prevSave;
 
@@ -25,9 +40,9 @@ public class Game : MonoBehaviour
     private static readonly string[] StructNames = { "Tree", "Trunk", "Bush" };
     [NonSerialized] public static int MaxStructSize; // how many blocks out can structures be searched for
 
-    public static class Blocks
+    public struct Blocks
     {
-        public static readonly int
+        public const int
             None = -1,
             Air = 0,
             Sand = 1,
@@ -44,7 +59,8 @@ public class Game : MonoBehaviour
             BokaHome = 12,
             BokaBeast = 13,
             DeadBush = 14,
-            DeadPlant = 15;
+            DeadPlant = 15,
+            Chest = 16;
 
         public static readonly Dictionary<int, Block> FromId = new()
         {
@@ -62,13 +78,35 @@ public class Game : MonoBehaviour
             { BokaBoom, new Block(Tiles.BokaBrick, Tiles.BokaBoom, Tiles.BokaBrick) },
             { BokaHome, new Block(Tiles.BokaBrick, Tiles.BokaHome, Tiles.BokaBrick) },
             { BokaBeast, new Block(Tiles.BokaBrick, Tiles.BokaBeast, Tiles.BokaBrick) },
-            { DeadBush, new Block(Tiles.DeadBush, new[] { Tag.Is2D, Tag.Transparent, Tag.NoCollide }) },
-            { DeadPlant, new Block(Tiles.DeadPlant, new[] { Tag.Is2D, Tag.Transparent, Tag.NoCollide }) }
+            { DeadBush, new Block(Tiles.DeadBush, new[] { Tag.Is2D, Tag.NoCollide }) },
+            { DeadPlant, new Block(Tiles.DeadPlant, new[] { Tag.Is2D, Tag.NoCollide }) },
+            { Chest, new Block(null, new[] { Tag.NoTexture, Tag.IsModel }) }
+        };
+    }
+
+    public struct Models
+    {
+        // { Block ID, asset index }
+        public static readonly Dictionary<int, int> ModelsIndex = new()
+        {
+            { Blocks.Chest, 0 }
+        };
+        
+        public static GameObject[] GameObjects;
+
+        public static readonly Vector3[] Offsets =
+        {
+            new(0.5f, 0, 0.5f)
         };
     }
 
     public void InitGameUtils()
     {
+        if (Models.Offsets.Length != models.Length)
+            throw new BlockException("Not all models initialized");
+        Models.GameObjects = models;
+        Object = this;
+        
         // start some things very early
         Started = false;
         
@@ -87,8 +125,8 @@ public class Game : MonoBehaviour
             Structs.TryAdd(type, s);
         }
 
-        SaveManager = new SaveManagement();
         // set up SuperGlobals
+        SaveManager = new SaveManagement();
         GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
         if (globals != null) SaveManager.SaveName = SuperGlobals.SaveName;
     }
@@ -133,7 +171,6 @@ public class Game : MonoBehaviour
         // quit game, even if in editor
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-        Debug.Log("Game quit in editor");
 #endif
         Application.Quit();
     }
