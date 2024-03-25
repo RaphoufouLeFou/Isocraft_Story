@@ -29,7 +29,33 @@ public class Overlay : MonoBehaviour
             text += $"{_displayFps:F1} FPS {(Settings.Overlay.DisplayMs ? " " : "\n")}";
         if (Settings.Overlay.DisplayMs) text += $"(last: {_displayMs:F1}ms)\n";
         if (Settings.Overlay.DisplayCoords)
+        {
             text += $"[{pos.x:F3}, {pos.y:F3}, {pos.z:F3}]\n";
+            int rotStep = Utils.Mod((int)Game.Player.playerCamera.GoalRot.y, 360) / 45;
+            string rot;
+            switch (rotStep)
+            {
+                case 0: rot = "North (+Z)";
+                    break;
+                case 1: rot = "NorthEast (+X+Z)";
+                    break;
+                case 2: rot = "East (+X)";
+                    break;
+                case 3: rot = "SouthEast (+X-Z)";
+                    break;
+                case 4: rot = "South (-Z)";
+                    break;
+                case 5: rot = "SouthWest (-X-Z)";
+                    break;
+                case 6: rot = "West (-X)";
+                    break;
+                default: rot = "NorthWest (-X+Z)";
+                    break;
+            }
+
+            text += $"Rotation: {rot}\n";
+        }
+
         if (Settings.Overlay.DisplaySaveName)
             text += "Name: " + (SuperGlobals.StartedFromMainMenu ? Game.SaveManager.SaveName : "[debug mode]");
         textData.text = text;

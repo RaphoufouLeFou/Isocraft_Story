@@ -44,7 +44,7 @@ public class Block
                     Transparent = true;
                     NoTexture = true;
                     break;
-                case Tag.Interactable:
+                case Tag.CanInteract:
                     CanInteract = true;
                     break;
                 default: throw new BlockException($"Unknown tag name: {tag}");
