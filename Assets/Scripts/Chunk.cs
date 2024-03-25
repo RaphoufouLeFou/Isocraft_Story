@@ -2,51 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class FaceUtils
-{
-    // for cube faces
-    // front, back, top, bottom, right, left
-    private static readonly int[,] FacesIndices =
-        { { 5, 7, 6, 4 }, { 0, 2, 3, 1 }, { 2, 6, 7, 3 }, { 4, 0, 1, 5 }, { 1, 3, 7, 5 }, { 4, 6, 2, 0 } };
-    public static readonly List<Vector3[]> FacesOffsets = new();
-    
-    // for cross shapes
-    // front left, front right, back right, back left
-    private static readonly int[,] CrossIndices =
-        { { 5, 7, 2, 0 }, { 1, 3, 6, 4 }, { 0, 2, 7, 5 }, { 4, 6, 3, 1 } };
-    public static readonly List<Vector3[]> CrossOffsets = new();
-
-    static FaceUtils()
-    {
-        // initialize vertex lists
-        List<Vector3> vertexOffset = new List<Vector3>();
-        for (int i = 0; i < 8; i++) vertexOffset.Add(new Vector3(i & 1, i >> 1 & 1, i >> 2));
-        
-        List<Vector3> crossVertexOffset = new List<Vector3>();
-        for (int i = 0; i < 8; i++) crossVertexOffset.Add(new Vector3(i & 1, i >> 1 & 1, i >> 2));
-        // TODO
-        
-        // initialize face offsets
-        for (int face = 0; face < 6; face++)
-            FacesOffsets.Add(new[]
-            {
-                vertexOffset[FacesIndices[face, 0]],
-                vertexOffset[FacesIndices[face, 1]],
-                vertexOffset[FacesIndices[face, 2]],
-                vertexOffset[FacesIndices[face, 3]]
-            });
-
-        for (int face = 0; face < 4; face++)
-            CrossOffsets.Add(new[]
-            {
-                crossVertexOffset[CrossIndices[face, 0]],
-                crossVertexOffset[CrossIndices[face, 1]],
-                crossVertexOffset[CrossIndices[face, 2]],
-                crossVertexOffset[CrossIndices[face, 3]]
-            });
-    }
-}
-
 public class Chunk : MonoBehaviour
 {
     [NonSerialized] public const int Size = 16;
@@ -124,11 +79,10 @@ public class Chunk : MonoBehaviour
         for (int z = 0; z < Size; z++)
         {
             int blockId = Blocks[x, y, z];
-            if (blockId == Game.Blocks.Air) continue;
             Block blockObj = Game.Blocks.FromId[blockId];
             Vector3 pos = new Vector3(x, y, z);
 
-            if (blockObj is Cross) // cross-shaped block: display all cross faces
+            if (blockObj.Is2D) // cross-shaped block: display all cross faces
             {
                 for (int face = 0; face < 4; face++)
                 {
@@ -140,7 +94,7 @@ public class Chunk : MonoBehaviour
                     nFaces++;
                 }
             }
-            else // full block: display face by face if visible
+            else if (!blockObj.Transparent) // full block: display face by face if visible
             {
                 for (int face = 0; face < 6; face++)
                 {
@@ -168,7 +122,7 @@ public class Chunk : MonoBehaviour
                             break;
                     }
 
-                    int other = -1; // other block
+                    int otherId = -1; // other block
                     int i = 0;
                     if (otherPos.x < 0)
                     {
@@ -180,8 +134,8 @@ public class Chunk : MonoBehaviour
                         otherPos.x -= Size;
                         i = 1;
                     }
-                    else if (otherPos.y < 0) other = 0; // air under
-                    else if (otherPos.y >= Size) other = 0; // air above
+                    else if (otherPos.y < 0) otherId = 0; // air under
+                    else if (otherPos.y >= Size) otherId = 0; // air above
                     else if (otherPos.z < 0)
                     {
                         otherPos.z += Size;
@@ -193,15 +147,16 @@ public class Chunk : MonoBehaviour
                         i = 3;
                     }
                     else
-                        other = Blocks[(int)otherPos.x, (int)otherPos.y,
+                        otherId = Blocks[(int)otherPos.x, (int)otherPos.y,
                             (int)otherPos.z]; // other block is in the same chunk
 
-                    if (other == -1) // other block is in another chunk
-                        other = neighbors.TryGetValue(i, out Chunk chunk)
+                    if (otherId == -1) // other block is in another chunk
+                        otherId = neighbors.TryGetValue(i, out Chunk chunk)
                             ? chunk.Blocks
                                 [(int)otherPos.x, (int)otherPos.y, (int)otherPos.z] // block is in neighboring chunk
                             : Game.Blocks.Bedrock; // block in unloaded chunk: avoid rendering useless faces
-                    if (other == Game.Blocks.Air || Game.Blocks.FromId[other] is Cross)
+                    Block otherObj = Game.Blocks.FromId[otherId];
+                    if (otherObj.Transparent || otherObj.Is2D)
                     {
                         // face visible to the player
                         for (int j = 0; j < 4; j++) vertices.Add(pos + FaceUtils.FacesOffsets[face][j]);

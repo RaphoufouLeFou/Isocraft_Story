@@ -6,7 +6,7 @@ public class PlayerCamera : MonoBehaviour
 {
     public Player player;
     public Camera cam;
-    private readonly float _moveDelay = 0.5f, _rotDelay = 0.1f, _zoom = 4, _debounceTime = 0.25f;
+    private const float MoveDelay = 0.5f, RotDelay = 0.1f, Zoom = 4, DebounceTime = 0.25f;
     private float _currentRotDelay; // different possible rotation speeds
 
     // position and rotation
@@ -33,7 +33,7 @@ public class PlayerCamera : MonoBehaviour
         if (x < 0 || x > 1 || y < 0 || y > 1) return; // outside of screen
 
         // allow to rotate multiple times in a row, leave time to react and not rotate twice
-        bool debounce = Time.time > _startMouseShift + _debounceTime;
+        bool debounce = Time.time > _startMouseShift + DebounceTime;
 
         bool change = false;
         if (_mouseOffset > 0) _mouseOffset -= Time.deltaTime * 3; // add hysteresis
@@ -69,7 +69,7 @@ public class PlayerCamera : MonoBehaviour
         {
             float goalX = x < 0.5f ? w * 0.2f : w * 0.8f;
             if ((x < 0.5f) ^ (pos.x < goalX)) _mouseOffset = 0; // stop animation early if moved back to the center
-            float fps = Time.deltaTime == 0 ? 10e6f : _rotDelay / Time.deltaTime;
+            float fps = Time.deltaTime == 0 ? 10e6f : RotDelay / Time.deltaTime;
             pos.x = (pos.x * (fps - 1) + goalX) / fps;
             Mouse.current.WarpCursorPosition(pos);
         }
@@ -99,8 +99,7 @@ public class PlayerCamera : MonoBehaviour
 
         Transform tr = transform;
         Vector3 pPos = player.transform.position;
-        if (_lastPlayerY < 0) pPos.y = 0;
-        if (_lastPlayerY > Chunk.Size + 2) pPos.y = Chunk.Size + 2; 
+        pPos.y = _lastPlayerY;
         Vector3 m = player.Body.Movement;
 
         // only update target height if the player is falling or on the ground
@@ -108,10 +107,10 @@ public class PlayerCamera : MonoBehaviour
 
         // edit target position: use last Y, move camera when walking up/down, rotate when walking left/right
         pPos.y = _lastPlayerY + player.Body.MoveRelative.z * (m.x * m.x + m.z * m.z) * 3;
-        float goalRotY = GoalRot.y + player.Body.MoveRelative.x * 5; 
+        float goalRotY = GoalRot.y + player.Body.MoveRelative.x * 5;
 
         float fps = Time.deltaTime == 0 ? 10e6f : 1 / Time.deltaTime;
-        float posFps = _moveDelay * fps, rotFps = _rotDelay * (1 + _lastPlayerY / 8) * fps;
+        float posFps = MoveDelay * fps, rotFps = RotDelay * (1 + _lastPlayerY / 8) * fps;
         
         // fix y rotation 360 wrapping
         float currentRotY = _currentRot.y;
@@ -119,7 +118,8 @@ public class PlayerCamera : MonoBehaviour
         while (goalRotY - currentRotY > 180) currentRotY += 360;
         
         // set target X rotation
-        float targetX = _targetAbove ? 90 : 80 - _lastPlayerY * 4;
+        float targetX = _targetAbove ? 90 : 60 - _lastPlayerY * 3;
+        targetX = targetX < 0 ? 0 : targetX > 90 ? 90 : targetX;
         
         // smoothly interpolate according to fps:
         // (current * (fps-1) + goal) / fps
@@ -127,10 +127,11 @@ public class PlayerCamera : MonoBehaviour
         _currentPos = (_currentPos * posFps1 + pPos) / posFps;
         _currentRot.x = (_currentRot.x * rotFps1 + targetX) / rotFps;
         _currentRot.y = (currentRotY * rotFps1 + goalRotY) / rotFps;
-        cam.orthographicSize = (cam.orthographicSize * posFps1 + _zoom * (1 + _lastPlayerY / 10)) / posFps;
+        cam.orthographicSize = (cam.orthographicSize * posFps1 + Zoom * (1 + _lastPlayerY / Chunk.Size)) / posFps;
         
         // update transform: go to currentPos, rotate, then move back
+        Vector3 offsetY = new Vector3(0, _lastPlayerY / Chunk.Size * 3.5f, 0);
         tr.rotation = Quaternion.Euler(_currentRot);
-        tr.position = _currentPos + tr.rotation * new Vector3(0, 0, -20);
+        tr.position = _currentPos + tr.rotation * new Vector3(0, 0, -20) + offsetY;
     }
 }

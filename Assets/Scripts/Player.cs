@@ -141,7 +141,7 @@ public class Player : NetworkBehaviour
         int result = chunk.Blocks[x, y, z]; // for inventory management
         if (isPlacing ^ chunk.Blocks[x, y, z] == Game.Blocks.Air) return -1;
 
-        if (!isPlacing && result == Game.Blocks.Bedrock) return -1; // can't break bedrock
+        if (!isPlacing && Game.Blocks.FromId[result].Unbreakable) return -1; // can't break bedrock
 
         List<string> update = new List<string> { chunkName };
         if (x == 0) update.Add(chunkX - 1 + "." + chunkZ);

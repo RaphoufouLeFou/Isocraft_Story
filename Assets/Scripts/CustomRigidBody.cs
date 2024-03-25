@@ -45,7 +45,6 @@ public class CustomRigidBody
     
     void CheckCollisions(Vector3 pos)
     {
-        if(MapHandler.Chunks == null) return;
         OnFloor = false;
 
         Vector3 movement = pos - _transform.position;
@@ -58,13 +57,11 @@ public class CustomRigidBody
         for (int j = chunkZ - 1; j < chunkZ + 2; j++)
         {
             // no collisions for unloaded chunks
-            if (!MapHandler.Chunks.ContainsKey(i + "." + j))
+            if (!MapHandler.Chunks.TryGetValue($"{i}.{j}", out Chunk chunk))
             {
                 if (i == chunkX && j == chunkZ) return; // sitting in unloaded chunk
                 continue;
             }
-
-            Chunk chunk = MapHandler.Chunks[i + "." + j];
             
             // check collisions with blocks around
             // only calculate collisions with the block with the most depth
@@ -76,7 +73,7 @@ public class CustomRigidBody
             {
                 if (x < 0 || x >= Chunk.Size || y < 0 || y >= Chunk.Size || z < 0 ||
                     z >= Chunk.Size) continue;
-                if (chunk.Blocks[x, y, z] == 0) continue;
+                if (Game.Blocks.FromId[chunk.Blocks[x, y, z]].NoCollide) continue;
                 if (x + 1 > p.x - _width && x < p.x + _width &&
                     y + 1 > p.y - _height && y < p.y + _height &&
                     z + 1 > p.z - _width && z < p.z + _width)
@@ -128,7 +125,7 @@ public class CustomRigidBody
                     if (MathF.Abs(corr.z) > MathF.Abs(correction.z)) correction.z = corr.z;
                     _sprinting = false;
                 }
-                else throw new Exception("Way too much correction, gotta be an error somewhere");
+                else throw new ColliderException("Way too much correction, gotta be an error somewhere");
             }
 
             // move by final collision
@@ -171,7 +168,7 @@ public class CustomRigidBody
             if (backwards) z--;
             if (Input.GetKey(Settings.KeyMap["Left"])) x--;
             if (Input.GetKey(Settings.KeyMap["Right"])) x++;
-/*
+            /*
             if (forwards || backwards)
             {
                 Animator anim = _transform.gameObject.GetComponentInChildren<Animator>();

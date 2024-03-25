@@ -34,7 +34,7 @@ public static class NoiseGen
         switch (Game.Player.Level)
         {
             case 0: return _simplex.GetNoise(x, z) * 2 + 5;
-            default: throw new ArgumentException("Incorrect level: " + Game.Player.Level);
+            default: throw new GenerationException("Incorrect level: " + Game.Player.Level);
         }
     }
 
