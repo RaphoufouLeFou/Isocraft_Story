@@ -34,7 +34,7 @@ public static class NoiseGen
         switch (Game.Player.Level)
         {
             case 0: return _simplex.GetNoise(x, z) * 2 + 5;
-            default: throw new GenerationException("Incorrect level: " + Game.Player.Level);
+            default: return -1; // method should stay private so no error can be thrown
         }
     }
 
@@ -44,26 +44,31 @@ public static class NoiseGen
         float deco = _value2.GetNoise(x, levelY, z) / 2 + 0.5f; // does decoration spawn?
         float decoType = Value(x, levelY, z) / 2 + 0.5f; // in this case, which type?
         
-        if (Game.Player.Level == 0)
+        switch (Game.Player.Level)
         {
-            int? decoration = null;
-            decoType *= deco * deco;
-            if (decoType < 0.001f && Value(x, -100, z) < 0.5f)
-            {
-                decoType *= 1000;
-                decoration = decoType < 0.5f ? Game.Blocks.DeadPlant : Game.Blocks.DeadBush;
-            }
-            
-            for (int y = 0; y < Chunk.Size; y++)
-            {
-                float height = GetHeight(x, z);
-                if (y == 0) yield return Game.Blocks.Bedrock;
-                else if (y - 1 <= height && y > height && decoration != null) yield return (int)decoration;
-                else if (y > height) yield return Game.Blocks.Air;
-                else if (y + 1 > height) yield return Game.Blocks.Sand;
-                else if (y + 3 < height) yield return Game.Blocks.Sandstone;
-                else yield return Game.Blocks.RedSand;
-            }
+            case 0:
+                int? decoration = null;
+                decoType *= deco * deco;
+                if (decoType < 0.001f && Value(x, -100, z) < 0.5f)
+                {
+                    decoType *= 1000;
+                    decoration = decoType < 0.5f ? Game.Blocks.DeadPlant : Game.Blocks.DeadBush;
+                    decoration = Game.Blocks.Chest;
+                }
+                
+                for (int y = 0; y < Chunk.Size; y++)
+                {
+                    float height = GetHeight(x, z);
+                    if (y == 0) yield return Game.Blocks.Bedrock;
+                    else if (y - 1 <= height && y > height && decoration != null) yield return (int)decoration;
+                    else if (y > height) yield return Game.Blocks.Air;
+                    else if (y + 1 > height) yield return Game.Blocks.Sand;
+                    else if (y + 3 < height) yield return Game.Blocks.Sandstone;
+                    else yield return Game.Blocks.RedSand;
+                }
+
+                break; 
+                default: throw new GenerationException("Incorrect level: " + Game.Player.Level);
         }
     }
 

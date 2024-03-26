@@ -118,21 +118,9 @@ public class Player : NetworkBehaviour
         _healthImage.transform.localScale = new Vector3(Health,1 ,1);
     }
     
-    private int PlaceBreak(Vector3 pos, int type, bool isPlacing)
+    private int PlaceBreak(int chunkX, int chunkZ, int x, int y, int z, Chunk chunk, int type, bool isPlacing)
     {
-        int chunkX = Utils.Floor(pos.x / Chunk.Size),
-            chunkZ = Utils.Floor(pos.z / Chunk.Size);
-
-        // chunk is not loaded, current player cannot edit
         string chunkName = $"{chunkX}.{chunkZ}";
-        if (!MapHandler.Chunks.ContainsKey(chunkName)) return -1;
-        Chunk chunk = MapHandler.Chunks[chunkName];
-
-        int x = Utils.Floor(pos.x) - chunkX * Chunk.Size,
-            y = Utils.Floor(pos.y),
-            z = Utils.Floor(pos.z) - chunkZ * Chunk.Size;
-
-        if (y is < 0 or >= Chunk.Size) return -1; // outside of world
         
         // the slight position change makes the action replace a block or break air
         int result = chunk.Blocks[x, y, z]; // for inventory management
@@ -160,6 +148,7 @@ public class Player : NetworkBehaviour
     private void RpcPlaceBreak(List<string> update, int x, int y, int z, int type, bool isPlacing)
     {
         if (!MapHandler.Chunks.ContainsKey(update[0])) return; // map edit isn't visible for this player
+        // this could skip an update when editing a chunk border, but this shouldn't matter most of the time
         Chunk chunk = MapHandler.Chunks[update[0]];
         
         // update block in chunk
@@ -181,27 +170,52 @@ public class Player : NetworkBehaviour
 
     void DetectPlaceBreak()
     {
-        bool left = Input.GetMouseButtonDown(0), right = Input.GetMouseButtonDown(1);
-        if (left || right)
+        bool breaking = Input.GetMouseButtonDown(0), placing = Input.GetMouseButtonDown(1);
+        if (breaking || placing)
         {
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 // move into or out of the block to get the right targeted block
-                hit.point += (right ? 0.01f : -0.01f) * hit.normal;
-
+                Vector3 breakPos = hit.point - 0.01f * hit.normal;
+                Vector3 placePos = hit.point + 0.01f * hit.normal;
+                
+                // get edition position: more into the block for breaking/interacting, and back a little for placing
+                int breakCx = Utils.Floor(breakPos.x / Chunk.Size),
+                    breakCz = Utils.Floor(breakPos.z / Chunk.Size);
+                int placeCx = Utils.Floor(placePos.x / Chunk.Size),
+                    placeCz = Utils.Floor(placePos.z / Chunk.Size);
+                int placeX = Utils.Floor(placePos.x) - placeCx * Chunk.Size,
+                    placeY = Utils.Floor(placePos.y),
+                    placeZ = Utils.Floor(placePos.z) - placeCz * Chunk.Size;
+                int breakX = Utils.Floor(breakPos.x) - breakCx * Chunk.Size,
+                    breakY = Utils.Floor(breakPos.y),
+                    breakZ = Utils.Floor(breakPos.z) - breakCz * Chunk.Size;
+                
+                // outside of world
+                if (placing && placeY is < 0 or >= Chunk.Size || breaking && breakY is < 0 or >= Chunk.Size) return;
+                
                 int currentBlock = Inventory.GetCurrentBlock(HotBar.SelectedIndex, 3);
-                if (right)
+                // check for breaking and interacting
+                if (MapHandler.Chunks.TryGetValue($"{breakCx}.{breakCz}", out Chunk chunk))
                 {
+                    if (placing && chunk.InteractBlock(breakX, breakY, breakZ)) return; // check for interactions
+                    if (breaking) // break block
+                    {
+                        int res = PlaceBreak(breakCx, breakCz, breakX, breakY, breakZ, chunk, currentBlock, false);
+                        if (res >= 0) Inventory.AddBlock(res, Game.InvSprites[res]);
+                        return;
+                    }
+                }
+                
+                // check for block placing
+                if (placing && MapHandler.Chunks.TryGetValue($"{placeCx}.{placeCz}", out chunk))
+                {
+                    Debug.Log("placing at " + placeX + " " + placeY + " " + placeZ + " in " + chunk.name);
                     int count = Inventory.GetCurrentBlockCount(HotBar.SelectedIndex, 3);
                     if (count <= 0) return;
-                    int res = PlaceBreak(hit.point, currentBlock, true); // place the block for this instance
+                    int res = PlaceBreak(placeCx, placeCz, placeX, placeY, placeZ, chunk, currentBlock, true);
                     if (res >= 0) Inventory.RemoveBlock(HotBar.SelectedIndex, 3, Game.InvSprites[0]);
-                }
-                else
-                {
-                    int res = PlaceBreak(hit.point, currentBlock, false); // place the block for this instance
-                    if (res >= 0) Inventory.AddBlock(res, Game.InvSprites[res]);
                 }
             }
         }

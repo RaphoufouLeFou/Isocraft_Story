@@ -7,13 +7,12 @@ public class Chunk : MonoBehaviour
     [NonSerialized] public const int Size = 16;
     [NonSerialized] public const int Size1 = Size - 1;
     [NonSerialized] public int[,,] Blocks;
+    private Dictionary<(int x, int y, int z), IBlockEntity> _models = new();
 
     private int _x, _z, _cx, _cz; // in chunk space 
     private MeshFilter _meshFilter1, _meshFilter2;
     private MeshCollider _collider1, _collider2;
     
-    private Dictionary<(int x, int y, int z), BlockEntity> _models = new();
-
     public void Init(int cx, int cz, int[,,] blocks)
     {
         _x = cx * Size;
@@ -62,6 +61,17 @@ public class Chunk : MonoBehaviour
         }
     }
 
+    public bool InteractBlock(int x, int y, int z)
+    {
+        if (_models.TryGetValue((x, y, z), out IBlockEntity blockEntity))
+        {
+            blockEntity.Interact();
+            return true;
+        }
+
+        return false;
+    }
+
     public void BuildMesh(bool newChunk = false)
     {
         // build mesh from blocks
@@ -89,7 +99,7 @@ public class Chunk : MonoBehaviour
 
             if (blockObj.IsModel) // 3D model: add model to children
             {
-                BlockEntity blockEntity = new BlockEntity(blockId);
+                BlockEntity blockEntity = BlockEntity.Create(blockId);
                 GameObject go = blockEntity.GetBaseObject();
                 go = Instantiate(go, transform);
                 blockEntity.SetObject(go, new Vector3(_x + x, y, _z + z));
@@ -180,7 +190,7 @@ public class Chunk : MonoBehaviour
                         uvs1.AddRange(blockObj.GetUVs(face));
                         n1 += 4;
                     }
-                    // handle transparent blocks faces
+                    // handle displaying faces of transparent blocks
                     else if (blockObj.Transparent && (otherObj.Transparent && !Settings.Game.FastGraphics || otherObj.NoTexture) && !(blockObj.IsFluid && otherObj.IsFluid))
                     {
                         for (int j = 0; j < 4; j++) vertices2.Add(pos + FaceUtils.FacesOffsets[face][j]);
