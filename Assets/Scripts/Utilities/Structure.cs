@@ -36,7 +36,7 @@ public class Structure
             // second line: origin for height offset: x/z=origin, y=offset (x.y.z)
             string[] origin = GetDataLine(file);
             Offset = (int.Parse(origin[0]), int.Parse(origin[1]), int.Parse(origin[2]));
-            
+
             // third line: blocks (x, then z, then y, separated by .)
             string[] data = GetDataLine(file);
             if (data.Length != X * Y * Z) throw new Exception();
@@ -51,7 +51,7 @@ public class Structure
             throw new ArgumentException("Error loading structure \"" + type + "\"");
         }
     }
-    
+
     public int GetBlock(int x, int y, int z, int dx, int dy, int dz)
     {
         // used to add additional generation conditions to structures

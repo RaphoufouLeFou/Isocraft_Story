@@ -2,7 +2,7 @@
 using UnityEngine;
 
 public static class Settings
-{       
+{
     public static bool IsPaused;
     public static bool Playing; // true only if no popup is open, e.g. cancel place/break, don't move
     public static Dictionary<string, KeyCode> KeyMap;

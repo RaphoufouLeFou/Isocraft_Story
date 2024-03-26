@@ -22,6 +22,6 @@ public class MobSpawner : MonoBehaviour
             // commented out for now
             //SpawnMob(new Vector3(0,7,0));
             spawn = false;
-        } 
+        }
     }
 }

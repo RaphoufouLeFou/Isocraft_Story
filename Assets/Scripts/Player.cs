@@ -7,7 +7,7 @@ public class Player : NetworkBehaviour
 {
     private Camera _camera;
     public PlayerCamera playerCamera;
-    
+
     [NonSerialized] public int Level = 0;
     [NonSerialized] public float Health;
     [NonSerialized] public bool IsLoaded;
@@ -21,7 +21,7 @@ public class Player : NetworkBehaviour
     private InventoryUI _inventoryUI;
     private NetworkManagement _networkManagement;
     public Inventory Inventory;
-    
+
     private void Start()
     {
         // camera
@@ -31,7 +31,7 @@ public class Player : NetworkBehaviour
 
         if (!isLocalPlayer) return;
         Game.Player = this;
-        
+
         // set up other objects
         GameObject scripts = GameObject.Find("Scripts");
         _inventoryUI = scripts.GetComponent<InventoryUI>();
@@ -39,25 +39,25 @@ public class Player : NetworkBehaviour
         Health = 1;
         DealDamage(0); // update health bar at the start
         _networkManagement = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
-        
+
         Inventory = new Inventory();
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
-        
+
         _inventoryUI.SetPlayerInv(Inventory);
         HotBar.UpdateHotBarVisual(Inventory);
-        
+
         // body settings
         Transform tr = transform;
         Body = new PlayerBody(tr);
 
         tr.position = new Vector3(0, Chunk.Size, 0);
-        
+
         // activate camera if needed
         playerCamera.cam.gameObject.SetActive(isLocalPlayer || Level == NetworkClient.localPlayer.gameObject.GetComponent<Player>().Level);
-        
+
         IsLoaded = true;
     }
-    
+
     public void SaveLoaded(Vector3 pos, Vector3 rot, Inventory inv, float health)
     {
         // set variables once save infos are loaded
@@ -69,7 +69,7 @@ public class Player : NetworkBehaviour
         _inventoryUI.SetPlayerInv(Inventory);
         HotBar.UpdateHotBarVisual(Inventory);
     }
-    
+
     public void SetSpawn(Vector3 pos)
     {
         int y = pos.y < 0 ? 0 : pos.y > Chunk.Size1 ? Chunk.Size1 : (int)pos.y;
@@ -93,7 +93,7 @@ public class Player : NetworkBehaviour
                     break;
                 }
             }
-            
+
             _spawn.y++; // player needs to be one block above the ground
             _spawnSuccess = true;
             Respawn();
@@ -117,7 +117,7 @@ public class Player : NetworkBehaviour
         Health = amount < Health ? Health - amount : 0;
         _healthImage.transform.localScale = new Vector3(Health,1 ,1);
     }
-    
+
     private int PlaceBreak(int chunkX, int chunkZ, int x, int y, int z, Chunk chunk, int type, bool isPlacing)
     {
         // the slight position change makes the action replace a block or break air
@@ -134,17 +134,17 @@ public class Player : NetworkBehaviour
 
         if (isServer) RpcPlaceBreak(update, x, y, z, type, isPlacing);
         else CmdPlaceBreak(update, x, y, z, type, isPlacing);
-        
+
         return isPlacing ? type : result;
     }
-    
+
     [ClientRpc]
     private void RpcPlaceBreak(List<string> update, int x, int y, int z, int type, bool isPlacing)
     {
         if (!MapHandler.Chunks.ContainsKey(update[0])) return; // map edit isn't visible for this player
         // this could skip an update when editing a chunk border, but this shouldn't matter most of the time
         Chunk chunk = MapHandler.Chunks[update[0]];
-        
+
         // update block in chunk
         if (isPlacing) chunk.Blocks[x, y, z] = type;
         else
@@ -153,13 +153,13 @@ public class Player : NetworkBehaviour
             if (Game.Blocks.FromId[chunk.Blocks[x, y, z]].IsModel) chunk.RemoveEntity(x, y, z);
             chunk.Blocks[x, y, z] = Game.Blocks.Air;
         }
-       
+
         // update current chunk, and also nearby chunks if placed on a chunk border
         foreach (string chunkName2 in update)
             if (MapHandler.Chunks.ContainsKey(chunkName2))
                 MapHandler.Chunks[chunkName2].BuildMesh();
     }
-    
+
     [Command (requiresAuthority = false)]
     private void CmdPlaceBreak(List<string> update, int x, int y, int z, int type, bool isPlacing)
     {
@@ -177,7 +177,7 @@ public class Player : NetworkBehaviour
                 // move into or out of the block to get the right targeted block
                 Vector3 breakPos = hit.point - 0.01f * hit.normal;
                 Vector3 placePos = hit.point + 0.01f * hit.normal;
-                
+
                 // get edition position: more into the block for breaking/interacting, and back a little for placing
                 int breakCx = Utils.Floor(breakPos.x / Chunk.Size),
                     breakCz = Utils.Floor(breakPos.z / Chunk.Size);
@@ -189,10 +189,10 @@ public class Player : NetworkBehaviour
                 int breakX = Utils.Floor(breakPos.x) - breakCx * Chunk.Size,
                     breakY = Utils.Floor(breakPos.y),
                     breakZ = Utils.Floor(breakPos.z) - breakCz * Chunk.Size;
-                
+
                 // outside of world
                 if (placing && placeY is < 0 or >= Chunk.Size || breaking && breakY is < 0 or >= Chunk.Size) return;
-                
+
                 int currentBlock = Inventory.GetCurrentBlock(HotBar.SelectedIndex, 3);
                 // check for breaking and interacting
                 if (MapHandler.Chunks.TryGetValue(Chunk.GetName(breakCx, breakCz), out Chunk chunk))
@@ -205,7 +205,7 @@ public class Player : NetworkBehaviour
                         return;
                     }
                 }
-                
+
                 // check for block placing
                 if (placing && MapHandler.Chunks.TryGetValue(Chunk.GetName(placeCx, placeCz), out chunk))
                 {
@@ -223,16 +223,16 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(Settings.KeyMap["Kill"])) Respawn();
         if (Input.GetKeyDown(Settings.KeyMap["Respawn"])) SetSpawn(transform.position);
     }
-    
+
     void Update()
     {
         if (Body == null) throw new PlayerException("Player body is null, check game start for errors");
-        
+
         // if couldn't spawn before, retry
         if (!_spawnSuccess) SetSpawn(_spawn);
 
         if (!isLocalPlayer) return; // don't update other players
-        
+
         Body.Update();
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
 
@@ -242,7 +242,7 @@ public class Player : NetworkBehaviour
             if (invVisible) _inventoryUI.HideInventory();
             else if (!Settings.IsPaused) _inventoryUI.DisplayInventory();
         }
-        
+
         // warning: the tilted camera rotation can make the player look down
         transform.rotation = Quaternion.Euler(playerCamera.GoalRot);
 
@@ -252,7 +252,7 @@ public class Player : NetworkBehaviour
         DetectPlaceBreak();
         Keys();
     }
-    
+
     public override void OnStopClient()
     {
         base.OnStopClient();

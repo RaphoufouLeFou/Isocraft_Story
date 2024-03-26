@@ -11,10 +11,10 @@ public static class Commands
         foreach (string s in command.Split(" "))
             if (s != "")
                 l.Add(s.ToLower());
-        
+
         return l;
     }
-    
+
     public static void ExecuteCommand(string command)
     {
         List<string> args = Parse(command);

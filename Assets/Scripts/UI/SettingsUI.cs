@@ -35,10 +35,10 @@ public class SettingsUI : MonoBehaviour
     private int _maxPlayerConnections = 20;
 
     // variables when assigning a key
-    private bool _isReadingKey; 
+    private bool _isReadingKey;
     private string _key;
     private TMP_Text _keyText;
-    
+
     // unity button event functions
     public void ToggleFps() { Settings.Overlay.DisplayFps = !Settings.Overlay.DisplayFps; }
     public void ToggleMs() { Settings.Overlay.DisplayMs = !Settings.Overlay.DisplayMs; }
@@ -51,7 +51,7 @@ public class SettingsUI : MonoBehaviour
         _key = obj.name; // the function name is also the name of the UI input
         _keyText = obj.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); // get the pressed key Text to hide it later
     }
-    
+
     public void GoToMenu(string menu)
     {
         if (menu == "None") // close menus
@@ -111,7 +111,7 @@ public class SettingsUI : MonoBehaviour
             child.GetChild(1).GetComponentInChildren<TMP_Text>().text = Settings.KeyMap[child.gameObject.name].ToString();
         }
     }
-    
+
     private void LoadSettings()
     {
         // set all settings to default
@@ -170,8 +170,6 @@ public class SettingsUI : MonoBehaviour
         // save fixed settings to file
         SaveSettings();
     }
-
-
     public void MultiplayerMenuListener(GameObject self)
     {
         if (self.name == "IsMulti")
@@ -187,7 +185,7 @@ public class SettingsUI : MonoBehaviour
             management.ChangeMaxConnection(_maxPlayerConnections);
         }
     }
-    
+
     private void Update()
     {
         // handle escape key for all popups, including chat and inventory
@@ -228,11 +226,11 @@ public class SettingsUI : MonoBehaviour
                 {
                     _isReadingKey = false;
                     pressKeyText.SetActive(_isReadingKey); //hide the text
-                    
+
                     if(key == KeyCode.Escape) return; // cancel if escape key is pressed
-                    
+
                     Settings.KeyMap[_key] = key; // map the key in the dictionary
-                    _keyText.text = key.ToString();  // update the button text of the parameter 
+                    _keyText.text = key.ToString();  // update the button text of the parameter
                 }
     }
 }

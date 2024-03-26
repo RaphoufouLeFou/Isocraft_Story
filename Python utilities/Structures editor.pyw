@@ -297,13 +297,13 @@ class Structure:
                     # update boundaries since the collision box is not a rectangle
                     dx, t = x02-x0, (_y-y0)/(y1-y0)
                     x0, x1 = x0 + dx*t, x1 + dx*t
-                    
+
                     ok = 3 # both X and Z conditions are needed, use bitwise operations
                     if _y < y0: y -= 1
                     elif _y > y1: y += 1
                     else:
                         ok -= 2
-                        
+
                         if _x < x0: x -= 1
                         elif _x > x1: x += 1
                         else: ok -= 1

@@ -8,11 +8,11 @@ public class Overlay : MonoBehaviour
     private float _displayFps, _displayMs;
     private long _lastUpdate;
     private const long UpdateDelay = 300; // ms
-    
+
     private void Update()
     {
         if (!Game.Started) return;
-        
+
         long now = DateTime.Now.Ticks / 10000;
         if (now >= _lastUpdate + UpdateDelay)
         {
@@ -20,7 +20,7 @@ public class Overlay : MonoBehaviour
             _displayMs = Time.deltaTime * 1000;
             _lastUpdate = now;
         }
-        
+
         string text = "";
         Vector3 pos = Vector3.zero;
         if (Game.Player != null)

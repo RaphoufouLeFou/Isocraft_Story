@@ -13,7 +13,7 @@ public class Inventory
      *   hotBar:
      *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
      */
-    public readonly int[,,] Inv = new int[9, 4, 2]; 
+    public readonly int[,,] Inv = new int[9, 4, 2];
     private static readonly Image[] Images = new Image[9]; // cells images
     private static readonly TMP_Text[] TmpText = new TMP_Text[9]; // cells numbers
 
@@ -23,16 +23,16 @@ public class Inventory
         for (int i = 0; i < 9; i++)
         {
             GameObject go = HotBar.ItemImages[i].transform.GetChild(0).GetChild(0).gameObject;
-            Images[i] = go.GetComponent<Image>();   
+            Images[i] = go.GetComponent<Image>();
             TmpText[i] = go.GetComponentInChildren<TMP_Text>();
         }
     }
-    
+
     // add one block in the inventory where possible
     public void AddBlock(int block, Sprite texture)
     {
         if (block == Game.Blocks.Air) return;
-        
+
         for (int j = 3; j >= 0; j--) for (int i = 0; i < 9; i++)
             if ((Inv[i, j, 0] == block && Inv[i, j, 1] < 64) || Inv[i, j, 1] == 0)
             {
@@ -51,7 +51,7 @@ public class Inventory
     public void AddBlock(int block, Sprite texture, int count)
     {
         for (int j = 3; j >= 0; j--) for (int i = 0; i < 9; i++)
-            if ((Inv[i, j, 0] == block && Inv[i, j, 1] + count <= 64) || Inv[i, j, 1] == 0) 
+            if ((Inv[i, j, 0] == block && Inv[i, j, 1] + count <= 64) || Inv[i, j, 1] == 0)
             {
                 Inv[i, j, 0] = block; // set the inventory cell block id to the given id
                 Inv[i, j, 1] += count; // increment the inventory cell block count by the given count
@@ -63,7 +63,7 @@ public class Inventory
                 return;
             }
     }
-    
+
     public override string ToString()
     {
         string text = "";
@@ -78,7 +78,7 @@ public class Inventory
 
         return text;
     }
-    
+
     public int AddBlockAt(int x, int y, int block, int count, Sprite texture)
     {
         int remaining = 0;
@@ -97,7 +97,7 @@ public class Inventory
         }
         return remaining; //return the updated block count
     }
-    
+
     public int AddBlockAt(int x, int y, int block, int count)
     {
         int remaining = 0;
@@ -124,7 +124,7 @@ public class Inventory
         }
         else TmpText[x].text = Inv[x, y, 1].ToString();
     }
-    
+
     public void RemoveHalfBlocks(int x, int y, Sprite texture)
     {
         if (Inv[x, y, 1] == 1) RemoveAllBlocks(x, y, texture);
@@ -133,7 +133,7 @@ public class Inventory
         if (y == 3)
             TmpText[x].text = Inv[x, y, 1].ToString();
     }
-    
+
     public void RemoveAllBlocks(int x, int y, Sprite texture)
     {
         if (Inv[x, y, 1] == 0) return;

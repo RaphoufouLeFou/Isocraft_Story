@@ -12,7 +12,7 @@ public interface IBlockEntity
 public class BlockEntity : Block, IBlockEntity
 {
     private static readonly Vector3 Center = new(0.5f, 0, 0.5f);
-    
+
     public GameObject GameObject { get; private set; }
     private readonly int _id;
 
@@ -24,7 +24,7 @@ public class BlockEntity : Block, IBlockEntity
             default: return new BlockEntity(id);
         }
     }
-    
+
     protected BlockEntity(int id) : base(null, Game.Blocks.FromId[id].Tags)
     {
         _id = Game.Models.ModelsIndex[id];

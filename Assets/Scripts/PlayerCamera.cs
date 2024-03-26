@@ -62,7 +62,7 @@ public class PlayerCamera : MonoBehaviour
         else if (y > 0.9f) _targetAbove = false;
 
         if (change) _startMouseShift = Time.time;
-        
+
         // move the mouse towards the center if needed
         if (_mouseOffset > 0)
         {
@@ -75,7 +75,7 @@ public class PlayerCamera : MonoBehaviour
 
         _prevMousePos = pos;
     }
-    
+
     private void Start()
     {
         GoToPlayer();
@@ -91,7 +91,7 @@ public class PlayerCamera : MonoBehaviour
     private void Update()
     {
         // change camera target with mouse movement
-        if (Settings.Playing && Application.isFocused) MouseMovement(); 
+        if (Settings.Playing && Application.isFocused) MouseMovement();
 
         Transform tr = transform;
         Transform pTr = Game.Player.transform;
@@ -108,16 +108,16 @@ public class PlayerCamera : MonoBehaviour
 
         float fps = Time.deltaTime == 0 ? 10e6f : 1 / Time.deltaTime;
         float posFps = MoveDelay * fps, rotFps = RotDelay * (1 + _lastPlayerY / 8) * fps;
-        
+
         // fix y rotation 360 wrapping
         float currentRotY = _currentRot.y;
         while (currentRotY - goalRotY > 180) goalRotY += 360;
         while (goalRotY - currentRotY > 180) currentRotY += 360;
-        
+
         // set target X rotation
         float targetX = _targetAbove ? 90 : 60 - _lastPlayerY * 3;
         targetX = targetX < 0 ? 0 : targetX > 90 ? 90 : targetX;
-        
+
         // smoothly interpolate according to fps:
         // (current * (fps-1) + goal) / fps
         float posFps1 = posFps - 1, rotFps1 = rotFps - 1;
@@ -125,7 +125,7 @@ public class PlayerCamera : MonoBehaviour
         _currentRot.x = (_currentRot.x * rotFps1 + targetX) / rotFps;
         _currentRot.y = (currentRotY * rotFps1 + goalRotY) / rotFps;
         cam.orthographicSize = (cam.orthographicSize * posFps1 + Zoom * (1 + _lastPlayerY / Chunk.Size)) / posFps;
-        
+
         // update transform: go to currentPos, rotate, then move back
         Vector3 offsetY = new Vector3(0, _lastPlayerY / Chunk.Size * 3.5f, 0);
         tr.rotation = Quaternion.Euler(_currentRot);

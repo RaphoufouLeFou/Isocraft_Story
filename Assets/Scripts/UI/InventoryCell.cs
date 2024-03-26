@@ -5,7 +5,7 @@ public class InventoryCell : MonoBehaviour, IPointerClickHandler
 {
     public InventoryUI inventoryUI;
     public GameObject self;
-    
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Left)

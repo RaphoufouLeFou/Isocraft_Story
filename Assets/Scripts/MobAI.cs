@@ -5,7 +5,7 @@ using UnityEngine;
 public class MobAI : MonoBehaviour
 {
     private MobBody _body;
-    
+
     // Start is called before the first frame update
     void Start()
     {

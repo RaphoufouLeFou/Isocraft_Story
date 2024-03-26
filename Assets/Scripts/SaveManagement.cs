@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 
-public class SaveManagement 
+public class SaveManagement
 {
     // manages players saves, chunks are handled in ChunksSave
 
@@ -11,7 +11,7 @@ public class SaveManagement
     public void SaveGame()
     {
         if (SuperGlobals.EditorMode) return;
-        
+
         // save player data
         Vector3 pos = Game.Player.transform.position;
         Vector3 rot = Game.Player.playerCamera.GoalRot;
@@ -30,11 +30,11 @@ public class SaveManagement
         text += $"Health:{Game.Player.Health}";
         if (File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, text);
-        
+
         // save chunks
         ChunksSave.SaveAllChunks();
     }
-    
+
     private void CreateSaveFile(string path)
     {
         string dir = Path.GetDirectoryName(path);
@@ -43,20 +43,20 @@ public class SaveManagement
         if (!Directory.Exists(dir) && dir is not null) Directory.CreateDirectory(dir);
         if (!Directory.Exists(chunkDir)) Directory.CreateDirectory(chunkDir);
     }
-    
+
     public void LoadSave()
     {
         string usableSaveName = SuperGlobals.SaveName + (Game.Player.isServer ? "" : "CLIENT__");
-        
+
         string path = $"{Application.persistentDataPath}/Saves/{usableSaveName}/{usableSaveName}.IsoSave";
         if (!File.Exists(path)) throw new FileNotFoundException("No save file found");
-        
+
         StreamReader file = new StreamReader(path);
 
         Inventory inv = new();
         Vector3 pos = new(), rot = new();
         float health = 1;
-        
+
         while (file.ReadLine() is { } line)
         {
             // check if valid line and edit settings
@@ -75,12 +75,12 @@ public class SaveManagement
                 int index = value.IndexOf('.');
                 int type = Int32.Parse(value.Substring(0, index));
                 int count = Int32.Parse(value.Substring(index + 1));
-                
+
                 if (count > 0 && type > 0) inv.AddBlockAt(x, y, type, count);
             }
             else if (key == "Health") health = float.Parse(value);
         }
-        
+
         Game.Player.SaveLoaded(pos, rot, inv, health);
         file.Close();
     }

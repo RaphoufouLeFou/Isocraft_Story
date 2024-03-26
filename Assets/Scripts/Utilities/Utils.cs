@@ -28,7 +28,7 @@ public static class FaceUtils
     private static readonly int[,] FacesIndices =
         { { 5, 7, 6, 4 }, { 0, 2, 3, 1 }, { 2, 6, 7, 3 }, { 4, 0, 1, 5 }, { 1, 3, 7, 5 }, { 4, 6, 2, 0 } };
     public static readonly List<Vector3[]> FacesOffsets = new();
-    
+
     // for cross shapes
     // front left, front right, back right, back left
     private static readonly int[,] CrossIndices =
@@ -49,7 +49,7 @@ public static class FaceUtils
                 i >> 1 & 1,
                 0.5f + ((i >> 2) * 2 - 1) * sqrt
             ));
-        
+
         // initialize face offsets
         for (int face = 0; face < 6; face++)
             FacesOffsets.Add(new[]

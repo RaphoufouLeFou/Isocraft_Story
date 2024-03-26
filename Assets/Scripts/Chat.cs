@@ -15,7 +15,7 @@ public class Msg
         _endTime = Time.time + lifeTime;
     }
     public bool IsTimesUp() => Time.time >= _endTime;
-    
+
 }
 public class Chat : NetworkBehaviour
 {
@@ -23,7 +23,7 @@ public class Chat : NetworkBehaviour
     private Queue<Msg> _messages = new();
     private List<string> _pastMessages = new();
     private int _pastIndex;
-    
+
     public GameObject contentParent;
     public GameObject messagePrefab;
     public GameObject chatWindow;
@@ -44,7 +44,7 @@ public class Chat : NetworkBehaviour
         msg.GetComponentInChildren<TMP_Text>().text = $"{prefix} : {message}";
         _messages.Enqueue(new Msg(msg, 5));
     }
-    
+
     [Command(requiresAuthority = false)]
     private void CommandReceiveMessageFromUser(string prefix, string message)
     {
@@ -56,7 +56,7 @@ public class Chat : NetworkBehaviour
         if (isServer) RcpClientReceiveMessageFromUser("Server", message);
         else CommandReceiveMessageFromUser("Client", message);
     }
-    
+
     [ClientRpc]
     private void RcpClientReceiveMessage(string message)
     {
@@ -65,7 +65,7 @@ public class Chat : NetworkBehaviour
         msg.GetComponentInChildren<TMP_Text>().color = Color.yellow;
         _messages.Enqueue(new Msg(msg, 5));
     }
-    
+
     [Command(requiresAuthority = false)]
     private void CommandReceiveMessage( string message)
     {
@@ -76,7 +76,7 @@ public class Chat : NetworkBehaviour
         if (isServer) RcpClientReceiveMessage(message);
         else CommandReceiveMessage(message);
     }
-    
+
     public void SendMessageFromChatUI(GameObject self)
     {
         TMP_InputField inputField = self.GetComponent<TMP_InputField>();
@@ -130,6 +130,4 @@ public class Chat : NetworkBehaviour
             }
         }
     }
-    
-    
 }

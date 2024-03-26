@@ -12,7 +12,7 @@ public static class HotBar
         GameObject items = GameObject.Find("HotBarBackground");
         for (int i = 0; i < 9; i++) HotBar.ItemImages[i] = items.transform.GetChild(i).gameObject;
     }
-    
+
     public static void UpdateHotBar()
     {
         SelectedIndex -= (int)Input.mouseScrollDelta.y;

@@ -37,7 +37,7 @@ public class Block
     private Block(Tag[] tags = null)
     {
         Tags = tags;
-        
+
         if (tags != null) foreach (Tag tag in tags)
             switch (tag)
             {
@@ -115,7 +115,7 @@ public class Block
                 }
             throw new BlockException($"Trying to access texture from block of ID: {id ?? "[unknown]"}");
         }
-        
+
         switch (faceIndex)
         {
             case 2: return _top.UVs;

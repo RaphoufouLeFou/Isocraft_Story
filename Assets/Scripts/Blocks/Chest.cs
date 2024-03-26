@@ -7,7 +7,7 @@ public class Chest : BlockEntity, IBlockEntity
 
     public Chest(int id) : base(id)
     {
-        
+
     }
 
     public new void Interact()

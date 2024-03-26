@@ -20,7 +20,7 @@ public static class NoiseGen
         _value.SetNoiseType(FastNoiseLite.NoiseType.Value);
         _value.SetSeed(Game.Seed);
         _value.SetFrequency(10);
-        
+
         // for decoration spawning likeliness
         _value2 = new FastNoiseLite();
         _value2.SetNoiseType(FastNoiseLite.NoiseType.Value);
@@ -42,7 +42,7 @@ public static class NoiseGen
         int levelY = Game.Player.Level << 7;
         float deco = _value2.GetNoise(x, levelY, z) / 2 + 0.5f; // does decoration spawn?
         float decoType = Value(x, levelY, z) / 2 + 0.5f; // in this case, which type?
-        
+
         switch (Game.Player.Level)
         {
             case 0:
@@ -53,7 +53,7 @@ public static class NoiseGen
                     decoType *= 1000;
                     decoration = decoType < 0.5f ? Game.Blocks.DeadPlant : Game.Blocks.DeadBush;
                 }
-                
+
                 for (int y = 0; y < Chunk.Size; y++)
                 {
                     float height = GetHeight(x, z);
@@ -65,7 +65,7 @@ public static class NoiseGen
                     else yield return Game.Blocks.RedSand;
                 }
 
-                break; 
+                break;
                 default: throw new GenerationException("Incorrect level: " + Game.Player.Level);
         }
     }

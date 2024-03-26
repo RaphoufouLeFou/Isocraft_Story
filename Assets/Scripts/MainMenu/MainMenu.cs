@@ -15,7 +15,7 @@ public class MainMenu : MonoBehaviour
     public GameObject joinGameParent;
     public GameObject backButton;
     public GameObject saveTextPrefab;
-    
+
     public TMP_InputField addressInput;
     public TMP_InputField codeInput;
     public TMP_InputField portInput;
@@ -32,7 +32,7 @@ public class MainMenu : MonoBehaviour
         newGameParent.SetActive(false);
         loadGameParent.SetActive(false);
         joinGameParent.SetActive(false);
-        
+
         // send SuperGlobals to main scene
         DontDestroyOnLoad(superGlobals);
         SuperGlobals.BackToMenu();
@@ -66,13 +66,13 @@ public class MainMenu : MonoBehaviour
         mainParent.SetActive(false);
         joinGameParent.SetActive(true);
     }
-    
+
     public void ConnectGameButtonClick()
     {
         if (_code != "")
         {
             (string ip, int err) = NetworkManagement.DecodeIP(_code.ToUpper().Replace("\n", "").Replace(" ",""));
-            
+
             if (err != 0)
             {
                 Debug.LogError($"Error : {err}");
@@ -86,13 +86,13 @@ public class MainMenu : MonoBehaviour
         SuperGlobals.IsHost = false;
         SceneManager.LoadScene(mainSceneName);
     }
-    
+
     public void MultiPlayerButtonClick(GameObject save)
     {
         string saveName = save.GetComponent<TMP_InputField>().text;
         StartGame(saveName, true, true);
     }
-    
+
     public void SinglePlayerButtonClick(GameObject save)
     {
         string saveName = save.GetComponent<TMP_InputField>().text;
@@ -106,7 +106,7 @@ public class MainMenu : MonoBehaviour
                && !Directory.Exists($"/Saves/{saveName}/")
                && !saveName.Contains("/") && !saveName.Contains("\\");
     }
-    
+
     private void StartGame(string saveName, bool multi, bool newSave)
     {
         saveName = saveName.Replace(' ', '_');
@@ -133,7 +133,7 @@ public class MainMenu : MonoBehaviour
 
         string path = $"{Application.persistentDataPath}/Saves/";
         if (!Directory.Exists(path)) return;
-        
+
         foreach (string dir in Directory.EnumerateDirectories(path))
         {
 
@@ -142,7 +142,7 @@ public class MainMenu : MonoBehaviour
             saveName = saveName.Replace('_' ,' ');
             GameObject go = Instantiate(saveTextPrefab, Vector3.zero, Quaternion.identity, content.transform);
             go.GetComponentInChildren<TMP_Text>().text = saveName;
-            
+
             go.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => LoadGameButton(saveName));
             go.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() =>
             {
@@ -163,20 +163,20 @@ public class MainMenu : MonoBehaviour
     {
         _ipAddress = addressInput.text;
     }
-    
+
     public void OnChangedGCode()
     {
         _code = codeInput.text;
         _code = _code.ToUpper();
         codeInput.text = _code;
     }
-    
+
     public void OnChangedPort()
     {
         _port = portInput.text;
 
     }
-    
+
     public void OnChangedPortNewGame()
     {
         _port = portNewGameInput.text;

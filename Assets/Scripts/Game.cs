@@ -8,7 +8,7 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Tick;
     [NonSerialized] public static int Seed;
     [NonSerialized] public static bool Started;
-    
+
     // static variables, get initialized from their serialized variables
     [NonSerialized] public static Sprite[] InvSprites;
     [NonSerialized] public static Player Player;
@@ -16,7 +16,7 @@ public class Game : MonoBehaviour
 
     public Sprite[] sprites;
     public MapHandler mapHandler;
-    
+
     public GameObject[] models;
 
     private static Game _object; // non-static Game object, available after InitGameUtils
@@ -31,15 +31,15 @@ public class Game : MonoBehaviour
         }
         private set => _object = value;
     }
-    
+
     private float _prevTick;
     private float _prevSave;
-    
+
     // structures info
     public static readonly Dictionary<string, Structure> Structs = new();
     private static readonly string[] StructNames = { "Tree", "Trunk", "Bush" };
     [NonSerialized] public static int MaxStructSize; // how many blocks out can structures be searched for
-    
+
     public struct Blocks
     {
         public const int
@@ -61,7 +61,7 @@ public class Game : MonoBehaviour
             DeadBush = 14,
             DeadPlant = 15,
             Chest = 16;
-        
+
         public static readonly Dictionary<int, Block> FromId = new()
         {
             { Air, new Block(null, new[] { Tag.NoTexture, Tag.NoCollide, Tag.NoRayCast, Tag.Unbreakable }) },
@@ -83,7 +83,7 @@ public class Game : MonoBehaviour
             { Chest, new Block(null, new[] { Tag.IsModel }) }
         };
     }
-    
+
     public struct Models
     {
         // { Block ID, asset index }
@@ -91,27 +91,27 @@ public class Game : MonoBehaviour
         {
             { Blocks.Chest, 0 }
         };
-        
+
         public static GameObject[] GameObjects;
     }
-    
+
     public void InitGameUtils()
     {
         if (Models.ModelsIndex.Count != models.Length)
             throw new BlockException("Not all models initialized");
         Models.GameObjects = models;
         Object = this;
-        
+
         // start some things very early
         Started = false;
-        
+
         InvSprites = sprites;
         HotBar.InitImages();
         Inventory.Init();
         System.Random rand = new System.Random();
         Seed = (int)(rand.NextDouble() * (1L << 16));
         NoiseGen.Init();
-        
+
         // initialize structures
         foreach (string type in StructNames)
         {
@@ -119,10 +119,10 @@ public class Game : MonoBehaviour
             MaxStructSize = MaxStructSize > s.X ? MaxStructSize > s.Z ? MaxStructSize : s.Z : s.X > s.Z ? s.X : s.Z;
             Structs.TryAdd(type, s);
         }
-        
+
         SaveManager = new SaveManagement();
     }
-    
+
     private void StartGame()
     {
         mapHandler.StartMapHandle();
@@ -132,7 +132,7 @@ public class Game : MonoBehaviour
         Tick = 0;
         _prevTick = Time.time;
     }
-    
+
     private void Update()
     {
         // wait for the player to start
@@ -142,14 +142,14 @@ public class Game : MonoBehaviour
             StartGame();
             Started = true;
         }
-        
+
         // tick
         if (Time.time - _prevTick > 1 / TickRate)
         {
             _prevTick = Time.time;
             Tick++;
         }
-        
+
         // autoSave
         if (Time.time - _prevSave > Settings.Game.AutoSaveDelay && Player is not null)
         {
@@ -157,7 +157,7 @@ public class Game : MonoBehaviour
             SaveManager.SaveGame();
         }
     }
-    
+
     public static void QuitGame()
     {
         // quit game, even if in editor

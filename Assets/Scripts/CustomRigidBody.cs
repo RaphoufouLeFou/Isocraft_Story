@@ -13,7 +13,7 @@ public class CustomRigidBody
     private bool _sprinting;
 
     private readonly float _width, _height;
-    
+
     public CustomRigidBody(Transform transform, float speed, float drag, float jumpForce, float gravity, float width, float height)
     {
         _transform = transform;
@@ -29,7 +29,7 @@ public class CustomRigidBody
     {
         return x > 0 ? x : 0;
     }
-    
+
     private float Negative(float x)
     {
         return x < 0 ? x : 0;
@@ -42,16 +42,16 @@ public class CustomRigidBody
         if (c < 0) c = -c;
         return a < b && b < c ? a : b < c ? b : c;
     }
-    
+
     void CheckCollisions(Vector3 pos)
     {
         OnFloor = false;
 
         Vector3 movement = pos - _transform.position;
-        
+
         int chunkX = (int)MathF.Floor(pos.x / Chunk.Size);
         int chunkZ = (int)MathF.Floor(pos.z / Chunk.Size);
-        
+
         // check collisions with chunks around
         for (int i = chunkX - 1; i < chunkX + 2; i++)
         for (int j = chunkZ - 1; j < chunkZ + 2; j++)
@@ -62,7 +62,7 @@ public class CustomRigidBody
                 if (i == chunkX && j == chunkZ) return; // sitting in unloaded chunk
                 continue;
             }
-            
+
             // check collisions with blocks around
             // only calculate collisions with the block with the most depth
             Vector3 p = pos - new Vector3(i * Chunk.Size, 0, j * Chunk.Size); // pos in the chunk
@@ -127,39 +127,39 @@ public class CustomRigidBody
                 }
                 else throw new PlayerException("Way too much correction, gotta be an error somewhere");
             }
-            
+
             // move by final collision
             if (correction.x != 0)
             {
                 Movement.x = 0;
                 pos.x += correction.x;
             }
-            
+
             if (correction.y != 0)
             {
                 if (movement.y <= 0) OnFloor = true; // floor collision
                 Movement.y = 0;
                 pos.y += correction.y;
             }
-            
+
             if (correction.z != 0)
             {
                 Movement.z = 0;
                 pos.z += correction.z;
             }
         }
-        
+
         _transform.position = pos;
     }
 
     protected float GetDelta()
     {
-        
+
         // capped movement speed
         float delta = Time.deltaTime;
         return delta > 0.1f ? 0.1f : delta;
     }
-    
+
     protected void Update(float x, float z, float delta)
     {
         // not gonna check, but x and z must be <= 1 in absolute value
@@ -167,13 +167,13 @@ public class CustomRigidBody
         Vector3 move = _transform.rotation * MoveRelative;
         float speed = _sprinting ? 1.7f * _speed : _speed;
         Movement += move * (speed * delta);
-        
+
         // move according to Movement
         float drag = MathF.Pow(_drag, 100 * delta);
         Movement.x *= drag;
         Movement.y += _gravity * delta;
         Movement.z *= drag;
-        
+
         Vector3 newPos = _transform.position + Movement * (delta * _speed);
         CheckCollisions(newPos);
     }
@@ -182,7 +182,7 @@ public class CustomRigidBody
     {
         _sprinting = true;
     }
-    
+
     protected void StopSprinting()
     {
         _sprinting = false;
@@ -204,7 +204,7 @@ public class PlanetBody : CustomRigidBody
 public class MobBody : PlanetBody
 {
     private readonly Func<(float side, float forwards)> _moveFunc;
-    
+
     public MobBody(Transform transform, Func<(float side, float forwards)> moveFunc) : base(transform)
     {
         _moveFunc = moveFunc;
@@ -225,7 +225,7 @@ public class PlayerBody : PlanetBody
     public void Update()
     {
         float delta = GetDelta();
-        
+
         if (!Settings.IsPaused) // keys movement
         {
             float x = 0;

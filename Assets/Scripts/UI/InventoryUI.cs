@@ -67,14 +67,14 @@ public class InventoryUI : MonoBehaviour
             }
         }
     }
-    
+
     public void HideInventory()
     {
         if (_isMovingItem)
         {
             _isMovingItem = false;
             Destroy(_movingItemImage);
-            
+
         }
         inventoryMenu.SetActive(false);
         Settings.Playing = true;
@@ -128,7 +128,7 @@ public class InventoryUI : MonoBehaviour
 
         UpdateInventory();
     }
-    
+
     void Update()
     {
         if (_isMovingItem) _movingItemImage.transform.position = Input.mousePosition;

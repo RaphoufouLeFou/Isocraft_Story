@@ -22,17 +22,17 @@ public class NetworkManagement : MonoBehaviour
 
         _manager = GetComponent<NetworkManager>();
         _manager.enabled = true;
-        
+
         if (SuperGlobals.EditorMode)
         {
             SuperGlobals.IsHost = true;
             SuperGlobals.IsMultiplayerGame = true;
             SuperGlobals.Uri = new Uri("kcp://127.0.0.1:7777");
         }
-        
+
         bool isOnline = SuperGlobals.IsMultiplayerGame;
         _manager.maxConnections = isOnline ? 20 : 1;
-        
+
         if (SuperGlobals.IsHost)
         {
             if (isOnline) _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
@@ -43,12 +43,12 @@ public class NetworkManagement : MonoBehaviour
             _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
             _manager.networkAddress = SuperGlobals.Uri.Host;
             _manager.StartClient(SuperGlobals.Uri);
-            
+
         }
 
         // server start is asynchronous, so don't StartGame here
     }
-    
+
     public static string EncodeIP(string ip)
     {
         Debug.Log(ip);
@@ -72,7 +72,7 @@ public class NetworkManagement : MonoBehaviour
         if (encoded.Length != 8) return ("", 1);
         string res = "";
         for (int i = 0; i < 8; i += 2)
-        {   
+        {
             char h = encoded[i];
             char l = encoded[i + 1];
             byte high = (byte)(h - 'A');
@@ -83,7 +83,7 @@ public class NetworkManagement : MonoBehaviour
         }
         return (res, 0);
     }
-    
+
     public static string GetLocalIPv4()
     {
         return new WebClient().DownloadString("https://icanhazip.com");
@@ -104,11 +104,11 @@ public class NetworkManagement : MonoBehaviour
 
         if (SuperGlobals.IsHost) _manager.StopHost();
         else _manager.StopClient();
-        
+
         SuperGlobals.IsMultiplayerGame = false;
         SuperGlobals.EditorMode = true;
         SuperGlobals.IsHost = false;
-        
+
         SceneManager.LoadScene(mainMenuSceneName);
     }
 

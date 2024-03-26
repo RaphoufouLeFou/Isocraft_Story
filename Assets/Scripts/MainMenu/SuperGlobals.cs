@@ -6,7 +6,7 @@ public class SuperGlobals : MonoBehaviour
     // data that gets sent through scenes
     public static bool EditorMode = true; // set to false if started from main menu
     public static bool IsNewSave = true; // overriden if started from main menu
-    
+
     // deprecated once game is loaded
     public static string SaveName;
 

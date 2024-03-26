@@ -19,7 +19,7 @@ public static class Tiles
             };
         }
     }
-    
+
     public static readonly Tile
         Bedrock = new(new Vector2(0, 3)),
         BokaBeast = new(new Vector2(1, 3)),

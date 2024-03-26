@@ -9,7 +9,7 @@ public class Chunk : MonoBehaviour
     [NonSerialized] public int[,,] Blocks;
     private readonly Dictionary<(int x, int y, int z), IBlockEntity> _models = new();
 
-    private int _x, _z, _cx, _cz; // in chunk space 
+    private int _x, _z, _cx, _cz; // in chunk space
     public MeshFilter opaqueMeshFilter, transparentMeshFilter;
     public MeshCollider meshCollider;
 
@@ -17,7 +17,7 @@ public class Chunk : MonoBehaviour
     {
         return $"c.{cx}.{cz}";
     }
-    
+
     public void Init(int cx, int cz, int[,,] blocks)
     {
         _x = cx * Size;
@@ -26,12 +26,12 @@ public class Chunk : MonoBehaviour
         _cz = cz;
         name = GetName(cx, cz);
         Blocks = blocks;
-        
+
         transform.position = new Vector3(_x, 0, _z);
-        
+
         BuildMesh(true);
     }
-    
+
     public static void GenerateBlocks(int[,,] blocks, int posX, int posZ)
     {
         // generate blocks and structures from NoiseGen into an int[,,] array
@@ -58,11 +58,11 @@ public class Chunk : MonoBehaviour
                 }
         }
     }
-    
+
     public bool InteractBlock(int x, int y, int z)
     {
         if (!_models.TryGetValue((x, y, z), out IBlockEntity blockEntity)) return false;
-        
+
         blockEntity.Interact();
         return true;
     }
@@ -70,7 +70,7 @@ public class Chunk : MonoBehaviour
     public void RemoveEntity(int x, int y, int z)
     {
         if (!_models.TryGetValue((x, y, z), out IBlockEntity blockEntity)) return;
-        
+
         Destroy(blockEntity.GameObject);
         _models.Remove((x, y, z));
     }
@@ -85,7 +85,7 @@ public class Chunk : MonoBehaviour
         List<int> triangles1 = new(), triangles2 = new(), colTriangles = new();
         List<Vector2> uvs1 = new(), uvs2 = new();
         int n1 = 0, n2 = 0, n3 = 0;
-        
+
         // get neighboring chunks
         Dictionary<int, Chunk> neighbors = new ();
         for (int i = 0; i < 4; i++)
@@ -114,13 +114,13 @@ public class Chunk : MonoBehaviour
                 for (int face = 0; face < 4; face++)
                 {
                     for (int j = 0; j < 4; j++) vertices2.Add(pos + FaceUtils.CrossOffsets[face][j]);
-                    
+
                     triangles2.AddRange(new[] { n2, n2 + 1, n2 + 2, n2, n2 + 2, n2 + 3 });
                     uvs2.AddRange(blockObj.GetUVs(face));
                     n2 += 4;
                 }
             }
-            
+
             // full block: display face by face under certain conditions
             // collide block: still need to execute all of this to build the collider
             // only except 2D blocks which are handled above
@@ -222,13 +222,13 @@ public class Chunk : MonoBehaviour
                 }
             }
         }
-        
+
         mesh1.vertices = vertices1.ToArray();
         mesh1.triangles = triangles1.ToArray();
         mesh1.uv = uvs1.ToArray();
         mesh1.RecalculateNormals();
         opaqueMeshFilter.mesh = mesh1;
-        
+
         mesh2.vertices = vertices2.ToArray();
         mesh2.triangles = triangles2.ToArray();
         mesh2.uv = uvs2.ToArray();
