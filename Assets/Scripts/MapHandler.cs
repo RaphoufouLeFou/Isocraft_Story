@@ -38,64 +38,16 @@ public class MapHandler : NetworkBehaviour
 
         if (isServer)
         {
-            Game.SaveManager.IsHost = true;
             if (SuperGlobals.IsNewSave) Game.SaveManager.SaveGame(); // initial save
             else Game.SaveManager.LoadSave();
         }
         else CmdRequestGameName(Id);
     }
 
-    public static void SaveAllChunks()
-    {
-        foreach (Chunk chunk in Chunks.Values) SaveChunk(chunk);
-    }
-    
-    public static void SaveChunk(Chunk chunk)
-    {
-        if (!SuperGlobals.StartedFromMainMenu) return;
-        
-        string dirPath = $"{Application.persistentDataPath}/Saves/{Game.SaveManager.SaveName}/Chunks/";
-        string path = $"{dirPath}{chunk.name}.Chunk";
-        int[,,] blocks = chunk.Blocks;
-        int size = Chunk.Size;
-        if (File.Exists(path)) File.Delete(path);
-        if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-        
-        FileStream fs = new FileStream(path, FileMode.Create);
-        for (int i = 0; i < size; i++) for (int j = 0; j < size; j++)
-        for (int k = 0; k < size; k++)
-            fs.WriteByte((byte)(blocks[i, j, k] & 0xFF));
-        fs.Close();
-    }
-
-    private static bool LoadBlocks(int[,,] blocks, string chunkName)
-    {
-        // returns false if couldn't find file, meaning the blocks have to be generated next
-
-        if (!SuperGlobals.StartedFromMainMenu) return false;
-        
-        string path = $"{Application.persistentDataPath}/Saves/{Game.SaveManager.SaveName}/Chunks/{chunkName}.Chunk";
-        if (!File.Exists(path)) return false;
-        
-        FileStream fs = new FileStream(path, FileMode.OpenOrCreate);
-        
-        for (int i = 0; i < Chunk.Size; i++) for (int j = 0; j < Chunk.Size; j++)
-        for (int k = 0; k < Chunk.Size; k++)
-        {
-            int currBlock = 0;
-            
-            currBlock |= fs.ReadByte();
-            blocks[i, j, k] = currBlock;
-        }
-        
-        fs.Close();
-        return true;
-    }
-
     [Command (requiresAuthority = false)]
     private void CmdRequestGameName(int id)
     {
-        RpcSendGameName(Game.SaveManager.SaveName, id);
+        RpcSendGameName(SuperGlobals.SaveName, id);
     }
 
     [ClientRpc]
@@ -104,8 +56,6 @@ public class MapHandler : NetworkBehaviour
         if (NetworkClient.localPlayer.GetInstanceID() != id) return;
         
         SuperGlobals.SaveName = gameName;
-        Game.SaveManager.SaveName = gameName;
-        Game.SaveManager.IsHost = false;
         string clientName = "CLIENT__" + gameName;
         string path = Application.persistentDataPath + $"/Saves/{clientName}/{clientName}.IsoSave";
         
@@ -124,7 +74,7 @@ public class MapHandler : NetworkBehaviour
         // chunk is loaded on the server
         if (Chunks.TryGetValue(chunkName, out Chunk chunk)) blocks = chunk.Blocks;
         // chunk isn't loaded
-        else if (!LoadBlocks(blocks, chunkName)) // try to get blocks from save, otherwise generate
+        else if (!ChunksSave.LoadBlocks(blocks, chunkName)) // try to get blocks from save, otherwise generate
             Chunk.GenerateBlocks(blocks, cx * Chunk.Size, cz * Chunk.Size);
         
         int len = blocks.Length;

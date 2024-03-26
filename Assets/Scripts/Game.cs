@@ -123,7 +123,6 @@ public class Game : MonoBehaviour
         // set up SuperGlobals
         SaveManager = new SaveManagement();
         GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
-        if (globals != null) SaveManager.SaveName = SuperGlobals.SaveName;
     }
     
     private void StartGame()
@@ -157,7 +156,6 @@ public class Game : MonoBehaviour
         {
             _prevSave = Time.time;
             SaveManager.SaveGame();
-            MapHandler.SaveAllChunks();
         }
     }
 

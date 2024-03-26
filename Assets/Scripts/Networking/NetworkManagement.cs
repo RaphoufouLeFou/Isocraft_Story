@@ -1,6 +1,5 @@
 using System;
 using System.Net;
-using TMPro;
 using kcp2k;
 using UnityEngine;
 using Mirror;
@@ -10,7 +9,6 @@ using System.Linq;
 public class NetworkManagement : MonoBehaviour
 {
     private NetworkManager _manager;
-    private bool _isHost;
 
     public string mainMenuSceneName;
 
@@ -25,7 +23,7 @@ public class NetworkManagement : MonoBehaviour
         _manager = GetComponent<NetworkManager>();
         _manager.enabled = true;
         
-        if (!SuperGlobals.StartedFromMainMenu)
+        if (SuperGlobals.EditorMode)
         {
             SuperGlobals.IsHost = true;
             SuperGlobals.IsMultiplayerGame = true;
@@ -33,10 +31,9 @@ public class NetworkManagement : MonoBehaviour
         }
         
         bool isOnline = SuperGlobals.IsMultiplayerGame;
-        _isHost = SuperGlobals.IsHost;
         _manager.maxConnections = isOnline ? 20 : 1;
         
-        if (_isHost)
+        if (SuperGlobals.IsHost)
         {
             if (isOnline) _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
             _manager.StartHost();
@@ -56,8 +53,8 @@ public class NetworkManagement : MonoBehaviour
     {
         Debug.Log(ip);
         string res = "";
-        string[] ints = ip.Split('.');
-        foreach (string s in ints)
+        string[] parts = ip.Split('.');
+        foreach (string s in parts)
         {
             byte b = byte.Parse(s);
             byte high = (byte)(b >> 4);
@@ -89,7 +86,7 @@ public class NetworkManagement : MonoBehaviour
     
     public static string GetLocalIPv4()
     {
-        return new WebClient().DownloadString("http://icanhazip.com");
+        return new WebClient().DownloadString("https://icanhazip.com");
     }
 
     public static string GetLocalIPv4L()
@@ -105,11 +102,11 @@ public class NetworkManagement : MonoBehaviour
         Game.SaveManager.SaveGame();
         Game.Player = null; // unload Player to load it again next time
 
-        if (_isHost) _manager.StopHost();
+        if (SuperGlobals.IsHost) _manager.StopHost();
         else _manager.StopClient();
         
         SuperGlobals.IsMultiplayerGame = false;
-        SuperGlobals.StartedFromMainMenu = false;
+        SuperGlobals.EditorMode = true;
         SuperGlobals.IsHost = false;
         
         SceneManager.LoadScene(mainMenuSceneName);

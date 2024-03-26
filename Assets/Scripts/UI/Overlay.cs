@@ -57,7 +57,7 @@ public class Overlay : MonoBehaviour
         }
 
         if (Settings.Overlay.DisplaySaveName)
-            text += "Name: " + (SuperGlobals.StartedFromMainMenu ? Game.SaveManager.SaveName : "[debug mode]");
+            text += "Save name: " + (SuperGlobals.EditorMode ? "[editor mode]" : SuperGlobals.SaveName);
         textData.text = text;
     }
 }

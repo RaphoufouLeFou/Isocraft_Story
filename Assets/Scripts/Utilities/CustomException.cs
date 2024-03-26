@@ -32,3 +32,8 @@ public class CommandException : Exception
 {
     public CommandException(string message = "Invalid command syntax") : base(message) { }
 }
+
+public class NetworkException : CustomException
+{
+    public NetworkException(string message = "Network error") : base(message) { }
+}

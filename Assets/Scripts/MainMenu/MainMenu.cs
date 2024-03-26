@@ -36,7 +36,6 @@ public class MainMenu : MonoBehaviour
         // send SuperGlobals to main scene
         DontDestroyOnLoad(superGlobals);
         SuperGlobals.BackToMenu();
-        SuperGlobals.StartedFromMainMenu = true;
     }
 
     public void NewGameButtonClick()
@@ -132,7 +131,7 @@ public class MainMenu : MonoBehaviour
     {
         foreach (Transform child in content.transform) Destroy(child.gameObject);
 
-        string path = Application.persistentDataPath + "/Saves/";
+        string path = $"{Application.persistentDataPath}/Saves/";
         if (!Directory.Exists(path)) return;
         
         foreach (string dir in Directory.EnumerateDirectories(path))
@@ -156,7 +155,7 @@ public class MainMenu : MonoBehaviour
     private void DeleteSave(string saveName)
     {
         saveName = saveName.Replace(' ' ,'_');
-        string path = Application.persistentDataPath + "/Saves/" + saveName + "/";
+        string path = Application.persistentDataPath + $"/Saves/{saveName}/";
         if (Directory.Exists(path)) Directory.Delete(path, true);
     }
 
@@ -164,12 +163,14 @@ public class MainMenu : MonoBehaviour
     {
         _ipAddress = addressInput.text;
     }
-    public void OnChangedGcode()
+    
+    public void OnChangedGCode()
     {
         _code = codeInput.text;
         _code = _code.ToUpper();
         codeInput.text = _code;
     }
+    
     public void OnChangedPort()
     {
         _port = portInput.text;

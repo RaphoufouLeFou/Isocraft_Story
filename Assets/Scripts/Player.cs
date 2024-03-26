@@ -132,11 +132,7 @@ public class Player : NetworkBehaviour
         if (z == 0) update.Add($"{chunkX}.{chunkZ - 1}");
         else if (z == Chunk.Size1) update.Add($"{chunkX}.{chunkZ + 1}");
 
-        if (isServer)
-        {
-            RpcPlaceBreak(update, x, y, z, type, isPlacing);
-            foreach (string chunkName2 in update) MapHandler.SaveChunk(MapHandler.Chunks[chunkName2]);
-        }
+        if (isServer) RpcPlaceBreak(update, x, y, z, type, isPlacing);
         else CmdPlaceBreak(update, x, y, z, type, isPlacing);
         
         return isPlacing ? type : result;
@@ -168,7 +164,6 @@ public class Player : NetworkBehaviour
     private void CmdPlaceBreak(List<string> update, int x, int y, int z, int type, bool isPlacing)
     {
         RpcPlaceBreak(update, x, y, z, type, isPlacing);
-        foreach (string chunkName2 in update) MapHandler.SaveChunk(MapHandler.Chunks[chunkName2]);
     }
 
     void DetectPlaceBreak()
