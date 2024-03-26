@@ -86,11 +86,11 @@ public class SettingsUI : MonoBehaviour
 
     private void SaveSettings()
     {
-        string s = "Ms:" + Settings.Overlay.DisplayMs + "\n";
-        s += "Fps:" + Settings.Overlay.DisplayFps + "\n";
-        s += "Coords:" + Settings.Overlay.DisplayCoords + "\n";
-        s += "SaveName:" + Settings.Overlay.DisplaySaveName + "\n";
-        foreach (KeyValuePair<string, KeyCode> key in Settings.KeyMap) s += key.Key + ":" + (int)key.Value + "\n";
+        string s = $"Ms:{Settings.Overlay.DisplayMs}\n";
+        s += $"Fps:{Settings.Overlay.DisplayFps}\n";
+        s += $"Coords:{Settings.Overlay.DisplayCoords}\n";
+        s += $"SaveName:{Settings.Overlay.DisplaySaveName}\n";
+        foreach (KeyValuePair<string, KeyCode> key in Settings.KeyMap) s += $"{key.Key}:{(int)key.Value}\n";
         if (File.Exists(_path)) File.Delete(_path);
         File.WriteAllText(_path, s);
     }

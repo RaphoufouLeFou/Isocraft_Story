@@ -57,7 +57,7 @@ public class Overlay : MonoBehaviour
         }
 
         if (Settings.Overlay.DisplaySaveName)
-            text += "Save name: " + (SuperGlobals.EditorMode ? "[editor mode]" : SuperGlobals.SaveName);
+            text += $"Save name: {(SuperGlobals.EditorMode ? "[editor mode]" : SuperGlobals.SaveName)}";
         textData.text = text;
     }
 }

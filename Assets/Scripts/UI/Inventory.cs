@@ -38,7 +38,8 @@ public class Inventory
             {
                 Inv[i, j, 0] = block; // set the inventory cell block id to the given id
                 Inv[i, j, 1]++; // increment the inventory cell block count by 1
-                if (j == 3) {
+                if (j == 3)
+                {
                     Images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
                     TmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
                 }

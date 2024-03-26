@@ -59,9 +59,7 @@ public class Player : NetworkBehaviour
 
         IsLoaded = true;
     }
-"test+"
-    "test"+"test"
-    $"test{1+1}"
+
     public void SaveLoaded(Vector3 pos, Vector3 rot, Inventory inv, float health)
     {
         // set variables once save infos are loaded

@@ -7,6 +7,7 @@ init()
 class Thing:
     def __init__(self, *args):
         self.file, self.line, self.code = args
+        self.code = self.code.strip()
         if len(self.code) > 120: self.code = self.code[:116]+'...'
     def __repr__(self):
         return 'In file %s"%s"%s, line %s%d%s:\n%s%s%s' %(
@@ -14,7 +15,7 @@ class Thing:
             Fore.RESET, Fore.RED, self.code, Fore.RESET)
 
 def clean_file(filename):
-    global n_changes, string, long, visual, expensive
+    global n_changes, string, long, visual, todo, expensive
 
     ext = splitext(filename)[1]
     if 'FastNoiseLite' in filename: return # skip this file
@@ -49,53 +50,50 @@ def clean_file(filename):
             if not py:
                 # get code part of line, check for string additions
                 _line = ''
-                if '"' in line:
-                    operation = []
-                    count = 0
-                    in_string = False
-                    depth = 0
-                    _depth = 0
-                    prev = None
-                    dollar = False
-                    for char in line:
-                        if char == '"' and prev != '\\': # I know about \\
-                            in_string = not in_string
-                            count += 1
-                            _line += char
-                            dollar = in_string and prev == '$'
-                            if in_string: _depth = 0
-                        elif in_string: # in string: if $"", add code inside
-                            if dollar and prev != '\\':
-                                if char in opening: _depth += 1
-                                elif char in closing:
-                                    _depth -= 1
-                                    _line += char
-                                if _depth: _line += char
-                        else: # outside of string: add and check for ""+""
-                            _line += 'q'#char
+                operation = []
+                count = 0
+                in_string = False
+                depth = 0
+                _depth = 0
+                prev = None
+                dollar = False
+                for char in line:
+                    if char == '"' and prev != '\\': # I know about \\
+                        in_string = not in_string
+                        count += 1
+                        _line += char
+                        dollar = in_string and prev == '$'
+                        if in_string: _depth = 0
+                    elif in_string: # in string: if $"", add code inside
+                        if dollar and prev != '\\':
+                            if char in opening: _depth += 1
+                            elif char in closing:
+                                _depth -= 1
+                                _line += char
+                            if _depth: _line += char
+                    else: # outside of string: add and check for ""+""
+                        _line += char
 
-                            if char in opening: depth += 1
-                            elif char in closing: depth -= 1
-                            elif not depth and char == '+':
-                                operation.append(count)
+                        if char in opening: depth += 1
+                        elif char in closing: depth -= 1
+                        elif not depth and char == '+':
+                            operation.append(count)
 
-                    op = False
-                    for o in operation:
-                        if o != 0 and o != count:
-                            op = True
-                            break
+                    prev = char
 
-                    if op: string.append(Thing(filename, i+1, line))
+                op = False
+                for o in operation:
+                    if o != 0 and o != count:
+                        op = True
+                        break
 
-                if 'Player' in filename:
-                    if 55 < i < 70: print(line+'\n', 'a', _line)
-                    if i == 70: sdjfhbh
+                if op: string.append(Thing(filename, i+1, line))
 
                 # check for operators
                 ok = True
-                _line = _line.split('//')[0] # I know about // //
+                _line = _line.split('//')[0]+' ' # I know about // //
                 j = 1
-                while j < len(_line)-1:
+                while j < len(_line)-2:
                     if 'case' in line: break
                     if _line[j] in operators:
                         a, b = j-1, j+1
@@ -108,30 +106,39 @@ def clean_file(filename):
                             if double or _line[b] == '=':
                                 j += 1
                                 b += 1
-                                if b < len(_line)-1 and double\
-                                   and _line[j+2] == '=':
-                                    # triple characters
+                                if b < len(_line)-1 and double \
+                                   and _line[j+1] == '=':
+                                    # triple characters operators
                                     j += 1
                                     b += 1
 
                         if a and _line[a] == '!': a -= 1
                         a, b = _line[a], _line[b]
-                        # avoid things like List<int>()
-                        if (a.isalpha() or a == ' ') \
-                           and (b.isalnum() or b in ' ('):
+                        if a == b == "'":
+                            j += 1
+                            continue # char
+
+                        # avoid things like List<(int, Vector3)>()
+                        if (a.isalpha() or a in ' 23)(]') \
+                           and (b.isalnum() or b == ' '
+                            or _line[j+1:j+3] == '()' or (
+                            b == '(' and _line[j+2].isalpha())):
                             j += 1
                             continue
 
                         if not (a == 0 or a == ' ') or not (
                             b == len(_line)-1 or b == ' '):
-                            print(line)
-                            print(_line)
-                            input((a, b))
                             ok = False
                             break
                     j += 1
 
+                _line = line.replace(' ', '')
+                if len(_line) > 1 and _line[-1] == '{' and _line[0] != '{':
+                    ok = False
+
                 if not ok: visual.append(Thing(filename, i+1, line))
+
+                if 'TODO' in line: todo.append(Thing(filename, i+1, line))
 
                 if 'GameObject.Find(' in line or 'GetComponent' in line:
                         expensive.append(Thing(filename, i+1, line))
@@ -156,14 +163,15 @@ def title(name):
 
 ignore = ('.', '..', '.git')
 types = ('.cs', '.py', '.pyw')
-operators = '+-*/<>=&|^:'
-double_operators = ('&&', '||', '^^', '<<', '>>', '=>')
+operators = '+-*/<>=&|^:?'
+double_operators = ('&&', '||', '^^', '<<', '>>', '=>', '??', '/*', '*/')
 opening, closing = '([{', ')]}'
 
 n_changes = 0
 string = []
 long = []
 visual = []
+todo = []
 expensive = []
 
 print('%sPHASE 1 - CODE CLEANING%s\n' %(Fore.RED, Fore.RESET))
@@ -205,6 +213,16 @@ print('%sSpaces around operators, newline %s{%s (except when inline)%s\n' %(
 )
 for thing in visual: print(thing)
 n = len(visual)
+print('Detected %s%d%s issues' %(
+    Fore.LIGHTRED_EX if n else Fore.GREEN, n, Fore.RESET)
+)
+
+title('TODO')
+print('%sDo every %sTODO%s\n' %(
+    Fore.LIGHTGREEN_EX, Fore.GREEN, Fore.RESET)
+)
+for thing in todo: print(thing)
+n = len(todo)
 print('Detected %s%d%s issues' %(
     Fore.LIGHTRED_EX if n else Fore.GREEN, n, Fore.RESET)
 )
