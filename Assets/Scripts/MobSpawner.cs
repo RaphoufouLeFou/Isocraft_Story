@@ -13,18 +13,14 @@ public class MobSpawner : MonoBehaviour
     {
         Instantiate(mobPrefab, position, Quaternion.identity);
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
     {
         if (spawn)
         {
-            SpawnMob(new Vector3(0,7,0));
+            // commented out for now
+            //SpawnMob(new Vector3(0,7,0));
             spawn = false;
         } 
     }

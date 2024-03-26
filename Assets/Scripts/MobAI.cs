@@ -4,19 +4,23 @@ using UnityEngine;
 
 public class MobAI : MonoBehaviour
 {
-    
-    public CustomRigidBody Body;
-    
+    private MobBody _body;
     
     // Start is called before the first frame update
     void Start()
     {
-        Body = new CustomRigidBody(transform, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
+        _body = new MobBody(transform, MoveFunction);
     }
 
     // Update is called once per frame
     void Update()
     {
-        Body.Update(Settings.IsPaused);
+        _body.Update();
+    }
+
+    private (float x, float z) MoveFunction()
+    {
+        // should return movement relative to rotation
+        return (0, 0);
     }
 }

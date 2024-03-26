@@ -9,6 +9,12 @@ public class Utils
         return (a % b + b) % b;
     }
 
+    public static (int, int) DivMod(int a, int b)
+    {
+        int mod = Mod(a, b);
+        return ((a - mod) / b, mod);
+    }
+
     public static int Floor(float x)
     {
         if (x < 0)

@@ -12,6 +12,11 @@ public class Chunk : MonoBehaviour
     private int _x, _z, _cx, _cz; // in chunk space 
     public MeshFilter opaqueMeshFilter, transparentMeshFilter;
     public MeshCollider meshCollider;
+
+    public static string GetName(int cx, int cz)
+    {
+        return $"c.{cx}.{cz}";
+    }
     
     public void Init(int cx, int cz, int[,,] blocks)
     {
@@ -19,7 +24,7 @@ public class Chunk : MonoBehaviour
         _z = cz * Size;
         _cx = cx;
         _cz = cz;
-        name = $"{cx}.{cz}";
+        name = GetName(cx, cz);
         Blocks = blocks;
         
         transform.position = new Vector3(_x, 0, _z);
@@ -84,7 +89,7 @@ public class Chunk : MonoBehaviour
         // get neighboring chunks
         Dictionary<int, Chunk> neighbors = new ();
         for (int i = 0; i < 4; i++)
-            if (MapHandler.Chunks.TryGetValue($"{_cx + (i < 2 ? i * 2 - 1 : 0)}.{_cz + (i > 1 ? i * 2 - 5 : 0)}",
+            if (MapHandler.Chunks.TryGetValue(GetName(_cx + (i < 2 ? i * 2 - 1 : 0), _cz + (i > 1 ? i * 2 - 5 : 0)),
                     out Chunk chunk))
                 neighbors.Add(i, chunk);
 

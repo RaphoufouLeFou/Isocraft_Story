@@ -48,16 +48,16 @@ public class CustomRigidBody
         OnFloor = false;
 
         Vector3 movement = pos - _transform.position;
-
+        
         int chunkX = (int)MathF.Floor(pos.x / Chunk.Size);
         int chunkZ = (int)MathF.Floor(pos.z / Chunk.Size);
-
+        
         // check collisions with chunks around
         for (int i = chunkX - 1; i < chunkX + 2; i++)
         for (int j = chunkZ - 1; j < chunkZ + 2; j++)
         {
             // no collisions for unloaded chunks
-            if (!MapHandler.Chunks.TryGetValue($"{i}.{j}", out Chunk chunk))
+            if (!MapHandler.Chunks.TryGetValue(Chunk.GetName(i, j), out Chunk chunk))
             {
                 if (i == chunkX && j == chunkZ) return; // sitting in unloaded chunk
                 continue;
@@ -134,31 +134,99 @@ public class CustomRigidBody
                 Movement.x = 0;
                 pos.x += correction.x;
             }
-
+            
             if (correction.y != 0)
             {
                 if (movement.y <= 0) OnFloor = true; // floor collision
                 Movement.y = 0;
                 pos.y += correction.y;
             }
-
+            
             if (correction.z != 0)
             {
                 Movement.z = 0;
                 pos.z += correction.z;
             }
         }
-
+        
         _transform.position = pos;
     }
-    
-    public void Update(bool paused)
+
+    protected float GetDelta()
     {
+        
         // capped movement speed
         float delta = Time.deltaTime;
-        if (delta > 0.1f) delta = 0.1f;
+        return delta > 0.1f ? 0.1f : delta;
+    }
+    
+    protected void Update(float x, float z, float delta)
+    {
+        // not gonna check, but x and z must be <= 1 in absolute value
+        MoveRelative = new Vector3(x * 0.8f, 0, z).normalized;
+        Vector3 move = _transform.rotation * MoveRelative;
+        float speed = _sprinting ? 1.7f * _speed : _speed;
+        Movement += move * (speed * delta);
+        
+        // move according to Movement
+        float drag = MathF.Pow(_drag, 100 * delta);
+        Movement.x *= drag;
+        Movement.y += _gravity * delta;
+        Movement.z *= drag;
+        
+        Vector3 newPos = _transform.position + Movement * (delta * _speed);
+        CheckCollisions(newPos);
+    }
 
-        if (!paused) // keys movement
+    protected void StartSprinting()
+    {
+        _sprinting = true;
+    }
+    
+    protected void StopSprinting()
+    {
+        _sprinting = false;
+    }
+
+    protected void Jump()
+    {
+        Movement.y = _jumpForce;
+    }
+}
+
+// body set up with the planet's constants
+public class PlanetBody : CustomRigidBody
+{
+    protected PlanetBody(Transform transform) : base(transform, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f) { }
+}
+
+// body with AI controller
+public class MobBody : PlanetBody
+{
+    private Func<(float x, float z)> _moveFunc;
+    
+    public MobBody(Transform transform, Func<(float x, float z)> moveFunc) : base(transform)
+    {
+        _moveFunc = moveFunc;
+    }
+
+    public void Update()
+    {
+        float delta = GetDelta();
+        (float x, float z) = _moveFunc();
+        base.Update(x, z, delta);
+    }
+}
+
+public class PlayerBody : PlanetBody
+{
+    public PlayerBody(Transform transform) : base(transform) { }
+
+    public void Update()
+    {
+        float delta = GetDelta();
+        
+        if (!Settings.IsPaused) // keys movement
         {
             float x = 0;
             float z = 0;
@@ -168,30 +236,12 @@ public class CustomRigidBody
             if (backwards) z--;
             if (Input.GetKey(Settings.KeyMap["Left"])) x--;
             if (Input.GetKey(Settings.KeyMap["Right"])) x++;
-            /*
-            if (forwards || backwards)
-            {
-                Animator anim = _transform.gameObject.GetComponentInChildren<Animator>();
-                anim.Play("New Animation");
-            }*/
 
-            if (Input.GetKey(Settings.KeyMap["Sprint"])) _sprinting = true;
-            if (!forwards || backwards) _sprinting = false;
+            if (Input.GetKey(Settings.KeyMap["Sprint"])) StartSprinting();
+            if (!forwards || backwards) StopSprinting();
 
-            MoveRelative = new Vector3(x * 0.8f, 0, z).normalized;
-            Vector3 move = _transform.rotation * MoveRelative;
-            float speed = _sprinting ? 1.7f * _speed : _speed;
-            Movement += move * (speed * delta);
-            if (Input.GetKey(Settings.KeyMap["Jump"]) && OnFloor) Movement.y = _jumpForce;
+            if (Input.GetKey(Settings.KeyMap["Jump"]) && OnFloor) Jump();
+            base.Update(x, z, delta);
         }
-
-        // move according to Movement
-        float drag = MathF.Pow(_drag, 100 * delta);
-        Movement.x *= drag;
-        Movement.y += _gravity * delta;
-        Movement.z *= drag;
-
-        Vector3 newPos = _transform.position + Movement * (delta * _speed);
-        CheckCollisions(newPos);
     }
 }

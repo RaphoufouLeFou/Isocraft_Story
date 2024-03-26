@@ -12,7 +12,7 @@ public class Player : NetworkBehaviour
     [NonSerialized] public float Health;
     [NonSerialized] public bool IsLoaded;
 
-    public CustomRigidBody Body;
+    public PlayerBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     private Vector3 _spawn;
     private bool _spawnSuccess = true;
@@ -48,7 +48,7 @@ public class Player : NetworkBehaviour
         
         // body settings
         Transform tr = transform;
-        Body = new CustomRigidBody(tr, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f);
+        Body = new PlayerBody(tr);
 
         tr.position = new Vector3(0, Chunk.Size, 0);
         
@@ -77,7 +77,7 @@ public class Player : NetworkBehaviour
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
         _spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
 
-        if (MapHandler.Chunks != null && MapHandler.Chunks.TryGetValue(chunkX + "." + chunkZ, out Chunk chunk))
+        if (MapHandler.Chunks != null && MapHandler.Chunks.TryGetValue(Chunk.GetName(chunkX, chunkZ), out Chunk chunk))
         {
             int modX = (int)(pos.x - chunkX * Chunk.Size),
                 modZ = (int)(pos.z - chunkZ * Chunk.Size);
@@ -126,11 +126,11 @@ public class Player : NetworkBehaviour
 
         if (!isPlacing && Game.Blocks.FromId[result].Unbreakable) return -1; // can't break bedrock
 
-        List<string> update = new List<string> { $"{chunkX}.{chunkZ}" };
-        if (x == 0) update.Add($"{chunkX - 1}.{chunkZ}");
-        else if (x == Chunk.Size1) update.Add($"{chunkX + 1}.{chunkZ}");
-        if (z == 0) update.Add($"{chunkX}.{chunkZ - 1}");
-        else if (z == Chunk.Size1) update.Add($"{chunkX}.{chunkZ + 1}");
+        List<string> update = new List<string> { Chunk.GetName(chunkX, chunkZ) };
+        if (x == 0) update.Add(Chunk.GetName(chunkX - 1,chunkZ));
+        else if (x == Chunk.Size1) update.Add(Chunk.GetName(chunkX + 1,chunkZ));
+        if (z == 0) update.Add(Chunk.GetName(chunkX, chunkZ - 1));
+        else if (z == Chunk.Size1) update.Add(Chunk.GetName(chunkX, chunkZ + 1));
 
         if (isServer) RpcPlaceBreak(update, x, y, z, type, isPlacing);
         else CmdPlaceBreak(update, x, y, z, type, isPlacing);
@@ -195,7 +195,7 @@ public class Player : NetworkBehaviour
                 
                 int currentBlock = Inventory.GetCurrentBlock(HotBar.SelectedIndex, 3);
                 // check for breaking and interacting
-                if (MapHandler.Chunks.TryGetValue($"{breakCx}.{breakCz}", out Chunk chunk))
+                if (MapHandler.Chunks.TryGetValue(Chunk.GetName(breakCx, breakCz), out Chunk chunk))
                 {
                     if (placing && chunk.InteractBlock(breakX, breakY, breakZ)) return; // check for interactions
                     if (breaking) // break block
@@ -207,7 +207,7 @@ public class Player : NetworkBehaviour
                 }
                 
                 // check for block placing
-                if (placing && MapHandler.Chunks.TryGetValue($"{placeCx}.{placeCz}", out chunk))
+                if (placing && MapHandler.Chunks.TryGetValue(Chunk.GetName(placeCx, placeCz), out chunk))
                 {
                     int count = Inventory.GetCurrentBlockCount(HotBar.SelectedIndex, 3);
                     if (count <= 0) return;
@@ -233,7 +233,7 @@ public class Player : NetworkBehaviour
 
         if (!isLocalPlayer) return; // don't update other players
         
-        Body.Update(Settings.IsPaused);
+        Body.Update();
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
 
         bool invVisible = _inventoryUI.inventoryMenu.activeSelf;

@@ -34,12 +34,12 @@ public class Game : MonoBehaviour
     
     private float _prevTick;
     private float _prevSave;
-
+    
     // structures info
     public static readonly Dictionary<string, Structure> Structs = new();
     private static readonly string[] StructNames = { "Tree", "Trunk", "Bush" };
     [NonSerialized] public static int MaxStructSize; // how many blocks out can structures be searched for
-
+    
     public struct Blocks
     {
         public const int
@@ -61,7 +61,7 @@ public class Game : MonoBehaviour
             DeadBush = 14,
             DeadPlant = 15,
             Chest = 16;
-
+        
         public static readonly Dictionary<int, Block> FromId = new()
         {
             { Air, new Block(null, new[] { Tag.NoTexture, Tag.NoCollide, Tag.NoRayCast, Tag.Unbreakable }) },
@@ -83,7 +83,7 @@ public class Game : MonoBehaviour
             { Chest, new Block(null, new[] { Tag.IsModel }) }
         };
     }
-
+    
     public struct Models
     {
         // { Block ID, asset index }
@@ -94,7 +94,7 @@ public class Game : MonoBehaviour
         
         public static GameObject[] GameObjects;
     }
-
+    
     public void InitGameUtils()
     {
         if (Models.ModelsIndex.Count != models.Length)
@@ -119,10 +119,11 @@ public class Game : MonoBehaviour
             MaxStructSize = MaxStructSize > s.X ? MaxStructSize > s.Z ? MaxStructSize : s.Z : s.X > s.Z ? s.X : s.Z;
             Structs.TryAdd(type, s);
         }
-
+        
         // set up SuperGlobals
         SaveManager = new SaveManagement();
-        GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
+        // TODO(?)GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
+        //if (globals != null) SaveManager.SaveName = SuperGlobals.SaveName;
     }
     
     private void StartGame()
@@ -134,12 +135,13 @@ public class Game : MonoBehaviour
         Tick = 0;
         _prevTick = Time.time;
     }
-
+    
     private void Update()
     {
         // wait for the player to start
-        if (!Started && Player is not null && Player.IsLoaded) // local player has been fully loaded
+        if (!Started && Player is not null && Player.IsLoaded)
         {
+            // current player has been fully loaded
             StartGame();
             Started = true;
         }
@@ -158,7 +160,7 @@ public class Game : MonoBehaviour
             SaveManager.SaveGame();
         }
     }
-
+    
     public static void QuitGame()
     {
         // quit game, even if in editor
