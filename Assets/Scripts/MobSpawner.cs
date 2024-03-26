@@ -20,7 +20,7 @@ public class MobSpawner : MonoBehaviour
         if (spawn)
         {
             // commented out for now
-            //SpawnMob(new Vector3(0,7,0));
+            SpawnMob(new Vector3(0,7,0));
             spawn = false;
         }
     }
