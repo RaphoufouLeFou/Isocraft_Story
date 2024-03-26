@@ -14,7 +14,8 @@ public class CustomRigidBody
 
     private readonly float _width, _height;
 
-    public CustomRigidBody(Transform transform, float speed, float drag, float jumpForce, float gravity, float width, float height)
+    public CustomRigidBody(Transform transform, float speed, float drag,
+                           float jumpForce, float gravity, float width, float height)
     {
         _transform = transform;
         _speed = speed;

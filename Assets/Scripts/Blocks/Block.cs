@@ -85,7 +85,9 @@ public class Block
 
     private void Warn(string useless, string child)
     {
-        throw new BlockException($"{useless} is not required when specifying {child}, please remove for performance");
+        throw new BlockException(
+            $"{useless} is not required when specifying {child},please remove for performance"
+        );
     }
 
     public Block(Tiles.Tile allFaces, Tag[] tags = null) : this(tags)

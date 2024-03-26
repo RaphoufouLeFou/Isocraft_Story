@@ -53,11 +53,15 @@ public class Player : NetworkBehaviour
         tr.position = new Vector3(0, Chunk.Size, 0);
 
         // activate camera if needed
-        playerCamera.cam.gameObject.SetActive(isLocalPlayer || Level == NetworkClient.localPlayer.gameObject.GetComponent<Player>().Level);
+        playerCamera.cam.gameObject.SetActive(
+            isLocalPlayer || Level == NetworkClient.localPlayer.gameObject.GetComponent<Player>().Level
+        );
 
         IsLoaded = true;
     }
-
+"test+"
+    "test"+"test"
+    $"test{1+1}"
     public void SaveLoaded(Vector3 pos, Vector3 rot, Inventory inv, float health)
     {
         // set variables once save infos are loaded

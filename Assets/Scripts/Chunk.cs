@@ -50,12 +50,13 @@ public class Chunk : MonoBehaviour
         for (int z = -Game.MaxStructSize; z < Size + Game.MaxStructSize; z++)
         {
             (int y, Structure s) = NoiseGen.GetStruct(posX + x, posZ + z);
-            if (y != -1) for(int dx = 0; dx < s.X; dx++) for(int dy = 0; dy < s.Y; dy++) for (int dz = 0; dz < s.Z; dz++)
-                if (x + dx is >= 0 and < Size && y + dy is >= 0 and < Size && z + dz is >= 0 and < Size)
-                {
-                    int b = s.GetBlock(x, y, z, dx, dy, dz);
-                    if (b != -1) blocks[x + dx, y + dy, z + dz] = b;
-                }
+            if (y != -1) for (int dx = 0; dx < s.X; dx++)
+                for (int dy = 0; dy < s.Y; dy++) for (int dz = 0; dz < s.Z; dz++)
+                    if (x + dx is >= 0 and < Size && y + dy is >= 0 and < Size && z + dz is >= 0 and < Size)
+                    {
+                        int b = s.GetBlock(x, y, z, dx, dy, dz);
+                        if (b != -1) blocks[x + dx, y + dy, z + dz] = b;
+                    }
         }
     }
 

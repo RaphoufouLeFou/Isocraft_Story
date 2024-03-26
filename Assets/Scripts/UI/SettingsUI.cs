@@ -49,7 +49,8 @@ public class SettingsUI : MonoBehaviour
         _isReadingKey = true;
         pressKeyText.SetActive(true); // show the "press a key" text
         _key = obj.name; // the function name is also the name of the UI input
-        _keyText = obj.transform.GetChild(1).GetComponentInChildren<TMP_Text>(); // get the pressed key Text to hide it later
+        // get the pressed key Text to hide it later
+        _keyText = obj.transform.GetChild(1).GetComponentInChildren<TMP_Text>();
     }
 
     public void GoToMenu(string menu)
@@ -108,7 +109,8 @@ public class SettingsUI : MonoBehaviour
         for (int i = 0; i < Settings.KeyMap.Count; i++)
         {
             Transform child = t.GetChild(i);
-            child.GetChild(1).GetComponentInChildren<TMP_Text>().text = Settings.KeyMap[child.gameObject.name].ToString();
+            child.GetChild(1).GetComponentInChildren<TMP_Text>().text =
+                Settings.KeyMap[child.gameObject.name].ToString();
         }
     }
 

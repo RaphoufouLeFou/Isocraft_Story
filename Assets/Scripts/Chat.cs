@@ -120,12 +120,14 @@ public class Chat : NetworkBehaviour
                 _pastIndex++;
                 if (_pastIndex == _pastMessages.Count)_pastIndex --;
                 if(_pastMessages.Count != 0)
-                    chatWindow.GetComponentInChildren<TMP_InputField>().text = _pastMessages[_pastMessages.Count - 1 - _pastIndex];
+                    chatWindow.GetComponentInChildren<TMP_InputField>().text =
+                        _pastMessages[_pastMessages.Count - 1 - _pastIndex];
             }
 
             if (Input.GetKeyDown(KeyCode.DownArrow) && _pastIndex > 0)
             {
-                chatWindow.GetComponentInChildren<TMP_InputField>().text = _pastMessages[_pastMessages.Count - 1 - _pastIndex];
+                chatWindow.GetComponentInChildren<TMP_InputField>().text =
+                    _pastMessages[_pastMessages.Count - 1 - _pastIndex];
                 if (_pastIndex - 1 >= 0 && _pastIndex - 1 < _pastMessages.Count) _pastIndex--;
             }
         }

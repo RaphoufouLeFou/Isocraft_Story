@@ -58,10 +58,15 @@ class Blocks:
         for i, dx, dy in [(0, dx0, dy0), (1, dx1, dy1), (2, dx2, dy2)]:
             for x in range(dx):
                 for y in range(dy):
-                    if block: r, g, b, a = tex.get_at((int(x*32/dx), int(y*32/dy)))
+                    if block:
+                        r, g, b, a = tex.get_at((int(x*32/dx), int(y*32/dy)))
                     if i == 0: front.set_at((x, y), (r*0.7, g*0.7, b*0.7, a))
-                    elif i == 1: top.set_at((x + int((1 - y/dy)*(x2-x1)), y), (r, g, b, a))
-                    else: right.set_at((x, y + int((1 - x/dx)*(y1-y0))), (r*0.9, g*0.9, b*0.9, a))
+                    elif i == 1:
+                        top.set_at((x + int((1 - y/dy)*(x2-x1)), y),
+                                   (r, g, b, a))
+                    else:
+                        right.set_at((x, y + int((1 - x/dx)*(y1-y0))),
+                                     (r*0.9, g*0.9, b*0.9, a))
 
         self.zoom[block] = zoom
         self.tex[block] = (front, top, right)
@@ -74,7 +79,8 @@ class Blocks:
                     self.threads.append(block)
                     Thread(target=self.make_tex, args=(block,)).start()
 
-                # get or make air texture while calculating if no other texture is available
+                # get or make air texture while calculating
+                # if no other texture is available
                 if block not in self.tex: return self.get_tex(0)
             else:
                 self.threads.append(0)
@@ -294,11 +300,14 @@ class Structure:
                     x0 = self.get2d(x, self.layer+1, y)[0]
                     x1, y0 = self.get2d(x+1, self.layer+1, y)
                     x02, y1 = self.get2d(x, self.layer+1, y+1)
-                    # update boundaries since the collision box is not a rectangle
+                    # update boundaries since the
+                    # collision box is not a rectangle
                     dx, t = x02-x0, (_y-y0)/(y1-y0)
                     x0, x1 = x0 + dx*t, x1 + dx*t
 
-                    ok = 3 # both X and Z conditions are needed, use bitwise operations
+                    # both X and Z conditions are needed,
+                    # use bitwise operations
+                    ok = 3
                     if _y < y0: y -= 1
                     elif _y > y1: y += 1
                     else:
@@ -310,7 +319,9 @@ class Structure:
 
                         if x < 0 or x >= self.size[0]:
                             ok = False
-                            break # x boundaries change as Z changes, only check after Z is ok
+                            # x boundaries change as Z changes,
+                            # only check after Z is ok
+                            break
                     ok = not ok
                 if ok:
                     if event.button == 1:

@@ -86,8 +86,14 @@ public class InventoryUI : MonoBehaviour
         int y = self.transform.parent.GetSiblingIndex();
         if (_isMovingItem)
         {
-            if (_movingItem.Item1 != _playerInv.GetCurrentBlock(x, y) && _playerInv.GetCurrentBlockCount(x, y) != 0) return;
-            int diff = _playerInv.AddBlockAt(x, y, _movingItem.Item1, _movingItem.Item2, Game.InvSprites[_movingItem.Item1]);
+            if (_movingItem.Item1 != _playerInv.GetCurrentBlock(x, y) && _playerInv.GetCurrentBlockCount(x, y) != 0)
+                return;
+            int diff = _playerInv.AddBlockAt(
+                x, y,
+                _movingItem.Item1,
+                _movingItem.Item2,
+                Game.InvSprites[_movingItem.Item1]
+            );
             if (diff != 0)
             {
                 _movingItem.Item2 = diff;

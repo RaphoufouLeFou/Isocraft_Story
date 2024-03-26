@@ -44,9 +44,12 @@ pygame.image.save(texmap, TEXMAP)
 
 # generate cs code
 # tile positions
-print('\n/!\ Don\'t forget to use .png images\n\nPlace these instructions inside Game.cs:')
+print('\n/!\ Don\'t forget to use .png images\n')
+print('Place these instructions inside Game.cs:')
 code = '\nprivate const int TexWidth = %d, TexHeight = %d;' %(w, h)
 code += '\n\npublic static readonly Tile'
 for i, name in zip(range(l), images):
     code += '\n    %s = new(new Vector2(%d, %d)),' %(name, i%w, h-1-i//w)
-input(code[:-1]+';\n\n/!\\ - Don\'t forget to move the texmap.png file into the Assets folder!\n- Don\'t forget to update the schematic editor!')
+print(code[:-1]+';\n/!\\', end='')
+print(' - Don\'t forget to move the texmap.png file into the Assets folder!')
+input(' - Don\'t forget to update the schematic editor!')
