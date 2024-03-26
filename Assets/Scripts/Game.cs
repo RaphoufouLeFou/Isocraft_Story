@@ -64,7 +64,7 @@ public class Game : MonoBehaviour
 
         public static readonly Dictionary<int, Block> FromId = new()
         {
-            { Air, new Block(null, new[] { Tag.NoTexture, Tag.NoCollide }) },
+            { Air, new Block(null, new[] { Tag.NoTexture, Tag.NoCollide, Tag.Unbreakable }) },
             { Sand, new Block(Tiles.SandTop, Tiles.SandSide, Tiles.SandTop) },
             { RedSand, new Block(Tiles.RedSand) },
             { Sandstone, new Block(Tiles.SandstoneTop, Tiles.SandstoneSide, Tiles.SandstoneTop) },
@@ -80,7 +80,7 @@ public class Game : MonoBehaviour
             { BokaBeast, new Block(Tiles.BokaBrick, Tiles.BokaBeast, Tiles.BokaBrick) },
             { DeadBush, new Block(Tiles.DeadBush, new[] { Tag.Is2D, Tag.NoCollide }) },
             { DeadPlant, new Block(Tiles.DeadPlant, new[] { Tag.Is2D, Tag.NoCollide }) },
-            { Chest, new Block(null, new[] { Tag.NoTexture, Tag.IsModel }) }
+            { Chest, new Block(null, new[] { Tag.IsModel }) }
         };
     }
 

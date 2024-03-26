@@ -118,6 +118,7 @@ public class Chunk : MonoBehaviour
             
             // full block: display face by face under certain conditions
             // collide block: still need to execute all of this to build the collider
+            // only except 2D blocks which are handled above
             if (!blockObj.Is2D && !blockObj.NoTexture || !blockObj.NoCollide)
             {
                 for (int face = 0; face < 6; face++)

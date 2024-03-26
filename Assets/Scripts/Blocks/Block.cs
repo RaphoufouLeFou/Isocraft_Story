@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 public enum Tag
@@ -41,6 +42,7 @@ public class Block
             switch (tag)
             {
                 case Tag.Transparent:
+                    if (NoTexture || IsModel) Warn("Transparent", "NoTexture");
                     Transparent = true;
                     break;
                 case Tag.Unbreakable:
@@ -54,7 +56,8 @@ public class Block
                     NoCollide = true;
                     break;
                 case Tag.NoTexture:
-                    Unbreakable = true;
+                    if (Transparent) Warn("Transparent", "NoTexture");
+                    if (IsModel) Warn("NoTexture", "IsModel");
                     Transparent = true;
                     NoTexture = true;
                     break;
@@ -62,7 +65,10 @@ public class Block
                     IsFluid = true;
                     break;
                 case Tag.IsModel:
+                    if (NoTexture) Warn("NoTexture", "IsModel");
+                    if (Transparent) Warn("Transparent", "IsModel");
                     IsModel = true;
+                    NoTexture = true;
                     Transparent = true;
                     break;
                 case Tag.HasInfo:
@@ -75,6 +81,11 @@ public class Block
             }
 
         if (HasInfo) Info = new Dictionary<string, int>();
+    }
+
+    private void Warn(string useless, string child)
+    {
+        throw new BlockException($"{useless} is not required when specifying {child}, please remove for performance");
     }
 
     public Block(Tiles.Tile allFaces, Tag[] tags = null) : this(tags)
