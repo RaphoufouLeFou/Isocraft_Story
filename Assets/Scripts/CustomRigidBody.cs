@@ -203,9 +203,9 @@ public class PlanetBody : CustomRigidBody
 // body with AI controller
 public class MobBody : PlanetBody
 {
-    private Func<(float x, float z)> _moveFunc;
+    private readonly Func<(float side, float forwards)> _moveFunc;
     
-    public MobBody(Transform transform, Func<(float x, float z)> moveFunc) : base(transform)
+    public MobBody(Transform transform, Func<(float side, float forwards)> moveFunc) : base(transform)
     {
         _moveFunc = moveFunc;
     }

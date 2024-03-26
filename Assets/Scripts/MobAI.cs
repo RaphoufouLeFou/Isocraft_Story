@@ -18,7 +18,7 @@ public class MobAI : MonoBehaviour
         _body.Update();
     }
 
-    private (float x, float z) MoveFunction()
+    private (float side, float forwards) MoveFunction()
     {
         // should return movement relative to rotation
         return (0, 0);

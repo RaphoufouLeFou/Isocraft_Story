@@ -120,10 +120,7 @@ public class Game : MonoBehaviour
             Structs.TryAdd(type, s);
         }
         
-        // set up SuperGlobals
         SaveManager = new SaveManagement();
-        // TODO(?)GameObject globals = GameObject.Find("SuperGlobals"); // just to know if we started from main menu
-        //if (globals != null) SaveManager.SaveName = SuperGlobals.SaveName;
     }
     
     private void StartGame()
