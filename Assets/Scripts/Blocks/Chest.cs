@@ -3,7 +3,7 @@ using UnityEngine;
 public class Chest : BlockEntity, IBlockEntity
 {
     private bool _isOpened;
-    public int[,,] Content = new int[9, 3, 2];
+    private int[,] _content = new int[9, 3];
 
     public Chest(int id) : base(id)
     {

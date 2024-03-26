@@ -2,6 +2,10 @@
 
 public interface IBlockEntity
 {
+    public GameObject GameObject { get; }
+
+    public GameObject GetBaseObject();
+    public void SetObject(GameObject go, Vector3 pos);
     public void Interact();
 }
 
@@ -9,10 +13,10 @@ public class BlockEntity : Block, IBlockEntity
 {
     private static readonly Vector3 Center = new(0.5f, 0, 0.5f);
     
-    private GameObject _gameObject;
+    public GameObject GameObject { get; private set; }
     private readonly int _id;
 
-    public static BlockEntity Create(int id)
+    public static IBlockEntity Create(int id)
     {
         switch (id)
         {
@@ -34,8 +38,8 @@ public class BlockEntity : Block, IBlockEntity
     public void SetObject(GameObject go, Vector3 pos)
     {
         // place the object in the center of the block
-        _gameObject = go;
-        _gameObject.transform.position = pos + Center - Game.Models.Offsets[_id];
+        GameObject = go;
+        GameObject.transform.position = pos + Center - Game.Models.Offsets[_id];
     }
 
     public void Interact()

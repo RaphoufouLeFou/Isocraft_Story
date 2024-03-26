@@ -120,19 +120,17 @@ public class Player : NetworkBehaviour
     
     private int PlaceBreak(int chunkX, int chunkZ, int x, int y, int z, Chunk chunk, int type, bool isPlacing)
     {
-        string chunkName = $"{chunkX}.{chunkZ}";
-        
         // the slight position change makes the action replace a block or break air
         int result = chunk.Blocks[x, y, z]; // for inventory management
         if (isPlacing ^ chunk.Blocks[x, y, z] == Game.Blocks.Air) return -1;
 
         if (!isPlacing && Game.Blocks.FromId[result].Unbreakable) return -1; // can't break bedrock
 
-        List<string> update = new List<string> { chunkName };
-        if (x == 0) update.Add(chunkX - 1 + "." + chunkZ);
-        else if (x == Chunk.Size1) update.Add(chunkX + 1 + "." + chunkZ);
-        if (z == 0) update.Add(chunkX + "." + (chunkZ - 1));
-        else if (z == Chunk.Size1) update.Add(chunkX + "." + (chunkZ + 1));
+        List<string> update = new List<string> { $"{chunkX}.{chunkZ}" };
+        if (x == 0) update.Add($"{chunkX - 1}.{chunkZ}");
+        else if (x == Chunk.Size1) update.Add($"{chunkX + 1}.{chunkZ}");
+        if (z == 0) update.Add($"{chunkX}.{chunkZ - 1}");
+        else if (z == Chunk.Size1) update.Add($"{chunkX}.{chunkZ + 1}");
 
         if (isServer)
         {
@@ -143,7 +141,7 @@ public class Player : NetworkBehaviour
         
         return isPlacing ? type : result;
     }
-
+    
     [ClientRpc]
     private void RpcPlaceBreak(List<string> update, int x, int y, int z, int type, bool isPlacing)
     {
@@ -153,7 +151,12 @@ public class Player : NetworkBehaviour
         
         // update block in chunk
         if (isPlacing) chunk.Blocks[x, y, z] = type;
-        else chunk.Blocks[x, y, z] = Game.Blocks.Air;
+        else
+        {
+            // remove block entity if needed
+            if (Game.Blocks.FromId[chunk.Blocks[x, y, z]].IsModel) chunk.RemoveEntity(x, y, z);
+            chunk.Blocks[x, y, z] = Game.Blocks.Air;
+        }
        
         // update current chunk, and also nearby chunks if placed on a chunk border
         foreach (string chunkName2 in update)
@@ -211,7 +214,6 @@ public class Player : NetworkBehaviour
                 // check for block placing
                 if (placing && MapHandler.Chunks.TryGetValue($"{placeCx}.{placeCz}", out chunk))
                 {
-                    Debug.Log("placing at " + placeX + " " + placeY + " " + placeZ + " in " + chunk.name);
                     int count = Inventory.GetCurrentBlockCount(HotBar.SelectedIndex, 3);
                     if (count <= 0) return;
                     int res = PlaceBreak(placeCx, placeCz, placeX, placeY, placeZ, chunk, currentBlock, true);

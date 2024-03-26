@@ -7,11 +7,11 @@ public class Chunk : MonoBehaviour
     [NonSerialized] public const int Size = 16;
     [NonSerialized] public const int Size1 = Size - 1;
     [NonSerialized] public int[,,] Blocks;
-    private Dictionary<(int x, int y, int z), IBlockEntity> _models = new();
+    private readonly Dictionary<(int x, int y, int z), IBlockEntity> _models = new();
 
     private int _x, _z, _cx, _cz; // in chunk space 
-    private MeshFilter _meshFilter1, _meshFilter2;
-    private MeshCollider _collider1, _collider2;
+    public MeshFilter opaqueMeshFilter, transparentMeshFilter;
+    public MeshCollider meshCollider;
     
     public void Init(int cx, int cz, int[,,] blocks)
     {
@@ -23,13 +23,6 @@ public class Chunk : MonoBehaviour
         Blocks = blocks;
         
         transform.position = new Vector3(_x, 0, _z);
-        GameObject opaquePlane = transform.Find("Opaque").gameObject;
-        GameObject transparentPlane = transform.Find("Transparent").gameObject;
-        
-        _meshFilter1 = opaquePlane.GetComponent<MeshFilter>();
-        _meshFilter2 = transparentPlane.GetComponent<MeshFilter>();
-        _collider1 = opaquePlane.GetComponent<MeshCollider>();
-        _collider2 = transparentPlane.GetComponent<MeshCollider>();
         
         BuildMesh(true);
     }
@@ -60,16 +53,21 @@ public class Chunk : MonoBehaviour
                 }
         }
     }
-
+    
     public bool InteractBlock(int x, int y, int z)
     {
-        if (_models.TryGetValue((x, y, z), out IBlockEntity blockEntity))
-        {
-            blockEntity.Interact();
-            return true;
-        }
+        if (!_models.TryGetValue((x, y, z), out IBlockEntity blockEntity)) return false;
+        
+        blockEntity.Interact();
+        return true;
+    }
 
-        return false;
+    public void RemoveEntity(int x, int y, int z)
+    {
+        if (!_models.TryGetValue((x, y, z), out IBlockEntity blockEntity)) return;
+        
+        Destroy(blockEntity.GameObject);
+        _models.Remove((x, y, z));
     }
 
     public void BuildMesh(bool newChunk = false)
@@ -77,11 +75,11 @@ public class Chunk : MonoBehaviour
         // build mesh from blocks
         // update the neighboring chunks that need to be updated
 
-        Mesh mesh1 = new(), mesh2 = new();
-        List<Vector3> vertices1 = new(), vertices2 = new();
-        List<int> triangles1 = new(), triangles2 = new();
+        Mesh mesh1 = new(), mesh2 = new(), colMesh = new();
+        List<Vector3> vertices1 = new(), vertices2 = new(), colVertices = new();
+        List<int> triangles1 = new(), triangles2 = new(), colTriangles = new();
         List<Vector2> uvs1 = new(), uvs2 = new();
-        int n1 = 0, n2 = 0;
+        int n1 = 0, n2 = 0, n3 = 0;
         
         // get neighboring chunks
         Dictionary<int, Chunk> neighbors = new ();
@@ -99,7 +97,7 @@ public class Chunk : MonoBehaviour
 
             if (blockObj.IsModel) // 3D model: add model to children
             {
-                BlockEntity blockEntity = BlockEntity.Create(blockId);
+                IBlockEntity blockEntity = BlockEntity.Create(blockId);
                 GameObject go = blockEntity.GetBaseObject();
                 go = Instantiate(go, transform);
                 blockEntity.SetObject(go, new Vector3(_x + x, y, _z + z));
@@ -118,7 +116,9 @@ public class Chunk : MonoBehaviour
                 }
             }
             
-            else if (!blockObj.NoTexture) // full block: display face by face under certain conditions
+            // full block: display face by face under certain conditions
+            // collide block: still need to execute all of this to build the collider
+            if (!blockObj.Is2D && !blockObj.NoTexture || !blockObj.NoCollide)
             {
                 for (int face = 0; face < 6; face++)
                 {
@@ -180,24 +180,38 @@ public class Chunk : MonoBehaviour
                                 [(int)otherPos.x, (int)otherPos.y, (int)otherPos.z] // block is in neighboring chunk
                             : Game.Blocks.Bedrock; // block in unloaded chunk: avoid rendering useless faces
                     Block otherObj = Game.Blocks.FromId[otherId];
-                    
-                    // draw solid blocks faces next to transparent blocks
-                    if (!blockObj.Transparent && otherObj.Transparent)
-                    {
-                        for (int j = 0; j < 4; j++) vertices1.Add(pos + FaceUtils.FacesOffsets[face][j]);
 
-                        triangles1.AddRange(new[] { n1, n1 + 1, n1 + 2, n1, n1 + 2, n1 + 3 });
-                        uvs1.AddRange(blockObj.GetUVs(face));
-                        n1 += 4;
+                    if (!blockObj.Is2D && !blockObj.NoTexture)
+                    {
+                        // draw solid blocks faces next to transparent blocks
+                        if (!blockObj.Transparent && otherObj.Transparent)
+                        {
+                            for (int j = 0; j < 4; j++) vertices1.Add(pos + FaceUtils.FacesOffsets[face][j]);
+
+                            triangles1.AddRange(new[] { n1, n1 + 1, n1 + 2, n1, n1 + 2, n1 + 3 });
+                            uvs1.AddRange(blockObj.GetUVs(face));
+                            n1 += 4;
+                        }
+                        // handle displaying faces of transparent blocks
+                        else if (blockObj.Transparent &&
+                                 (otherObj.Transparent && !Settings.Game.FastGraphics || otherObj.NoTexture) &&
+                                 !(blockObj.IsFluid && otherObj.IsFluid))
+                        {
+                            for (int j = 0; j < 4; j++) vertices2.Add(pos + FaceUtils.FacesOffsets[face][j]);
+
+                            triangles2.AddRange(new[] { n2, n2 + 1, n2 + 2, n2, n2 + 2, n2 + 3 });
+                            uvs2.AddRange(blockObj.GetUVs(face));
+                            n2 += 4;
+                        }
                     }
-                    // handle displaying faces of transparent blocks
-                    else if (blockObj.Transparent && (otherObj.Transparent && !Settings.Game.FastGraphics || otherObj.NoTexture) && !(blockObj.IsFluid && otherObj.IsFluid))
-                    {
-                        for (int j = 0; j < 4; j++) vertices2.Add(pos + FaceUtils.FacesOffsets[face][j]);
 
-                        triangles2.AddRange(new[] { n2, n2 + 1, n2 + 2, n2, n2 + 2, n2 + 3 });
-                        uvs2.AddRange(blockObj.GetUVs(face));
-                        n2 += 4;
+                    // handle global collider
+                    if (!blockObj.NoCollide && otherObj.NoCollide)
+                    {
+                        for (int j = 0; j < 4; j++) colVertices.Add(pos + FaceUtils.FacesOffsets[face][j]);
+
+                        colTriangles.AddRange(new[] { n3, n3 + 1, n3 + 2, n3, n3 + 2, n3 + 3 });
+                        n3 += 4;
                     }
                 }
             }
@@ -207,15 +221,18 @@ public class Chunk : MonoBehaviour
         mesh1.triangles = triangles1.ToArray();
         mesh1.uv = uvs1.ToArray();
         mesh1.RecalculateNormals();
-        _meshFilter1.mesh = mesh1;
-        _collider1.sharedMesh = mesh1;
+        opaqueMeshFilter.mesh = mesh1;
         
         mesh2.vertices = vertices2.ToArray();
         mesh2.triangles = triangles2.ToArray();
         mesh2.uv = uvs2.ToArray();
         mesh2.RecalculateNormals();
-        _collider2.sharedMesh = mesh2;
-        _meshFilter2.mesh = mesh2;
+        transparentMeshFilter.mesh = mesh2;
+
+        colMesh.vertices = colVertices.ToArray();
+        colMesh.triangles = colTriangles.ToArray();
+        colMesh.RecalculateNormals();
+        meshCollider.sharedMesh = colMesh;
 
         // add to mapHandler, and update neighbors (remove side faces if needed) if newly created chunk
         if (newChunk)

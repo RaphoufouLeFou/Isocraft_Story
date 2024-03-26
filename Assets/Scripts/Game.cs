@@ -94,9 +94,10 @@ public class Game : MonoBehaviour
         
         public static GameObject[] GameObjects;
 
+        // offset from the model origin to to the bottom center
         public static readonly Vector3[] Offsets =
         {
-            new(0.5f, 0, 0.5f)
+            new()
         };
     }
 

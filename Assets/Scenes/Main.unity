@@ -2094,7 +2094,6 @@ GameObject:
   - component: {fileID: 124641302}
   - component: {fileID: 124641305}
   - component: {fileID: 124641306}
-  - component: {fileID: 124641307}
   - component: {fileID: 124641309}
   - component: {fileID: 124641310}
   m_Layer: 0
@@ -2172,19 +2171,6 @@ MonoBehaviour:
   scrollParent: {fileID: 1410844786}
   chatWindow: {fileID: 357479426}
   management: {fileID: 520568134}
---- !u!114 &124641307
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 124641301}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c394365a6facdca4fbfe18d37e2609cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isOpened: 0
 --- !u!114 &124641309
 MonoBehaviour:
   m_ObjectHideFlags: 0

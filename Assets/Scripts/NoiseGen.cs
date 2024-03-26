@@ -53,7 +53,6 @@ public static class NoiseGen
                 {
                     decoType *= 1000;
                     decoration = decoType < 0.5f ? Game.Blocks.DeadPlant : Game.Blocks.DeadBush;
-                    decoration = Game.Blocks.Chest;
                 }
                 
                 for (int y = 0; y < Chunk.Size; y++)
