@@ -39,7 +39,7 @@ public class BlockEntity : Block, IBlockEntity
     {
         // place the object in the center of the block
         GameObject = go;
-        GameObject.transform.position = pos + Center - Game.Models.Offsets[_id];
+        GameObject.transform.position = pos + Center;
     }
 
     public void Interact()

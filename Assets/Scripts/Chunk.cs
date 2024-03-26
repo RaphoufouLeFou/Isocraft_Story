@@ -119,7 +119,7 @@ public class Chunk : MonoBehaviour
             // full block: display face by face under certain conditions
             // collide block: still need to execute all of this to build the collider
             // only except 2D blocks which are handled above
-            if (!blockObj.Is2D && !blockObj.NoTexture || !blockObj.NoCollide)
+            if (!blockObj.Is2D && !blockObj.NoTexture || !blockObj.NoRayCast)
             {
                 for (int face = 0; face < 6; face++)
                 {
@@ -206,8 +206,8 @@ public class Chunk : MonoBehaviour
                         }
                     }
 
-                    // handle global collider
-                    if (!blockObj.NoCollide && otherObj.NoCollide)
+                    // handle RayCast collider
+                    if (!blockObj.NoRayCast && otherObj.NoRayCast)
                     {
                         for (int j = 0; j < 4; j++) colVertices.Add(pos + FaceUtils.FacesOffsets[face][j]);
 

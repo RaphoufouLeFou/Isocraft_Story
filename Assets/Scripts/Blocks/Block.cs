@@ -9,10 +9,10 @@ public enum Tag
     Is2D = 2,
     IsModel = 3,
     NoCollide = 4,
-    NoTexture = 5,
-    IsFluid = 6,
-    HasInfo = 7,
-    CanInteract = 8
+    NoRayCast = 5,
+    NoTexture = 6,
+    IsFluid = 7,
+    HasInfo = 8
 }
 
 public class Block
@@ -23,10 +23,10 @@ public class Block
     public readonly bool Is2D;
     public readonly bool IsModel;
     public readonly bool NoCollide;
+    public readonly bool NoRayCast;
     public readonly bool NoTexture;
     public readonly bool IsFluid;
     public readonly bool HasInfo;
-    public readonly bool CanInteract;
 
     public readonly Tag[] Tags; // deprecated, use individual properties instead
 
@@ -55,6 +55,9 @@ public class Block
                 case Tag.NoCollide:
                     NoCollide = true;
                     break;
+                case Tag.NoRayCast:
+                    NoRayCast = true;
+                    break;
                 case Tag.NoTexture:
                     if (Transparent) Warn("Transparent", "NoTexture");
                     if (IsModel) Warn("NoTexture", "IsModel");
@@ -73,9 +76,6 @@ public class Block
                     break;
                 case Tag.HasInfo:
                     HasInfo = true;
-                    break;
-                case Tag.CanInteract:
-                    CanInteract = true;
                     break;
                 default: throw new BlockException($"Unknown tag name: {tag}");
             }

@@ -64,7 +64,7 @@ public class Game : MonoBehaviour
 
         public static readonly Dictionary<int, Block> FromId = new()
         {
-            { Air, new Block(null, new[] { Tag.NoTexture, Tag.NoCollide, Tag.Unbreakable }) },
+            { Air, new Block(null, new[] { Tag.NoTexture, Tag.NoCollide, Tag.NoRayCast, Tag.Unbreakable }) },
             { Sand, new Block(Tiles.SandTop, Tiles.SandSide, Tiles.SandTop) },
             { RedSand, new Block(Tiles.RedSand) },
             { Sandstone, new Block(Tiles.SandstoneTop, Tiles.SandstoneSide, Tiles.SandstoneTop) },
@@ -93,17 +93,11 @@ public class Game : MonoBehaviour
         };
         
         public static GameObject[] GameObjects;
-
-        // offset from the model origin to to the bottom center
-        public static readonly Vector3[] Offsets =
-        {
-            new()
-        };
     }
 
     public void InitGameUtils()
     {
-        if (Models.Offsets.Length != models.Length)
+        if (Models.ModelsIndex.Count != models.Length)
             throw new BlockException("Not all models initialized");
         Models.GameObjects = models;
         Object = this;
