@@ -18,7 +18,7 @@ public class MobSpawner : MonoBehaviour
     {
         if (spawn)
         {
-            SpawnMob(new Vector3(0,7,0), 0);
+            SpawnMob(new Vector3(0, 7, 0), 0);
             spawn = false;
         }
     }

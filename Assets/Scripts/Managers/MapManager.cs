@@ -91,7 +91,7 @@ public class MapManager : NetworkBehaviour
         // clients generate chunks here
         if (NetworkClient.localPlayer.GetInstanceID() != id) return; // only send to a specific client
 
-        int[,,] blocks = new int[Chunk.Size,Chunk.Size,Chunk.Size];
+        int[,,] blocks = new int[Chunk.Size, Chunk.Size, Chunk.Size];
         Buffer.BlockCopy(bytes, 0, blocks, 0, bytes.Length * 4);
 
         _chunkQueue.Enqueue((Instantiate(chunkPlane, _chunksParent), cx, cz, blocks));

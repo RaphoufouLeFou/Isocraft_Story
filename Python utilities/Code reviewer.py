@@ -56,6 +56,7 @@ def clean_file(filename):
         elif Prev and Prev.lstrip() == '}' and \
              (line and line.lstrip() not in '{}'):
             edited += '\n'
+            changes += 1
 
         if add:
             # add line if needed
@@ -169,7 +170,7 @@ def clean_file(filename):
             for j in range(1, len(_line)):
                 # check commas "[no space], " except for e.g. "int[,,]"
                 if j < len(_line)-1 and _line[j] == ',' and (
-                   _line[j-1] == ' ' and _line[j+1] not in ' ,]' or \
+                   _line[j-1] == ' ' or _line[j+1] not in ' ,]' or \
                    j < len(_line)-2 and _line[j+1] == _line[j+2] == ' '):
                     ok = False
                     break

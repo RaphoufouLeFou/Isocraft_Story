@@ -78,7 +78,7 @@ public abstract class CustomRigidBody : IBody
         for (int j = chunkZ - 1; j < chunkZ + 2; j++)
         {
             // no collisions for unloaded chunks
-            if (!MapManager.Chunks.TryGetValue(Chunk.GetName(i, j), out Chunk chunk))
+            if (!MapManager.Chunks.TryGetValue(Chunk.GetName(i, Game.Player.Level, j), out Chunk chunk))
             {
                 if (i == chunkX && j == chunkZ) return; // sitting in unloaded chunk
                 continue;
@@ -188,7 +188,7 @@ public abstract class CustomRigidBody : IBody
     {
         // not gonna check, but x and z must be <= 1 in absolute value
         _moveRelative = new Vector3(x * 0.8f, 0, z).normalized;
-        Vector3 move = _transform.rotation * _moveRelative;
+        Vector3 move = MovementType == BodyMovement.Absolute ? _moveRelative : _transform.rotation * _moveRelative;
         float speed = _sprinting ? 1.7f * _speed : _speed;
         _movement += move * (speed * delta);
 

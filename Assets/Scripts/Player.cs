@@ -47,7 +47,7 @@ public class Player : Mob
         Transform tr = transform;
         InitMob(Game.Mobs.PlayerMob, new PlayerBody(tr));
         Damage(0); // update health bar at the start
-
+        // start at 0 0, overriden by save pos (temporary, TODO)
         tr.position = new Vector3(0, Chunk.Size, 0);
 
         // activate camera if needed
@@ -88,7 +88,8 @@ public class Player : Mob
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
         _spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
 
-        if (MapManager.Chunks != null && MapManager.Chunks.TryGetValue(Chunk.GetName(chunkX, chunkZ), out Chunk chunk))
+        if (MapManager.Chunks != null &&
+            MapManager.Chunks.TryGetValue(Chunk.GetName(chunkX, Level, chunkZ), out Chunk chunk))
         {
             int modX = (int)(pos.x - chunkX * Chunk.Size),
                 modZ = (int)(pos.z - chunkZ * Chunk.Size);
@@ -127,15 +128,15 @@ public class Player : Mob
     {
         // the slight position change makes the action replace a block or break air
         int result = chunk.Blocks[x, y, z]; // for inventory management
-        if (isPlacing ^ chunk.Blocks[x, y, z] == Game.Blocks.Air) return -1;
+        if (isPlacing ^ chunk.Blocks[x, y, z] == Game.Blocks.Air) return Game.Blocks.None;
 
-        if (!isPlacing && Game.Blocks.FromId[result].Unbreakable) return -1; // can't break bedrock
+        if (!isPlacing && Game.Blocks.FromId[result].Unbreakable) return Game.Blocks.None;
 
-        List<string> update = new List<string> { Chunk.GetName(chunkX, chunkZ) };
-        if (x == 0) update.Add(Chunk.GetName(chunkX - 1,chunkZ));
-        else if (x == Chunk.Size1) update.Add(Chunk.GetName(chunkX + 1,chunkZ));
-        if (z == 0) update.Add(Chunk.GetName(chunkX, chunkZ - 1));
-        else if (z == Chunk.Size1) update.Add(Chunk.GetName(chunkX, chunkZ + 1));
+        List<string> update = new List<string> { Chunk.GetName(chunkX, Level, chunkZ) };
+        if (x == 0) update.Add(Chunk.GetName(chunkX - 1, Level, chunkZ));
+        else if (x == Chunk.Size1) update.Add(Chunk.GetName(chunkX + 1, Level, chunkZ));
+        if (z == 0) update.Add(Chunk.GetName(chunkX, Level, chunkZ - 1));
+        else if (z == Chunk.Size1) update.Add(Chunk.GetName(chunkX, Level, chunkZ + 1));
 
         if (isServer) RpcPlaceBreak(update, x, y, z, type, isPlacing);
         else CmdPlaceBreak(update, x, y, z, type, isPlacing);
@@ -200,7 +201,7 @@ public class Player : Mob
 
                 int currentBlock = Inventory.GetCurrentBlock(HotBar.SelectedIndex, 3);
                 // check for breaking and interacting
-                if (MapManager.Chunks.TryGetValue(Chunk.GetName(breakCx, breakCz), out Chunk chunk))
+                if (MapManager.Chunks.TryGetValue(Chunk.GetName(breakCx, Level, breakCz), out Chunk chunk))
                 {
                     if (placing && chunk.InteractBlock(breakX, breakY, breakZ)) return; // check for interactions
                     if (breaking) // break block
@@ -212,7 +213,7 @@ public class Player : Mob
                 }
 
                 // check for block placing
-                if (placing && MapManager.Chunks.TryGetValue(Chunk.GetName(placeCx, placeCz), out chunk))
+                if (placing && MapManager.Chunks.TryGetValue(Chunk.GetName(placeCx, Level, placeCz), out chunk))
                 {
                     int count = Inventory.GetCurrentBlockCount(HotBar.SelectedIndex, 3);
                     if (count <= 0) return;

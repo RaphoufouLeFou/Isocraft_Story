@@ -110,7 +110,7 @@ public class Game : MonoBehaviour
             { Mob, "Mob" },
             { Zapatos, "Zapatos" }
         };
-        
+
         public static readonly Dictionary<int, string> Names = new()
         {
             { PlayerMob, "Player" },

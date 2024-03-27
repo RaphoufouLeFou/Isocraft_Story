@@ -7,11 +7,11 @@ public class Inventory
     /*
      *   Inventory format : x(0) = item, v(1) = quantity
      *   hidden:
-     *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
-     *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
-     *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
+     *   [x, v][x, v][x, v][x, v][x, v][x, v][x, v][x, v][x, v]
+     *   [x, v][x, v][x, v][x, v][x, v][x, v][x, v][x, v][x, v]
+     *   [x, v][x, v][x, v][x, v][x, v][x, v][x, v][x, v][x, v]
      *   hotBar:
-     *   [x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v][x,v]
+     *   [x, v][x, v][x, v][x, v][x, v][x, v][x, v][x, v][x, v]
      */
     public readonly int[,,] Inv = new int[9, 4, 2];
     private static readonly Image[] Images = new Image[9]; // cells images
@@ -71,11 +71,7 @@ public class Inventory
         string text = "";
         for (int i = 0; i < 4; i++)
         {
-            for (int j = 0; j < 9; j++)
-            {
-                text += $"{Inv[j,i,0]}:{Inv[j,i,0]} ";
-            }
-
+            for (int j = 0; j < 9; j++) text += $"{Inv[j, i, 0]}:{Inv[j, i, 0]} ";
             text += "\n";
         }
 

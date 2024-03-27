@@ -9,22 +9,29 @@ public class Chunk : MonoBehaviour
     [NonSerialized] public int[,,] Blocks;
     private readonly Dictionary<(int x, int y, int z), IBlockEntity> _models = new();
 
-    private int _x, _z, _cx, _cz; // in chunk space
+    private int _x, _z, _cx, _level, _cz; // in chunk space
     public MeshFilter opaqueMeshFilter, transparentMeshFilter;
     public MeshCollider meshCollider;
 
-    public static string GetName(int cx, int cz)
+    public string GetName()
     {
-        return $"c.{cx}.{cz}";
+        return GetName(_cx, _level, _cz);
+    }
+
+    public static string GetName(int cx, int level, int cz)
+    {
+        return $"c.{cx}.{level}.{cz}";
     }
 
     public void Init(int cx, int cz, int[,,] blocks)
     {
         _x = cx * Size;
         _z = cz * Size;
+        int level = Game.Player.Level;
         _cx = cx;
+        _level = level;
         _cz = cz;
-        name = GetName(cx, cz);
+        name = GetName(cx, level, cz);
         Blocks = blocks;
 
         transform.position = new Vector3(_x, 0, _z);
@@ -90,8 +97,11 @@ public class Chunk : MonoBehaviour
         // get neighboring chunks
         Dictionary<int, Chunk> neighbors = new ();
         for (int i = 0; i < 4; i++)
-            if (MapManager.Chunks.TryGetValue(GetName(_cx + (i < 2 ? i * 2 - 1 : 0), _cz + (i > 1 ? i * 2 - 5 : 0)),
-                    out Chunk chunk))
+            if (MapManager.Chunks.TryGetValue(GetName(
+                    _cx + (i < 2 ? i * 2 - 1 : 0),
+                    _level,
+                    _cz + (i > 1 ? i * 2 - 5 : 0)
+                ), out Chunk chunk))
                 neighbors.Add(i, chunk);
 
         for (int x = 0; x < Size; x++) for (int y = 0; y < Size; y++)
