@@ -10,7 +10,7 @@ public static class HotBar
     public static void InitImages()
     {
         GameObject items = GameObject.Find("HotBarBackground");
-        for (int i = 0; i < 9; i++) HotBar.ItemImages[i] = items.transform.GetChild(i).gameObject;
+        for (int i = 0; i < 9; i++) ItemImages[i] = items.transform.GetChild(i).gameObject;
     }
 
     public static void UpdateHotBar()

@@ -22,6 +22,7 @@ public class Mob : NetworkBehaviour
         if (Time.time - _invincible < Game.InvincibilityTime) return;
         Health = amount < Health ? Health - amount : 0;
         _invincible = Time.time;
+        Body.Animator.ReceiveAnimation(Health == 0 ? AnimationType.Die : AnimationType.Hurt);
     }
 }
 

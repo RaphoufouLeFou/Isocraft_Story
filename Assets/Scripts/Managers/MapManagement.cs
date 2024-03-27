@@ -69,11 +69,11 @@ public class MapManagement : NetworkBehaviour
     [Command(requiresAuthority = false)]
     private void CmdRequestPlayersNameDictionary(int id, uint networkId, string playerName)
     {
-        bool res = Game.PlayersNames.TryAdd(networkId, playerName);
+        bool res = NetworkManagement.PlayersNames.TryAdd(networkId, playerName);
         if (res) Debug.LogWarning("A player already exist with this name !");
         List<uint> idList = new List<uint>();
         List<string> nameList = new List<string>();
-        foreach (KeyValuePair<uint, string> keyValuePair in Game.PlayersNames)
+        foreach (KeyValuePair<uint, string> keyValuePair in NetworkManagement.PlayersNames)
         {
             idList.Add(keyValuePair.Key);
             nameList.Add(keyValuePair.Value);
@@ -92,14 +92,17 @@ public class MapManagement : NetworkBehaviour
         for (int i = 0; i < idList.Count; i++)
             dictionary.Add(idList[i], nameList[i]);
 
-        Game.PlayersNames = dictionary;
-        //UpdateNameTags(); Not working yet
+        NetworkManagement.PlayersNames = dictionary;
+        UpdateNameTags();
     }
 
     private void UpdateNameTags()
     {
-        foreach (KeyValuePair<uint, string> pair in Game.PlayersNames)
+        Debug.LogWarning("Not working yet");
+        /*
+        foreach (KeyValuePair<uint, string> pair in NetworkManagement.PlayersNames)
             NetworkServer.spawned[pair.Key].transform.GetChild(3).GetComponent<TMP_Text>().text = pair.Value;
+        */
     }
 
     [Command (requiresAuthority = false)]

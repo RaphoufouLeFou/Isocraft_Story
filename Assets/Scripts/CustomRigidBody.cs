@@ -12,8 +12,10 @@ public interface IBody
 {
     public Vector3 Movement { get; }
     public Vector3 MoveRelative { get; }
-    public BodyMovement MovementType { get; set; }
+    public BodyMovement MovementType { set; }
     public bool OnFloor { get; }
+
+    public IAnimator Animator { get; }
 
     public void Stop();
     public void Update();
@@ -27,6 +29,8 @@ public abstract class CustomRigidBody : IBody
     public Vector3 MoveRelative => _moveRelative;
     public bool OnFloor { get; private set; }
     public BodyMovement MovementType { get; set; } = BodyMovement.Relative;
+
+    public IAnimator Animator { get; } = new DummyAnimator();
 
     private readonly Transform _transform;
     private readonly float _speed, _drag, _jumpForce, _gravity;
@@ -187,7 +191,13 @@ public abstract class CustomRigidBody : IBody
     protected void Update(float x, float z, float delta)
     {
         // not gonna check, but x and z must be <= 1 in absolute value
+        bool prevImmobile = _moveRelative == Vector3.zero;
         _moveRelative = new Vector3(x * 0.8f, 0, z).normalized;
+        bool immobile = _moveRelative == Vector3.zero;
+        
+        if (prevImmobile && !immobile) Animator.ReceiveAnimation(_sprinting ? AnimationType.Run : AnimationType.Walk);
+        else if (!prevImmobile && immobile) Animator.ReceiveAnimation(AnimationType.Idle);
+        
         Vector3 move = MovementType == BodyMovement.Absolute ? _moveRelative : _transform.rotation * _moveRelative;
         float speed = _sprinting ? 1.7f * _speed : _speed;
         _movement += move * (speed * delta);
@@ -208,21 +218,25 @@ public abstract class CustomRigidBody : IBody
     protected void StartSprinting()
     {
         _sprinting = true;
+        Animator.ReceiveAnimation(AnimationType.Run);
     }
 
     protected void StopSprinting()
     {
         _sprinting = false;
+        Animator.ReceiveAnimation(AnimationType.Walk);
     }
 
     protected void Jump()
     {
         _movement.y = _jumpForce;
+        Animator.ReceiveAnimation(AnimationType.Jump);
     }
 
     public void Stop()
     {
         _movement = Vector3.zero;
+        Animator.ReceiveAnimation(AnimationType.Idle);
     }
 }
 

@@ -13,11 +13,6 @@ public class Chunk : MonoBehaviour
     public MeshFilter opaqueMeshFilter, transparentMeshFilter;
     public MeshCollider meshCollider;
 
-    public string GetName()
-    {
-        return GetName(_cx, _level, _cz);
-    }
-
     public static string GetName(int cx, int level, int cz)
     {
         return $"c.{cx}.{level}.{cz}";

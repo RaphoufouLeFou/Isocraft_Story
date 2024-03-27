@@ -1,10 +1,11 @@
 using System;
 using System.Net;
+using System.Linq;
+using System.Collections.Generic;
+using Mirror;
 using kcp2k;
 using UnityEngine;
-using Mirror;
 using UnityEngine.SceneManagement;
-using System.Linq;
 
 public class NetworkManagement : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class NetworkManagement : MonoBehaviour
 
     public GameObject game;
     private Game _game;
+
+    public static Dictionary<uint, string> PlayersNames = new ();
 
     void Start()
     {

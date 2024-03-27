@@ -8,9 +8,8 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Tick;
     [NonSerialized] public static int Seed;
     [NonSerialized] public static bool Started;
-    [NonSerialized] public static float InvincibilityTime = 0.5f;
 
-    [NonSerialized] public static Dictionary<uint, string> PlayersNames = new ();
+    public const float InvincibilityTime = 0.5f;
 
     // static variables, get initialized from their serialized variables
     public static Sprite[] InvSprites;
@@ -104,27 +103,23 @@ public class Game : MonoBehaviour
     {
         public const int
             PlayerMob = 0,
-            Mob = 1,
-            Zapatos = 2;
+            Zapatos = 1;
 
         public static readonly Dictionary<int, string> Prefab = new()
         {
             { PlayerMob, "Player" },
-            { Mob, "Mob" },
             { Zapatos, "Zapatos" }
         };
 
         public static readonly Dictionary<int, string> Names = new()
         {
             { PlayerMob, "Player" },
-            { Mob, "Mob" },
             { Zapatos, "Zapatos" }
         };
 
         public static readonly Dictionary<int, int> Health = new()
         {
             { PlayerMob, 100 },
-            { Mob, 9001 },
             { Zapatos, 50 }
         };
     }
