@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MobAI : MonoBehaviour
 {
-    private readonly Dictionary<string, float> _dico = new()
+    private readonly Dictionary<string, float> _mobsHealth = new()
     {
         {"Zapatos(Clone)", 2},
         {"Mob(Clone)",9001}
@@ -21,7 +21,7 @@ public class MobAI : MonoBehaviour
 
         // initializing attached mob
         string gameObjectName = gameObject.name;
-        _health = _dico[gameObjectName];
+        _health = _mobsHealth[gameObjectName];
     }
 
     void Update()

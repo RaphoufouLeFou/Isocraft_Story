@@ -17,9 +17,9 @@ public class Region
         return $"r.{_rx}.{_rz}";
     }
 
-    private Region(int rx, int rz)
+    private Region(int rx,  int rz)
     {
-        _rx = rx;
+        _rx = rx ;
         _rz = rz;
     }
 }

@@ -5,6 +5,7 @@ try:
     from colorama import init, Fore
     init()
 except:
+    print('/!\\ Please install (`pip install colorama`) colorama')
     class Fore: GREEN = RESET = RED = YELLOW = LIGHTGREEN_EX = \
                 LIGHTYELLOW_EX = LIGHTRED_EX = ''
 
@@ -22,7 +23,9 @@ def clean_file(filename):
     global n_changes, string, long, visual, todo, expensive
 
     ext = splitext(filename)[1]
-    if 'FastNoiseLite' in filename: return # skip this file
+    for name in ignore_filenames:
+        if name in filename: return # skip this file
+
     if ext not in types: return
 
     py = 'py' in ext
@@ -61,7 +64,7 @@ def clean_file(filename):
                 prev = None
                 dollar = False
                 for char in line:
-                    if char == '"' and prev != '\\': # I know about \\
+                    if char == '"' and prev != '\\': # I know about "\\"
                         in_string = not in_string
                         count += 1
                         _line += char
@@ -90,7 +93,7 @@ def clean_file(filename):
 
                 # check for operators
                 ok = True
-                _line = _line.split('//')[0]+' ' # I know about // //
+                _line = _line.split('//')[0]+' ' # I know about "// //"
                 j = 1
                 while j < len(_line)-2:
                     if 'case' in line or 'default' in line: break
@@ -118,7 +121,7 @@ def clean_file(filename):
                             j += 1
                             continue # char
 
-                        # avoid things like List<(int, Vector3)>()
+                        # avoid things like "List<(int, Vector3)>()"
                         if (_line[j] in '<>?' and not double
                             or _line[j] == '-' or _line[j:j+2] == ':F') \
                             and (a.isalpha() or a in ' 23)(]') \
@@ -134,6 +137,20 @@ def clean_file(filename):
                             break
                     j += 1
 
+                for j in range(1, len(_line)):
+                    # check commas "[no space], " except for e.g. "int[,,]"
+                    if j < len(_line)-1 and _line[j] == ',' and (
+                       _line[j-1] == ' ' and _line[j+1] not in ' ,]' or \
+                       j < len(_line)-2 and _line[j+1] == _line[j+2] == ' '):
+                        ok = False
+                        break
+
+                    # check semicolons "[no space];"
+                    if _line[j] == ';' and _line[j-1] == ' ':
+                        ok = False
+                        break
+
+                # check newline before "{", except if "{ whatever"
                 _line = line.replace(' ', '')
                 if len(_line) > 1 and _line[-1] == '{' and _line[0] != '{':
                     ok = False
@@ -165,6 +182,7 @@ def title(name):
     print('\n%s-----%s-----%s' %(Fore.YELLOW, name, Fore.RESET))
 
 ignore = ('.', '..', '.git')
+ignore_filenames = ('FastNoiseLite', 'Mirror')
 types = ('.cs', '.py', '.pyw')
 operators = '+-*/<>=&|^:?'
 double_operators = ('&&', '||', '^^', '<<', '>>', '=>', '??', '/*', '*/')
@@ -178,8 +196,7 @@ todo = []
 expensive = []
 
 print('%sPHASE 1 - CODE CLEANING%s\n' %(Fore.RED, Fore.RESET))
-clean_folder('../Assets/Scripts')
-clean_folder('.')
+clean_folder('../Assets')
 
 print()
 print('%s\nPHASE 2 - FEEDBACK%s' %(Fore.RED, Fore.RESET))
@@ -211,9 +228,10 @@ print('Detected %s%d%s issues' %(
 )
 
 title('VISUAL')
-print('%sSpaces around operators, newline %s{%s (except when inline)%s\n' %(
-    Fore.LIGHTGREEN_EX, Fore.GREEN, Fore.LIGHTGREEN_EX, Fore.RESET)
+print('%sSpaces around operators, newline %s{%s (except when inline),' %(
+    Fore.LIGHTGREEN_EX, Fore.GREEN, Fore.LIGHTGREEN_EX)
 )
+print('correct comma and semicolon spacing%s\n' %Fore.RESET)
 for thing in visual: print(thing)
 n = len(visual)
 print('Detected %s%d%s issues' %(
