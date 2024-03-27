@@ -11,10 +11,13 @@ public class Player : Mob
     [NonSerialized] public int Level = 0;
     [NonSerialized] public bool IsLoaded;
 
+    [NonSerialized] public string Name;
+
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     private Vector3 _spawn;
     private bool _spawnSuccess = true;
 
+    private GameObject _nameTag;
     private GameObject _healthImage;
     private InventoryUI _inventoryUI;
     private NetworkManagement _networkManagement;
@@ -22,17 +25,24 @@ public class Player : Mob
 
     private void Start()
     {
+
         // camera
         _camera = GetComponentInChildren<Camera>();
         GetComponentInChildren<AudioListener>().enabled = isLocalPlayer;
         _camera.enabled = isLocalPlayer;
 
+        _nameTag = transform.GetChild(3).gameObject;
+
         if (!isLocalPlayer) return;
         Game.Player = this;
+        _nameTag.SetActive(false);
         
         Debug.LogWarning("Saving disabled !");
         SuperGlobals.EditorMode = true;
 
+        Name = SuperGlobals.PlayerName;
+        Debug.Log($"My pseudo is : {Name}");
+        
         // set up other objects
         GameObject scripts = GameObject.Find("Scripts");
         _inventoryUI = scripts.GetComponent<InventoryUI>();
@@ -239,8 +249,11 @@ public class Player : Mob
 
         // if couldn't spawn before, retry
         if (!_spawnSuccess) SetSpawn(_spawn);
-
-        if (!isLocalPlayer) return; // don't update other players
+        
+        if (!isLocalPlayer){
+            _nameTag.transform.rotation = playerCamera.cam.transform.rotation;
+            return; // don't update other players
+        }
         
         if (Body == null) throw new PlayerException("Player body is null, check game start for errors");
 

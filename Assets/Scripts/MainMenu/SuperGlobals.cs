@@ -10,6 +10,8 @@ public class SuperGlobals : MonoBehaviour
     // deprecated once game is loaded
     public static string SaveName;
 
+    public static string PlayerName;
+
     // network data
     public static bool IsMultiplayerGame;
     public static bool IsHost;

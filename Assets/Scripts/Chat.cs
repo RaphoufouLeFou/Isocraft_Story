@@ -33,7 +33,7 @@ public class Chat : NetworkBehaviour
     {
         if (!isServer)
         {
-            SendMessages("A new player joined !");
+            SendMessages($"{SuperGlobals.PlayerName} joined !");
         }
 
         chatWindow.SetActive(false);
@@ -55,8 +55,8 @@ public class Chat : NetworkBehaviour
 
     private void SendMessagesFromUser(string message)
     {
-        if (isServer) RcpClientReceiveMessageFromUser("Server", message);
-        else CommandReceiveMessageFromUser("Client", message);
+        if (isServer) RcpClientReceiveMessageFromUser(SuperGlobals.PlayerName, message);
+        else CommandReceiveMessageFromUser(SuperGlobals.PlayerName, message);
     }
 
     [ClientRpc]
@@ -94,17 +94,18 @@ public class Chat : NetworkBehaviour
         if (msg[0] == '/') Commands.ExecuteCommand(msg.Substring(1)); // command
         else SendMessagesFromUser(msg);
         chatWindow.SetActive(false);
+        Settings.IsPaused = false;
     }
 
     private void Update()
     {
         if (Settings.KeyMap == null) return; // in case this runs before settings are loaded
-        if (Input.GetKeyDown(Settings.KeyMap["Chat"]) && Settings.Playing)
+        if (Input.GetKeyDown(Settings.KeyMap["Chat"]) && !Settings.IsPaused)
         {
             chatWindow.SetActive(true);
             chatWindow.GetComponentInChildren<TMP_InputField>().Select();
             chatWindow.GetComponentInChildren<TMP_InputField>().ActivateInputField();
-            Settings.Playing = false;
+            Settings.IsPaused = true;
         }
 
         if ((Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) && chatWindow.activeSelf)

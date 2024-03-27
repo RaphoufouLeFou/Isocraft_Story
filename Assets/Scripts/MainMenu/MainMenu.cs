@@ -15,7 +15,9 @@ public class MainMenu : MonoBehaviour
     public GameObject joinGameParent;
     public GameObject backButton;
     public GameObject saveTextPrefab;
+    public GameObject pseudo;
 
+    public TMP_InputField pseudoField;
     public TMP_InputField addressInput;
     public TMP_InputField codeInput;
     public TMP_InputField portInput;
@@ -32,6 +34,7 @@ public class MainMenu : MonoBehaviour
         newGameParent.SetActive(false);
         loadGameParent.SetActive(false);
         joinGameParent.SetActive(false);
+        pseudo.SetActive(false);
 
         // send SuperGlobals to main scene
         DontDestroyOnLoad(superGlobals);
@@ -41,6 +44,7 @@ public class MainMenu : MonoBehaviour
     public void NewGameButtonClick()
     {
         backButton.SetActive(true);
+        pseudo.SetActive(true);
         mainParent.SetActive(false);
         newGameParent.SetActive(true);
     }
@@ -52,11 +56,13 @@ public class MainMenu : MonoBehaviour
         loadGameParent.SetActive(false);
         joinGameParent.SetActive(false);
         backButton.SetActive(false);
+        pseudo.SetActive(false);
     }
 
     public void LoadGameButtonClick()
     {
         backButton.SetActive(true);
+        pseudo.SetActive(true);
         mainParent.SetActive(false);
         loadGameParent.SetActive(true);
     }
@@ -64,6 +70,7 @@ public class MainMenu : MonoBehaviour
     public void JoinGameButtonClick()
     {
         backButton.SetActive(true);
+        pseudo.SetActive(true);
         mainParent.SetActive(false);
         joinGameParent.SetActive(true);
     }
@@ -87,6 +94,7 @@ public class MainMenu : MonoBehaviour
         SuperGlobals.Uri = new Uri($"kcp://{_ipAddress}:{_port}");
         SuperGlobals.IsMultiplayerGame = true;
         SuperGlobals.IsHost = false;
+        SuperGlobals.PlayerName = pseudoField.text;
         SceneManager.LoadScene(mainSceneName);
     }
 
@@ -122,6 +130,7 @@ public class MainMenu : MonoBehaviour
         SuperGlobals.Uri = new Uri($"kcp://{_ipAddress}:{_port}");
         SuperGlobals.IsMultiplayerGame = multi;
         SuperGlobals.IsHost = true;
+        SuperGlobals.PlayerName = pseudoField.text;
         SceneManager.LoadScene(mainSceneName);
     }
 

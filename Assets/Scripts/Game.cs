@@ -10,6 +10,8 @@ public class Game : MonoBehaviour
     [NonSerialized] public static bool Started;
     [NonSerialized] public static float InvincibilityTime = 0.5f;
 
+    [NonSerialized] public static Dictionary<uint, string> PlayersNames = new ();
+
     // static variables, get initialized from their serialized variables
     [NonSerialized] public static Sprite[] InvSprites;
     [NonSerialized] public static Player Player;
