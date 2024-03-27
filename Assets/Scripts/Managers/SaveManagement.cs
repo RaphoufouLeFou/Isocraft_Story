@@ -11,11 +11,12 @@ public class SaveManagement
     public void SaveGame()
     {
         if (SuperGlobals.EditorMode) return;
+        if (!Game.Player.isServer) return;
 
         // save player data
         Vector3 pos = Game.Player.transform.position;
         Vector3 rot = Game.Player.playerCamera.GoalRot;
-        string usableSaveName = SuperGlobals.SaveName + (Game.Player.isServer ? "" : "CLIENT__");
+        string usableSaveName =(Game.Player.isServer ? "" : "CLIENT__") +  SuperGlobals.SaveName;
 
         string path = Application.persistentDataPath + $"/Saves/{usableSaveName}/{usableSaveName}.IsoSave";
         if (!_isInit) CreateSaveFile(path);
@@ -31,7 +32,7 @@ public class SaveManagement
         if (File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, text);
         // save chunks if is the host
-        if(SuperGlobals.IsHost) ChunksSave.SaveAllChunks();
+        if(Game.Player.isServer) ChunksSave.SaveAllChunks();
     }
 
     private void CreateSaveFile(string path)
@@ -45,7 +46,7 @@ public class SaveManagement
 
     public void LoadSave()
     {
-        string usableSaveName = SuperGlobals.SaveName + (Game.Player.isServer ? "" : "CLIENT__");
+        string usableSaveName = (Game.Player.isServer ? "" : "CLIENT__") + SuperGlobals.SaveName;
 
         string path = $"{Application.persistentDataPath}/Saves/{usableSaveName}/{usableSaveName}.IsoSave";
         if (!File.Exists(path)) throw new FileNotFoundException("No save file found");

@@ -29,6 +29,9 @@ public class Player : Mob
 
         if (!isLocalPlayer) return;
         Game.Player = this;
+        
+        Debug.LogWarning("Saving disabled !");
+        SuperGlobals.EditorMode = true;
 
         // set up other objects
         GameObject scripts = GameObject.Find("Scripts");
@@ -52,7 +55,7 @@ public class Player : Mob
 
         // activate camera if needed
         playerCamera.cam.gameObject.SetActive(
-            isLocalPlayer || Level == NetworkClient.localPlayer.gameObject.GetComponent<Player>().Level
+            isLocalPlayer && Level == NetworkClient.localPlayer.gameObject.GetComponent<Player>().Level
         );
 
         IsLoaded = true;
