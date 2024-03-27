@@ -31,8 +31,13 @@ public class DummyAnimator : IAnimator
             case AnimationType.Walk:
                 Annimate("Walk");
                 break;
+            case AnimationType.Run:
+                Annimate("Sprint");
+                break;
+            case AnimationType.Jump:
+                break;
             default:
-                //Game.Player.GetComponentInChildren<Animator>().enabled = false;
+                Annimate("Idle");
                 break;
         }
     }

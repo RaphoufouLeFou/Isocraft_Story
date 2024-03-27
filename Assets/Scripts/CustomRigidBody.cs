@@ -137,6 +137,7 @@ public abstract class CustomRigidBody : IBody
                 {
                     if (MathF.Abs(corr.x) > MathF.Abs(correction.x)) correction.x = corr.x;
                     _sprinting = false; // reset sprint when bonking on wall
+                    Animator.ReceiveAnimation(AnimationType.Walk);
                 }
 
                 else if (toChange == 1) // floor / ceiling collision
@@ -152,6 +153,7 @@ public abstract class CustomRigidBody : IBody
                 {
                     if (MathF.Abs(corr.z) > MathF.Abs(correction.z)) correction.z = corr.z;
                     _sprinting = false;
+                    Animator.ReceiveAnimation(AnimationType.Walk);
                 }
 
                 else throw new PlayerException("Way too much correction, gotta be an error somewhere");
