@@ -223,6 +223,7 @@ public abstract class CustomRigidBody : IBody
 
     protected void StopSprinting()
     {
+        Debug.Log("walking");
         _sprinting = false;
         Animator.ReceiveAnimation(AnimationType.Walk);
     }
@@ -236,6 +237,7 @@ public abstract class CustomRigidBody : IBody
     public void Stop()
     {
         _movement = Vector3.zero;
+        Debug.Log("idling");
         Animator.ReceiveAnimation(AnimationType.Idle);
     }
 }
@@ -284,7 +286,7 @@ public class PlayerBody : PlanetBody, IBody
         if (Input.GetKey(Settings.KeyMap["Right"])) x++;
 
         if (Input.GetKey(Settings.KeyMap["Sprint"])) StartSprinting();
-        if (!forwards || backwards) StopSprinting();
+        if ((!forwards || backwards) && Input.GetKey(Settings.KeyMap["Sprint"])) StopSprinting();
 
         if (Input.GetKey(Settings.KeyMap["Jump"]) && OnFloor) Jump();
         base.Update(x, z, delta);
