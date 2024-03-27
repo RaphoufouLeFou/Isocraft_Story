@@ -12,7 +12,7 @@ public class MainMenu : MonoBehaviour
 {
     [Header("Main Scene Name")]
     public string mainSceneName;
-    
+
     [Header("GameObjects")]
     public GameObject superGlobals;
     public GameObject mainParent;
@@ -111,7 +111,6 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(mainSceneName);
     }
 
- 
     public void MultiPlayerButtonClick(GameObject save)
     {
         string saveName = save.GetComponent<TMP_InputField>().text;

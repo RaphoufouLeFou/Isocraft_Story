@@ -194,10 +194,10 @@ public abstract class CustomRigidBody : IBody
         bool prevImmobile = _moveRelative == Vector3.zero;
         _moveRelative = new Vector3(x * 0.8f, 0, z).normalized;
         bool immobile = _moveRelative == Vector3.zero;
-        
+
         if (prevImmobile && !immobile) Animator.ReceiveAnimation(_sprinting ? AnimationType.Run : AnimationType.Walk);
         else if (!prevImmobile && immobile) Animator.ReceiveAnimation(AnimationType.Idle);
-        
+
         Vector3 move = MovementType == BodyMovement.Absolute ? _moveRelative : _transform.rotation * _moveRelative;
         float speed = _sprinting ? 1.7f * _speed : _speed;
         _movement += move * (speed * delta);

@@ -1,4 +1,4 @@
-﻿public enum AnimationType
+public enum AnimationType
 {
     Idle,
     Walk,
@@ -16,7 +16,5 @@ public interface IAnimator
 
 public class DummyAnimator : IAnimator
 {
-    public void ReceiveAnimation(AnimationType type)
-    {
-    }
+    public void ReceiveAnimation(AnimationType type) { }
 }
