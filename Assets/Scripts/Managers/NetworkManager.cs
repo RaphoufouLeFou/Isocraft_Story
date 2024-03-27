@@ -6,9 +6,9 @@ using Mirror;
 using UnityEngine.SceneManagement;
 using System.Linq;
 
-public class NetworkManagement : MonoBehaviour
+public class NetworkManager : MonoBehaviour
 {
-    private NetworkManager _manager;
+    private Mirror.NetworkManager _manager;
 
     public string mainMenuSceneName;
 
@@ -20,7 +20,7 @@ public class NetworkManagement : MonoBehaviour
         _game = game.GetComponent<Game>();
         _game.InitGameUtils();
 
-        _manager = GetComponent<NetworkManager>();
+        _manager = GetComponent<Mirror.NetworkManager>();
         _manager.enabled = true;
 
         if (SuperGlobals.EditorMode)

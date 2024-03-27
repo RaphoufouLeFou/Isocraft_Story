@@ -40,7 +40,7 @@ public class Chat : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void RcpClientReceiveMessageFromUser(string prefix ,string message)
+    private void RcpClientReceiveMessageFromUser(string prefix, string message)
     {
         GameObject msg = Instantiate(messagePrefab, Vector3.zero, Quaternion.identity, contentParent.transform);
         msg.GetComponentInChildren<TMP_Text>().text = $"{prefix} : {message}";

@@ -20,7 +20,7 @@ public class Player : NetworkBehaviour
 
     private GameObject _healthImage;
     private InventoryUI _inventoryUI;
-    private NetworkManagement _networkManagement;
+    private NetworkManager _networkManager;
     public Inventory Inventory;
 
     private void Start()
@@ -40,7 +40,7 @@ public class Player : NetworkBehaviour
         MaxHealth = 100;
         Health = 100;
         DealDamage(0); // update health bar at the start
-        _networkManagement = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
+        _networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
 
         Inventory = new Inventory();
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
@@ -81,7 +81,7 @@ public class Player : NetworkBehaviour
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
         _spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
 
-        if (MapHandler.Chunks != null && MapHandler.Chunks.TryGetValue(Chunk.GetName(chunkX, chunkZ), out Chunk chunk))
+        if (MapManager.Chunks != null && MapManager.Chunks.TryGetValue(Chunk.GetName(chunkX, chunkZ), out Chunk chunk))
         {
             int modX = (int)(pos.x - chunkX * Chunk.Size),
                 modZ = (int)(pos.z - chunkZ * Chunk.Size);
@@ -119,7 +119,7 @@ public class Player : NetworkBehaviour
     public void DealDamage(int amount)
     {
         Health = amount < Health ? Health - amount : 0;
-        _healthImage.transform.localScale = new Vector3(Health/MaxHealth,1 ,1);
+        _healthImage.transform.localScale = new Vector3(Health / MaxHealth, 1, 1);
     }
 
     private int PlaceBreak(int chunkX, int chunkZ, int x, int y, int z, Chunk chunk, int type, bool isPlacing)
@@ -145,9 +145,9 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     private void RpcPlaceBreak(List<string> update, int x, int y, int z, int type, bool isPlacing)
     {
-        if (!MapHandler.Chunks.ContainsKey(update[0])) return; // map edit isn't visible for this player
+        if (!MapManager.Chunks.ContainsKey(update[0])) return; // map edit isn't visible for this player
         // this could skip an update when editing a chunk border, but this shouldn't matter most of the time
-        Chunk chunk = MapHandler.Chunks[update[0]];
+        Chunk chunk = MapManager.Chunks[update[0]];
 
         // update block in chunk
         if (isPlacing) chunk.Blocks[x, y, z] = type;
@@ -160,8 +160,8 @@ public class Player : NetworkBehaviour
 
         // update current chunk, and also nearby chunks if placed on a chunk border
         foreach (string chunkName2 in update)
-            if (MapHandler.Chunks.ContainsKey(chunkName2))
-                MapHandler.Chunks[chunkName2].BuildMesh();
+            if (MapManager.Chunks.ContainsKey(chunkName2))
+                MapManager.Chunks[chunkName2].BuildMesh();
     }
 
     [Command (requiresAuthority = false)]
@@ -199,7 +199,7 @@ public class Player : NetworkBehaviour
 
                 int currentBlock = Inventory.GetCurrentBlock(HotBar.SelectedIndex, 3);
                 // check for breaking and interacting
-                if (MapHandler.Chunks.TryGetValue(Chunk.GetName(breakCx, breakCz), out Chunk chunk))
+                if (MapManager.Chunks.TryGetValue(Chunk.GetName(breakCx, breakCz), out Chunk chunk))
                 {
                     if (placing && chunk.InteractBlock(breakX, breakY, breakZ)) return; // check for interactions
                     if (breaking) // break block
@@ -211,7 +211,7 @@ public class Player : NetworkBehaviour
                 }
 
                 // check for block placing
-                if (placing && MapHandler.Chunks.TryGetValue(Chunk.GetName(placeCx, placeCz), out chunk))
+                if (placing && MapManager.Chunks.TryGetValue(Chunk.GetName(placeCx, placeCz), out chunk))
                 {
                     int count = Inventory.GetCurrentBlockCount(HotBar.SelectedIndex, 3);
                     if (count <= 0) return;
@@ -266,6 +266,6 @@ public class Player : NetworkBehaviour
             return;
         }
 
-        _networkManagement.LeaveGame();
+        _networkManager.LeaveGame();
     }
 }

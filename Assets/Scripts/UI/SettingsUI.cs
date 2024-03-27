@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Serialization;
 
 public class SettingsUI : MonoBehaviour
 {
@@ -28,7 +29,7 @@ public class SettingsUI : MonoBehaviour
     public GameObject scrollParent;
     public GameObject chatWindow;
 
-    public NetworkManagement management;
+    public NetworkManager manager;
 
     private string _path;
 
@@ -77,8 +78,8 @@ public class SettingsUI : MonoBehaviour
         multiplayerMenu.SetActive(menu == "Multiplayer");
         if (menu == "Multiplayer")
         {
-            string encP = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4());
-            string encL = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4L());
+            string encP = NetworkManager.EncodeIP(NetworkManager.GetLocalIPv4());
+            string encL = NetworkManager.EncodeIP(NetworkManager.GetLocalIPv4L());
             GameObject.Find("GameCodeMultiP").GetComponent<TMP_Text>().text = $"Public : {encP}";
             GameObject.Find("GameCodeMultiL").GetComponent<TMP_Text>().text = $"Lan : {encL}";
         }
@@ -181,15 +182,15 @@ public class SettingsUI : MonoBehaviour
         if (self.name == "IsMulti")
         {
             SuperGlobals.IsMultiplayerGame = self.GetComponent<Toggle>().isOn;
-            management.ChangeMaxConnection(SuperGlobals.IsMultiplayerGame ? _maxPlayerConnections : 1);
+            manager.ChangeMaxConnection(SuperGlobals.IsMultiplayerGame ? _maxPlayerConnections : 1);
         }
 
         else if (self.name == "Port")
-            management.ChangePort((ushort)Int32.Parse(self.GetComponent<TMP_InputField>().text));
+            manager.ChangePort((ushort)Int32.Parse(self.GetComponent<TMP_InputField>().text));
         else if (self.name == "Players")
         {
             _maxPlayerConnections = Int32.Parse(self.GetComponent<TMP_InputField>().text);
-            management.ChangeMaxConnection(_maxPlayerConnections);
+            manager.ChangeMaxConnection(_maxPlayerConnections);
         }
     }
 

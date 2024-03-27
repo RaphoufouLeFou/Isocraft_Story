@@ -8,7 +8,7 @@ public static class ChunksSave
 
     public static void SaveAllChunks()
     {
-        foreach (Chunk chunk in MapHandler.Chunks.Values) SaveChunk(chunk);
+        foreach (Chunk chunk in MapManager.Chunks.Values) SaveChunk(chunk);
     }
 
     private static void SaveChunk(Chunk chunk)

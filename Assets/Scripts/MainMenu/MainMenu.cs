@@ -72,7 +72,7 @@ public class MainMenu : MonoBehaviour
     {
         if (_code != "")
         {
-            (string ip, int err) = NetworkManagement.DecodeIP(_code.ToUpper().Replace("\n", "").Replace(" ",""));
+            (string ip, int err) = NetworkManager.DecodeIP(_code.ToUpper().Replace("\n", "").Replace(" ",""));
 
             if (err != 0)
             {
@@ -141,7 +141,7 @@ public class MainMenu : MonoBehaviour
         {
             string saveName = new DirectoryInfo(dir).Name;
             if(saveName.StartsWith("CLIENT__")) continue;
-            saveName = saveName.Replace('_' ,' ');
+            saveName = saveName.Replace('_', ' ');
             GameObject go = Instantiate(saveTextPrefab, Vector3.zero, Quaternion.identity, content.transform);
             go.GetComponentInChildren<TMP_Text>().text = saveName;
 
@@ -156,7 +156,7 @@ public class MainMenu : MonoBehaviour
 
     private void DeleteSave(string saveName)
     {
-        saveName = saveName.Replace(' ' ,'_');
+        saveName = saveName.Replace(' ', '_');
         string path = Application.persistentDataPath + $"/Saves/{saveName}/";
         if (Directory.Exists(path)) Directory.Delete(path, true);
     }

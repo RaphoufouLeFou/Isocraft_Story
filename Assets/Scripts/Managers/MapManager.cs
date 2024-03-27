@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using Mirror;
 
-public class MapHandler : NetworkBehaviour
+public class MapManager : NetworkBehaviour
 {
     public GameObject chunkPlane;
     public GameObject chunkParent;

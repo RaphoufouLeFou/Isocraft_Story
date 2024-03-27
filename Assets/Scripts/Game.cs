@@ -15,7 +15,7 @@ public class Game : MonoBehaviour
     [NonSerialized] public static SaveManagement SaveManager;
 
     public Sprite[] sprites;
-    public MapHandler mapHandler;
+    public MapManager mapManager;
 
     public GameObject[] models;
 
@@ -126,7 +126,7 @@ public class Game : MonoBehaviour
 
     private void StartGame()
     {
-        mapHandler.StartMapHandle();
+        mapManager.StartMapHandle();
         // local player hasn't been spawned by map handler
         if (SuperGlobals.IsNewSave) Player.SetSpawn(Player.transform.position);
 

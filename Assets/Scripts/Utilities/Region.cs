@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public class Region
+﻿public class Region
 {
     // regions have a fixed size of 8x8 chunks, centered at the origin
     // e.g. region r.1.0 contains chunks from c.4.0 to c.11.7
@@ -17,9 +15,9 @@ public class Region
         return $"r.{_rx}.{_rz}";
     }
 
-    private Region(int rx,  int rz)
+    private Region(int rx, int rz)
     {
-        _rx = rx ;
+        _rx = rx;
         _rz = rz;
     }
 }

@@ -58,7 +58,7 @@ public class CustomRigidBody
         for (int j = chunkZ - 1; j < chunkZ + 2; j++)
         {
             // no collisions for unloaded chunks
-            if (!MapHandler.Chunks.TryGetValue(Chunk.GetName(i, j), out Chunk chunk))
+            if (!MapManager.Chunks.TryGetValue(Chunk.GetName(i, j), out Chunk chunk))
             {
                 if (i == chunkX && j == chunkZ) return; // sitting in unloaded chunk
                 continue;
