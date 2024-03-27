@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2170,7 +2170,7 @@ MonoBehaviour:
   pressKeyText: {fileID: 2012243992}
   scrollParent: {fileID: 1410844786}
   chatWindow: {fileID: 357479426}
-  manager: {fileID: 520568134}
+  management: {fileID: 520568134}
 --- !u!114 &124641309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7484,10 +7484,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 520568129}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2540ae383913d704b8d1f47385017c8a, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f106890dcb87614fbc595ff118b3c9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainMenuSceneName: MainMenu
+  mainMenuSceneName: Main
   game: {fileID: 124641301}
 --- !u!1 &524451472
 GameObject:

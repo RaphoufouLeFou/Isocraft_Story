@@ -17,7 +17,7 @@ public class Player : Mob
 
     private GameObject _healthImage;
     private InventoryUI _inventoryUI;
-    private NetworkManager _networkManager;
+    private NetworkManagement _networkManagement;
     public Inventory Inventory;
 
     private void Start()
@@ -35,7 +35,7 @@ public class Player : Mob
         _inventoryUI = scripts.GetComponent<InventoryUI>();
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
 
-        _networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+        _networkManagement = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
 
         Inventory = new Inventory();
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
@@ -231,12 +231,15 @@ public class Player : Mob
 
     void Update()
     {
-        if (Body == null) throw new PlayerException("Player body is null, check game start for errors");
+
 
         // if couldn't spawn before, retry
         if (!_spawnSuccess) SetSpawn(_spawn);
 
         if (!isLocalPlayer) return; // don't update other players
+        
+        if (Body == null) throw new PlayerException("Player body is null, check game start for errors");
+
 
         Body.Update();
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera
@@ -267,6 +270,6 @@ public class Player : Mob
             return;
         }
 
-        _networkManager.LeaveGame();
+        _networkManagement.LeaveGame();
     }
 }

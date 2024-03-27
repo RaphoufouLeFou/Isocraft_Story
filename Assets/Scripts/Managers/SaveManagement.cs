@@ -30,9 +30,8 @@ public class SaveManagement
         text += $"Health:{Game.Player.GetHealth()}";
         if (File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, text);
-
-        // save chunks
-        ChunksSave.SaveAllChunks();
+        // save chunks if is the host
+        if(SuperGlobals.IsHost) ChunksSave.SaveAllChunks();
     }
 
     private void CreateSaveFile(string path)

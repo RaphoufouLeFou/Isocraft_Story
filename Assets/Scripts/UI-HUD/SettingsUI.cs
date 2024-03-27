@@ -29,7 +29,7 @@ public class SettingsUI : MonoBehaviour
     public GameObject scrollParent;
     public GameObject chatWindow;
 
-    public NetworkManager manager;
+    [FormerlySerializedAs("manager")] public NetworkManagement management;
 
     private string _path;
 
@@ -78,8 +78,8 @@ public class SettingsUI : MonoBehaviour
         multiplayerMenu.SetActive(menu == "Multiplayer");
         if (menu == "Multiplayer")
         {
-            string encP = NetworkManager.EncodeIP(NetworkManager.GetLocalIPv4());
-            string encL = NetworkManager.EncodeIP(NetworkManager.GetLocalIPv4L());
+            string encP = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4());
+            string encL = NetworkManagement.EncodeIP(NetworkManagement.GetLocalIPv4L());
             GameObject.Find("GameCodeMultiP").GetComponent<TMP_Text>().text = $"Public : {encP}";
             GameObject.Find("GameCodeMultiL").GetComponent<TMP_Text>().text = $"Lan : {encL}";
         }
@@ -182,15 +182,15 @@ public class SettingsUI : MonoBehaviour
         if (self.name == "IsMulti")
         {
             SuperGlobals.IsMultiplayerGame = self.GetComponent<Toggle>().isOn;
-            manager.ChangeMaxConnection(SuperGlobals.IsMultiplayerGame ? _maxPlayerConnections : 1);
+            management.ChangeMaxConnection(SuperGlobals.IsMultiplayerGame ? _maxPlayerConnections : 1);
         }
 
         else if (self.name == "Port")
-            manager.ChangePort((ushort)Int32.Parse(self.GetComponent<TMP_InputField>().text));
+            management.ChangePort((ushort)Int32.Parse(self.GetComponent<TMP_InputField>().text));
         else if (self.name == "Players")
         {
             _maxPlayerConnections = Int32.Parse(self.GetComponent<TMP_InputField>().text);
-            manager.ChangeMaxConnection(_maxPlayerConnections);
+            management.ChangeMaxConnection(_maxPlayerConnections);
         }
     }
 

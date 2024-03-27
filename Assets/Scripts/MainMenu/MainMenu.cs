@@ -72,7 +72,7 @@ public class MainMenu : MonoBehaviour
     {
         if (_code != "")
         {
-            (string ip, int err) = NetworkManager.DecodeIP(_code.ToUpper().Replace("\n", "").Replace(" ",""));
+            (string ip, int err) = NetworkManagement.DecodeIP(_code.ToUpper().Replace("\n", "").Replace(" ",""));
 
             if (err != 0)
             {
