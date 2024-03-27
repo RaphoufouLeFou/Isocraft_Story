@@ -1,7 +1,8 @@
 using Mirror;
 using UnityEngine;
 
-public class Mob : NetworkBehaviour
+// base class for all mobs, even Player
+public abstract class Mob : NetworkBehaviour
 {
     private float _invincible;
     protected int MaxHealth;
@@ -26,13 +27,19 @@ public class Mob : NetworkBehaviour
     }
 }
 
-// mob child, but with AI capabilities
-public class MobAI : Mob
+// all AI-controlled mobs need to implement this interface
+public interface IAiControlled
+{
+    public void Init(int mobName);
+    public Vector2 MoveFunction();
+}
+
+public class MobZapatos : Mob, IAiControlled
 {
     public void Init(int mobName)
     {
-        InitMob(mobName, new MobBody(transform, MoveFunction));
-        Body.MovementType = BodyMovement.Absolute;
+        // Body is a MobBody, meaning it will need a function to get the movement from
+        InitMob(mobName, new AiBody(transform, MoveFunction));
     }
 
     void Update()
@@ -40,8 +47,8 @@ public class MobAI : Mob
         Body.Update();
     }
 
-    private (float side, float forwards) MoveFunction()
+    public Vector2 MoveFunction()
     {
-        return (0, 0);
+        return Vector2.zero;
     }
 }

@@ -107,7 +107,6 @@ public class Game : MonoBehaviour
             PlayerMob = 0,
             Mob = 1,
             Zapatos = 2;
-        
 
         public static readonly Dictionary<int, string> Names = new()
         {
@@ -127,7 +126,7 @@ public class Game : MonoBehaviour
     public void InitGameUtils()
     {
         MobPrefabs = mobPrefabs;
-        
+
         if (Models.ModelsIndex.Count != models.Length) throw new BlockException("Not all models initialized");
         Models.GameObjects = models;
         Object = this;

@@ -225,7 +225,6 @@ public abstract class CustomRigidBody : IBody
 
     protected void StopSprinting()
     {
-        
         sprinting = false;
         Animator.ReceiveAnimation(AnimationType.Walk);
     }
@@ -251,20 +250,21 @@ public abstract class PlanetBody : CustomRigidBody
 }
 
 // body with AI controller
-public class MobBody : PlanetBody, IBody
+public class AiBody : PlanetBody, IBody
 {
-    private readonly Func<(float side, float forwards)> _moveFunc;
+    private readonly Func<Vector2> _moveFunc;
 
-    public MobBody(Transform transform, Func<(float side, float forwards)> moveFunc) : base(transform)
+    public AiBody(Transform transform, Func<Vector2> moveFunc) : base(transform)
     {
         _moveFunc = moveFunc;
+        MovementType = BodyMovement.Absolute;
     }
 
     public override void Update()
     {
         float delta = GetDelta();
-        (float x, float z) = _moveFunc();
-        base.Update(x, z, delta);
+        Vector2 move = _moveFunc();
+        base.Update(move.x, move.y, delta);
     }
 }
 

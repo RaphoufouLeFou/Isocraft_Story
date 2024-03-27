@@ -3,14 +3,12 @@ using UnityEngine;
 
 public class MobSpawner : MonoBehaviour
 {
-
     public bool spawn;
 
     public void SpawnMob(Vector3 position, int mobID)
     {
         GameObject mob = Instantiate(Game.MobPrefabs[mobID], position, Quaternion.identity);
-        MobAI ai = new MobAI();
-        Debug.LogWarning(ai is null);
+        IAiControlled ai = mob.GetComponent<IAiControlled>();
         ai.Init(mobID);
     }
 
