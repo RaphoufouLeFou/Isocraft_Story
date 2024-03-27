@@ -100,18 +100,28 @@ public class Game : MonoBehaviour
     {
         public const int
             PlayerMob = 0,
-            Zapatos = 1;
+            Mob = 1,
+            Zapatos = 2;
 
+        public static readonly Dictionary<int, string> Prefab = new()
+        {
+            { PlayerMob, "Player" },
+            { Mob, "Mob" },
+            { Zapatos, "Zapatos" }
+        };
+        
         public static readonly Dictionary<int, string> Names = new()
         {
             { PlayerMob, "Player" },
+            { Mob, "Mob" },
             { Zapatos, "Zapatos" }
         };
 
         public static readonly Dictionary<int, int> Health = new()
         {
             { PlayerMob, 100 },
-            { Zapatos, 2 }
+            { Mob, 9001 },
+            { Zapatos, 50 }
         };
     }
 
