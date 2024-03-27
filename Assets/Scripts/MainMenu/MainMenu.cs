@@ -1,13 +1,19 @@
 using System;
+using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.Serialization;
+using UnityEngine.Video;
 
 public class MainMenu : MonoBehaviour
 {
+    [Header("Main Scene Name")]
     public string mainSceneName;
+    
+    [Header("GameObjects")]
     public GameObject superGlobals;
     public GameObject mainParent;
     public GameObject newGameParent;
@@ -17,11 +23,17 @@ public class MainMenu : MonoBehaviour
     public GameObject saveTextPrefab;
     public GameObject pseudo;
 
+    [Header("Inputs fields")]
     public TMP_InputField pseudoField;
     public TMP_InputField addressInput;
     public TMP_InputField codeInput;
     public TMP_InputField portInput;
     public TMP_InputField portNewGameInput;
+
+    [Header("Video")]
+    public Toggle playCinematicToggle;
+    public VideoPlayer videoPlayer;
+    public GameObject videoTexture;
 
     private string _ipAddress = "localhost";
     private string _code = "";
@@ -34,6 +46,7 @@ public class MainMenu : MonoBehaviour
         newGameParent.SetActive(false);
         loadGameParent.SetActive(false);
         joinGameParent.SetActive(false);
+        videoTexture.SetActive(false);
         pseudo.SetActive(false);
 
         // send SuperGlobals to main scene
@@ -98,16 +111,27 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(mainSceneName);
     }
 
+ 
     public void MultiPlayerButtonClick(GameObject save)
     {
         string saveName = save.GetComponent<TMP_InputField>().text;
-        StartGame(saveName, true, true);
+        if (playCinematicToggle.isOn) StartCoroutine(PlayCinematic(true, saveName));
+        else StartGame(saveName, true, true);
     }
 
     public void SinglePlayerButtonClick(GameObject save)
     {
         string saveName = save.GetComponent<TMP_InputField>().text;
-        StartGame(saveName, false, true);
+        if (playCinematicToggle.isOn) StartCoroutine(PlayCinematic(false, saveName));
+        else StartGame(saveName, false, true);
+    }
+
+    private IEnumerator PlayCinematic(bool multiplayer, string saveName)
+    {
+        videoTexture.SetActive(true);
+        videoPlayer.Play();
+        yield return new WaitForSeconds((float)videoPlayer.length);
+        StartGame(saveName, multiplayer, true);
     }
 
     private bool IsValidNewSaveName(string saveName)
