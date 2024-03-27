@@ -93,6 +93,7 @@ public static class NoiseGen
                     float type = _simplex.GetNoise(x, Game.Player.Level << 7, z) / 2 + 0.5f;
                     s = Game.Structs[type < 0.15f ? "Trunk" : type < 0.4f ? "Tree" : "Bush"];
                 }
+
                 break;
         }
 

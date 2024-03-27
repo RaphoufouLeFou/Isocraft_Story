@@ -41,6 +41,7 @@ public class MapHandler : NetworkBehaviour
             if (SuperGlobals.IsNewSave) Game.SaveManager.SaveGame(); // initial save
             else Game.SaveManager.LoadSave();
         }
+
         else CmdRequestGameName(Id);
     }
 

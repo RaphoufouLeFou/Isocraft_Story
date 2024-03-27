@@ -29,6 +29,7 @@ public class Game : MonoBehaviour
                 throw new NullExceptionCrash("Attempt at getting Game.Object before initialization");
             return Object;
         }
+
         private set => _object = value;
     }
 

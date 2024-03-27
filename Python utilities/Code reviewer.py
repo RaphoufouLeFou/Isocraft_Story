@@ -38,20 +38,36 @@ def clean_file(filename):
     with open(filename, encoding='utf-8') as f: content = f.read().split('\n')
 
     edited = ''
-    prev = None
+    Prev = None
     for i, line in enumerate(content):
+        # remove trailing spaces
         line = line.rstrip()
 
         add = True
         next = None if i == len(content)-1 else content[i+1].rstrip()
 
-        endnext = next is None or next == '' or next[-1] == '}'
-        if line == prev == '': add = False
-        elif line == '' and (prev[-1] == '}' or py) and endnext: add = False
+        # remove empty lines, except after } and before blocks
+        # and also after {, and before } too
+        startprev = Prev is None or Prev == '' or Prev.lstrip() == '{'
+        endnext = next is None or next == '' or next.lstrip() == '}'
+        if line == '' and (py and endnext or startprev or endnext): add = False
+
+        # add a single empty line after } and before blocks if missing
+        elif Prev and Prev.lstrip() == '}' and \
+             (line and line.lstrip() not in '{}'):
+            edited += '\n'
 
         if add:
+            # add line if needed
             edited += line+'\n'
 
+            # group empty blocks into "{ }"
+            if line.lstrip() == '}' and Prev.lstrip() == '{':
+                edited = '\n'.join(edited.split('\n')[:-3]) + ' { }\n'
+
+            Prev = line
+
+            # other warnings
             if len(line) > length:
                 long.append(Thing(filename, i+1, line))
             if not py:
@@ -164,11 +180,13 @@ def clean_file(filename):
                         expensive.append(Thing(filename, i+1, line))
 
         elif next is not None: n_changes += 1
-        prev = line
 
     with open(filename, 'w', encoding='utf-8') as f: f.write(edited)
 
 def clean_folder(path):
+    for name in ignore_folders:
+        if name in path: return # ignore folder
+
     print('%sLooking in %s%s%s' %(
         Fore.LIGHTYELLOW_EX, Fore.YELLOW, basename(path), Fore.RESET)
     )
@@ -183,6 +201,7 @@ def title(name):
 
 ignore = ('.', '..', '.git')
 ignore_filenames = ('FastNoiseLite', 'Mirror')
+ignore_folders = ('TextMesh',)
 types = ('.cs', '.py', '.pyw')
 operators = '+-*/<>=&|^:?'
 double_operators = ('&&', '||', '^^', '<<', '>>', '=>', '??', '/*', '*/')
@@ -197,6 +216,7 @@ expensive = []
 
 print('%sPHASE 1 - CODE CLEANING%s\n' %(Fore.RED, Fore.RESET))
 clean_folder('../Assets')
+clean_folder('.')
 
 print()
 print('%s\nPHASE 2 - FEEDBACK%s' %(Fore.RED, Fore.RESET))

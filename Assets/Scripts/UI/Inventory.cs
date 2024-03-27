@@ -61,6 +61,7 @@ public class Inventory
                     Images[i].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
                     TmpText[i].text = Inv[i, j, 1].ToString(); // update the hotBar number
                 }
+
                 return;
             }
     }
@@ -74,6 +75,7 @@ public class Inventory
             {
                 text += $"{Inv[j,i,0]}:{Inv[j,i,0]} ";
             }
+
             text += "\n";
         }
 
@@ -90,12 +92,14 @@ public class Inventory
             remaining = count - newCount;
             count = newCount;
         }
+
         Inv[x, y, 1] += count; // increment the inventory cell block count by the given count
         if (y == 3)
         {
             Images[x].sprite = texture; // set the hotBar texture to the sprite if the block is in the hotBar
             TmpText[x].text = Inv[x, y, 1].ToString(); // update the hotBar number
         }
+
         return remaining; //return the updated block count
     }
 
@@ -109,6 +113,7 @@ public class Inventory
             remaining = count - newCount;
             count = newCount;
         }
+
         Inv[x, y, 1] += count; // increment the inventory cell block count by the given count
         return remaining; // return the updated block count
     }
@@ -123,6 +128,7 @@ public class Inventory
             Images[x].sprite = texture;
             TmpText[x].text = "";
         }
+
         else TmpText[x].text = Inv[x, y, 1].ToString();
     }
 

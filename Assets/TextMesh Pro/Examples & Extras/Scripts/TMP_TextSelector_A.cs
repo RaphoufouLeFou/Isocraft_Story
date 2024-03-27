@@ -2,10 +2,8 @@
 using UnityEngine.EventSystems;
 using System.Collections;
 
-
 namespace TMPro.Examples
 {
-
     public class TMP_TextSelector_A : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         private TextMeshPro m_TextMeshPro;
@@ -25,7 +23,6 @@ namespace TMPro.Examples
             // Force generation of the text object so we have valid data to work with. This is needed since LateUpdate() will be called before the text object has a chance to generated when entering play mode.
             m_TextMeshPro.ForceMeshUpdate();
         }
-
 
         void LateUpdate()
         {
@@ -62,6 +59,7 @@ namespace TMPro.Examples
                     //m_TextMeshPro.mesh.colors32 = vertexColors;
                     m_TextMeshPro.textInfo.meshInfo[meshIndex].mesh.colors32 = vertexColors;
                 }
+
                 #endregion
 
                 #region Example of Link Handling
@@ -103,8 +101,8 @@ namespace TMPro.Examples
                             break;
                     }
                 }
-                #endregion
 
+                #endregion
 
                 #region Example of Word Selection
                 // Check if Mouse intersects any words and if so assign a random color to that word.
@@ -135,10 +133,10 @@ namespace TMPro.Examples
 
                     m_TextMeshPro.mesh.colors32 = vertexColors;
                 }
+
                 #endregion
             }
         }
-
 
         public void OnPointerEnter(PointerEventData eventData)
         {
@@ -146,12 +144,10 @@ namespace TMPro.Examples
             m_isHoveringObject = true;
         }
 
-
         public void OnPointerExit(PointerEventData eventData)
         {
             Debug.Log("OnPointerExit()");
             m_isHoveringObject = false;
         }
-
     }
 }

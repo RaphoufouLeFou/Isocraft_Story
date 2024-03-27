@@ -60,6 +60,7 @@ public class MainMenu : MonoBehaviour
         mainParent.SetActive(false);
         loadGameParent.SetActive(true);
     }
+
     public void JoinGameButtonClick()
     {
         backButton.SetActive(true);
@@ -78,8 +79,10 @@ public class MainMenu : MonoBehaviour
                 Debug.LogError($"Error : {err}");
                 return;
             }
+
             _ipAddress = ip;
         }
+
         Debug.Log($"Address = {_ipAddress}");
         SuperGlobals.Uri = new Uri($"kcp://{_ipAddress}:{_port}");
         SuperGlobals.IsMultiplayerGame = true;
@@ -136,7 +139,6 @@ public class MainMenu : MonoBehaviour
 
         foreach (string dir in Directory.EnumerateDirectories(path))
         {
-
             string saveName = new DirectoryInfo(dir).Name;
             if(saveName.StartsWith("CLIENT__")) continue;
             saveName = saveName.Replace('_' ,' ');
@@ -174,7 +176,6 @@ public class MainMenu : MonoBehaviour
     public void OnChangedPort()
     {
         _port = portInput.text;
-
     }
 
     public void OnChangedPortNewGame()

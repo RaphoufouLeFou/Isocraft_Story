@@ -63,6 +63,7 @@ public class SettingsUI : MonoBehaviour
             SaveSettings();
             return;
         }
+
         Settings.Playing = false;
         Settings.IsPaused = true;
 
@@ -81,6 +82,7 @@ public class SettingsUI : MonoBehaviour
             GameObject.Find("GameCodeMultiP").GetComponent<TMP_Text>().text = $"Public : {encP}";
             GameObject.Find("GameCodeMultiL").GetComponent<TMP_Text>().text = $"Lan : {encL}";
         }
+
         pressKeyText.SetActive(false);
     }
 
@@ -164,6 +166,7 @@ public class SettingsUI : MonoBehaviour
                 else if (key == "SaveName") Settings.Overlay.DisplaySaveName = value == "True";
                 else if (int.TryParse(value, out i)) Settings.KeyMap[key] = (KeyCode)i;
             }
+
             file.Close();
         }
 
@@ -172,6 +175,7 @@ public class SettingsUI : MonoBehaviour
         // save fixed settings to file
         SaveSettings();
     }
+
     public void MultiplayerMenuListener(GameObject self)
     {
         if (self.name == "IsMulti")
@@ -179,6 +183,7 @@ public class SettingsUI : MonoBehaviour
             SuperGlobals.IsMultiplayerGame = self.GetComponent<Toggle>().isOn;
             management.ChangeMaxConnection(SuperGlobals.IsMultiplayerGame ? _maxPlayerConnections : 1);
         }
+
         else if (self.name == "Port")
             management.ChangePort((ushort)Int32.Parse(self.GetComponent<TMP_InputField>().text));
         else if (self.name == "Players")
@@ -210,6 +215,7 @@ public class SettingsUI : MonoBehaviour
                     Settings.Playing = true;
                     Settings.IsPaused = false;
                 }
+
                 else if (settingsMenuButtons.activeSelf) GoToMenu("Pause");
                 else if (
                     overlayMenu.activeSelf

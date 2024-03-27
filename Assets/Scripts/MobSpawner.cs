@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class MobSpawner : MonoBehaviour
 {
-
     public GameObject mobPrefab;
 
     public bool spawn;

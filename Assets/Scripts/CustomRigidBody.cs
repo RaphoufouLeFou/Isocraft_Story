@@ -108,11 +108,13 @@ public class CustomRigidBody
                         toChange = k;
                     }
                 }
+
                 if (toChange == 0) // x wall collision
                 {
                     if (MathF.Abs(corr.x) > MathF.Abs(correction.x)) correction.x = corr.x;
                     _sprinting = false; // reset sprint when bonking on wall
                 }
+
                 else if (toChange == 1) // floor / ceiling collision
                 {
                     if (MathF.Abs(corr.y) > MathF.Abs(correction.y))
@@ -121,11 +123,13 @@ public class CustomRigidBody
                         if (movement.y <= 0) break; // stop checking for collisions if on the ground
                     }
                 }
+
                 else if (toChange == 2) // z wall collision
                 {
                     if (MathF.Abs(corr.z) > MathF.Abs(correction.z)) correction.z = corr.z;
                     _sprinting = false;
                 }
+
                 else throw new PlayerException("Way too much correction, gotta be an error somewhere");
             }
 
@@ -155,7 +159,6 @@ public class CustomRigidBody
 
     protected float GetDelta()
     {
-
         // capped movement speed
         float delta = Time.deltaTime;
         return delta > 0.1f ? 0.1f : delta;

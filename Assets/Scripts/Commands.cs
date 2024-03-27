@@ -44,6 +44,7 @@ public static class Commands
                     Game.TickRate = int.Parse(args[1]);
                     Debug.Log($"Changed tick rate to {Game.TickRate}");
                 }
+
                 catch
                 {
                     throw new CommandException("Invalid value");

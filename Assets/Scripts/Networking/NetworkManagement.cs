@@ -38,12 +38,12 @@ public class NetworkManagement : MonoBehaviour
             if (isOnline) _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
             _manager.StartHost();
         }
+
         else
         {
             _manager.GetComponent<KcpTransport>().Port = (ushort)SuperGlobals.Uri.Port;
             _manager.networkAddress = SuperGlobals.Uri.Host;
             _manager.StartClient(SuperGlobals.Uri);
-
         }
 
         // server start is asynchronous, so don't StartGame here
@@ -64,6 +64,7 @@ public class NetworkManagement : MonoBehaviour
             res += h;
             res += l;
         }
+
         return res;
     }
 
@@ -81,6 +82,7 @@ public class NetworkManagement : MonoBehaviour
             ushort n = (ushort)((high << 4) | low);
             res += i == 6 ? n : $"{n}.";
         }
+
         return (res, 0);
     }
 
@@ -116,6 +118,7 @@ public class NetworkManagement : MonoBehaviour
     {
         _manager.maxConnections = max;
     }
+
     public void ChangePort(ushort port)
     {
         _manager.GetComponent<KcpTransport>().Port = port;

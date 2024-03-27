@@ -47,6 +47,7 @@ public class PlayerCamera : MonoBehaviour
 
             _mouseOffset = 1;
         }
+
         else if (x > 0.9f)
         {
             if (pos.x - 1.5f > _prevMousePos.x && debounce)

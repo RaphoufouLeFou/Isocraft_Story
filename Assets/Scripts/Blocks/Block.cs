@@ -115,6 +115,7 @@ public class Block
                     id = key.ToString();
                     break;
                 }
+
             throw new BlockException($"Trying to access texture from block of ID: {id ?? "[unknown]"}");
         }
 

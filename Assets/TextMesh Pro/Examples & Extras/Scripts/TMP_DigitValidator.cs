@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System;
 
-
 namespace TMPro
 {
     /// <summary>

@@ -46,6 +46,7 @@ public class Structure
                 _blocks[i / (Y * Z), i / Z % Y, i % Z] = b;
             }
         }
+
         catch
         {
             throw new ArgumentException($"Error loading structure \"{type}\"");

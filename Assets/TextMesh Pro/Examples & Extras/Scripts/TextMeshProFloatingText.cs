@@ -1,10 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-
 namespace TMPro.Examples
 {
-
     public class TextMeshProFloatingText : MonoBehaviour
     {
         public Font TheFont;
@@ -71,6 +69,7 @@ namespace TMPro.Examples
 
                 StartCoroutine(DisplayTextMeshProFloatingText());
             }
+
             else if (SpawnType == 1)
             {
                 //Debug.Log("Spawning TextMesh Objects.");
@@ -87,13 +86,9 @@ namespace TMPro.Examples
 
                 StartCoroutine(DisplayTextMeshFloatingText());
             }
-            else if (SpawnType == 2)
-            {
 
-            }
-
+            else if (SpawnType == 2) { }
         }
-
 
         //void Update()
         //{
@@ -109,7 +104,6 @@ namespace TMPro.Examples
 
         //}
 
-
         public IEnumerator DisplayTextMeshProFloatingText()
         {
             float CountDuration = 2.0f; // How long is the countdown alive.
@@ -120,7 +114,6 @@ namespace TMPro.Examples
             Color32 start_color = m_textMeshPro.color;
             float alpha = 255;
             int int_counter = 0;
-
 
             float fadeDuration = 3 / starting_Count * CountDuration;
 
@@ -164,7 +157,6 @@ namespace TMPro.Examples
 
             StartCoroutine(DisplayTextMeshProFloatingText());
         }
-
 
         public IEnumerator DisplayTextMeshFloatingText()
         {

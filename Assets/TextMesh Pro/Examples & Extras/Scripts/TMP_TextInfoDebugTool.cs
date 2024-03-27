@@ -3,10 +3,8 @@ using UnityEngine;
 using System.Collections;
 using UnityEditor;
 
-
 namespace TMPro.Examples
 {
-
     public class TMP_TextInfoDebugTool : MonoBehaviour
     {
         // Since this script is used for debugging, we exclude it from builds.
@@ -30,7 +28,6 @@ namespace TMPro.Examples
 
         private float m_ScaleMultiplier;
         private float m_HandleSize;
-
 
         void OnDrawGizmos()
         {
@@ -92,7 +89,6 @@ namespace TMPro.Examples
             #endregion
         }
 
-
         /// <summary>
         /// Method to draw a rectangle around each character.
         /// </summary>
@@ -130,6 +126,7 @@ namespace TMPro.Examples
                     Color color = Color.green;
                     DrawDottedRectangle(bottomLeft, topRight, color);
                 }
+
                 else
                 {
                     Color color = Color.grey;
@@ -256,7 +253,6 @@ namespace TMPro.Examples
             }
         }
 
-
         /// <summary>
         /// Method to draw rectangles around each word of the text.
         /// </summary>
@@ -335,6 +331,7 @@ namespace TMPro.Examples
 
                         //Debug.Log("End Word Region at [" + currentCharInfo.character + "]");
                     }
+
                     // If Word is split on more than one line.
                     else if (isBeginRegion && currentLine != m_TextInfo.characterInfo[characterIndex + 1].lineNumber)
                     {
@@ -350,16 +347,12 @@ namespace TMPro.Examples
                         //Debug.Log("End Word Region at [" + currentCharInfo.character + "]");
                         maxAscender = -Mathf.Infinity;
                         minDescender = Mathf.Infinity;
-
                     }
                 }
 
                 //Debug.Log(wInfo.GetWord(m_TextMeshPro.textInfo.characterInfo));
             }
-
-
         }
-
 
         /// <summary>
         /// Draw rectangle around each of the links contained in the text.
@@ -441,6 +434,7 @@ namespace TMPro.Examples
 
                         //Debug.Log("End Word Region at [" + currentCharInfo.character + "]");
                     }
+
                     // If Link is split on more than one line.
                     else if (isBeginRegion && currentLine != textInfo.characterInfo[characterIndex + 1].lineNumber)
                     {
@@ -463,7 +457,6 @@ namespace TMPro.Examples
                 //Debug.Log(wInfo.GetWord(m_TextMeshPro.textInfo.characterInfo));
             }
         }
-
 
         /// <summary>
         /// Draw Rectangles around each lines of the text.
@@ -545,7 +538,6 @@ namespace TMPro.Examples
             }
         }
 
-
         /// <summary>
         /// Draw Rectangle around the bounds of the text object.
         /// </summary>
@@ -560,7 +552,6 @@ namespace TMPro.Examples
             DrawRectangle(bottomLeft, topRight, new Color(1, 0.5f, 0));
         }
 
-
         void DrawTextBounds()
         {
             Bounds textBounds = m_TextComponent.textBounds;
@@ -570,7 +561,6 @@ namespace TMPro.Examples
 
             DrawRectangle(bottomLeft, topRight, new Color(0f, 0.5f, 0.5f));
         }
-
 
         // Draw Rectangles
         void DrawRectangle(Vector3 BL, Vector3 TR, Color color)
@@ -621,7 +611,6 @@ namespace TMPro.Examples
             Handles.DrawLine(new Vector3(position.x, position.y - size, position.z), new Vector3(position.x, position.y + size, position.z));
         }
 
-
         // Draw Rectangles
         void DrawRectangle(Vector3 bl, Vector3 tl, Vector3 tr, Vector3 br, Color color)
         {
@@ -632,7 +621,6 @@ namespace TMPro.Examples
             Gizmos.DrawLine(tr, br);
             Gizmos.DrawLine(br, bl);
         }
-
 
         // Draw Rectangles
         void DrawDottedRectangle(Vector3 bl, Vector3 tl, Vector3 tr, Vector3 br, Color color)
@@ -646,7 +634,7 @@ namespace TMPro.Examples
             UnityEditor.Handles.DrawDottedLine(tr, br, dotSpacing);
             UnityEditor.Handles.DrawDottedLine(br, bl, dotSpacing);
         }
+
         #endif
     }
 }
-

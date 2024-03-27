@@ -160,11 +160,13 @@ public class Chunk : MonoBehaviour
                         otherPos.x += Size;
                         i = 0;
                     }
+
                     else if (otherPos.x > Size1)
                     {
                         otherPos.x -= Size;
                         i = 1;
                     }
+
                     else if (otherPos.y < 0) otherId = 0; // air under
                     else if (otherPos.y >= Size) otherId = 0; // air above
                     else if (otherPos.z < 0)
@@ -172,11 +174,13 @@ public class Chunk : MonoBehaviour
                         otherPos.z += Size;
                         i = 2;
                     }
+
                     else if (otherPos.z > Size1)
                     {
                         otherPos.z -= Size;
                         i = 3;
                     }
+
                     else
                         otherId = Blocks[(int)otherPos.x, (int)otherPos.y,
                             (int)otherPos.z]; // other block is in the same chunk
@@ -199,6 +203,7 @@ public class Chunk : MonoBehaviour
                             uvs1.AddRange(blockObj.GetUVs(face));
                             n1 += 4;
                         }
+
                         // handle displaying faces of transparent blocks
                         else if (blockObj.Transparent &&
                                  (otherObj.Transparent && !Settings.Game.FastGraphics || otherObj.NoTexture) &&

@@ -1,27 +1,20 @@
 using UnityEngine;
 using System.Collections;
 
-
 namespace TMPro.Examples
 {
-
     public class Benchmark02 : MonoBehaviour
     {
-
         public int SpawnType = 0;
         public int NumberOfNPC = 12;
 
         public bool IsTextObjectScaleStatic;
         private TextMeshProFloatingText floatingText_Script;
 
-
         void Start()
         {
-
             for (int i = 0; i < NumberOfNPC; i++)
             {
-
-
                 if (SpawnType == 0)
                 {
                     // TextMesh Pro Implementation
@@ -46,6 +39,7 @@ namespace TMPro.Examples
                     floatingText_Script.SpawnType = 0;
                     floatingText_Script.IsTextObjectScaleStatic = IsTextObjectScaleStatic;
                 }
+
                 else if (SpawnType == 1)
                 {
                     // TextMesh Implementation
@@ -66,6 +60,7 @@ namespace TMPro.Examples
                     floatingText_Script = go.AddComponent<TextMeshProFloatingText>();
                     floatingText_Script.SpawnType = 1;
                 }
+
                 else if (SpawnType == 2)
                 {
                     // Canvas WorldSpace Camera
@@ -88,9 +83,6 @@ namespace TMPro.Examples
                     floatingText_Script = go.AddComponent<TextMeshProFloatingText>();
                     floatingText_Script.SpawnType = 0;
                 }
-
-
-
             }
         }
     }

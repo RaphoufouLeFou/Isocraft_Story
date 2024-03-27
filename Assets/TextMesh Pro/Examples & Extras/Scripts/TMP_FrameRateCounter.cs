@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-
 namespace TMPro.Examples
 {
-    
     public class TMP_FrameRateCounter : MonoBehaviour
     {
         public float UpdateInterval = 5.0f;
@@ -38,7 +36,6 @@ namespace TMPro.Examples
             m_TextMeshPro.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
             m_TextMeshPro.fontSharedMaterial = Resources.Load<Material>("Fonts & Materials/LiberationSans SDF - Overlay");
 
-
             m_frameCounter_transform = frameCounter.transform;
             m_frameCounter_transform.SetParent(m_camera.transform);
             m_frameCounter_transform.localRotation = Quaternion.identity;
@@ -57,8 +54,6 @@ namespace TMPro.Examples
 
             Set_FrameCounter_Position(AnchorPosition);
             last_AnchorPosition = AnchorPosition;
-
-
         }
 
         void Start()
@@ -99,7 +94,6 @@ namespace TMPro.Examples
                 m_LastInterval = timeNow;
             }
         }
-
 
         void Set_FrameCounter_Position(FpsCounterAnchorPositions anchor_position)
         {

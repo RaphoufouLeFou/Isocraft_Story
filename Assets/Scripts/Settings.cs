@@ -14,6 +14,7 @@ public static class Settings
         public bool DisplayCoords;
         public bool DisplaySaveName;
     }
+
     public static OverlayStruct Overlay;
 
     public struct GameStruct

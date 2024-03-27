@@ -8,7 +8,6 @@ public class EnvMapAnimator : MonoBehaviour {
     public Vector3 RotationSpeeds;
     private TMP_Text m_textMeshPro;
     private Material m_material;
-    
 
     void Awake()
     {
@@ -20,8 +19,8 @@ public class EnvMapAnimator : MonoBehaviour {
     // Use this for initialization
 	IEnumerator Start ()
     {
-        Matrix4x4 matrix = new Matrix4x4(); 
-        
+        Matrix4x4 matrix = new Matrix4x4();
+
         while (true)
         {
             //matrix.SetTRS(new Vector3 (Time.time * TranslationSpeeds.x, Time.time * TranslationSpeeds.y, Time.time * TranslationSpeeds.z), Quaternion.Euler(Time.time * RotationSpeeds.x, Time.time * RotationSpeeds.y , Time.time * RotationSpeeds.z), Vector3.one);

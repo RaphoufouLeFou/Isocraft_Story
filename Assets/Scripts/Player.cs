@@ -265,6 +265,7 @@ public class Player : NetworkBehaviour
             Debug.LogWarning("probably an issue when there are multiple clients !! TODO");
             return;
         }
+
         _networkManagement.LeaveGame();
     }
 }

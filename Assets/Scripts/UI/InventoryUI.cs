@@ -60,6 +60,7 @@ public class InventoryUI : MonoBehaviour
                 _cellsImages[i].sprite = Game.InvSprites[_playerInv.GetCurrentBlock(x, y)];
                 _cellsTexts[i].text = count.ToString();
             }
+
             else // hide the number in the cell
             {
                 _cellsImages[i].sprite = Game.InvSprites[0];
@@ -74,8 +75,8 @@ public class InventoryUI : MonoBehaviour
         {
             _isMovingItem = false;
             Destroy(_movingItemImage);
-
         }
+
         inventoryMenu.SetActive(false);
         Settings.Playing = true;
     }
@@ -99,6 +100,7 @@ public class InventoryUI : MonoBehaviour
                 _movingItem.Item2 = diff;
                 _movingItemImage.GetComponentInChildren<TMP_Text>().text = diff.ToString();
             }
+
             else
             {
                 _movingItem = (-1, -1);
@@ -106,6 +108,7 @@ public class InventoryUI : MonoBehaviour
                 _isMovingItem = false;
             }
         }
+
         else
         {
             if (_playerInv.GetCurrentBlockCount(x, y) == 0) return;
@@ -114,6 +117,7 @@ public class InventoryUI : MonoBehaviour
                 _movingItem = (_playerInv.GetCurrentBlock(x, y), _playerInv.GetCurrentBlockCount(x, y));
                 _playerInv.RemoveAllBlocks(x, y, Game.InvSprites[0]);
             }
+
             else if (mouse == "Right")
             {
                 _movingItem = (_playerInv.GetCurrentBlockCount(x, y) & 1) == 0
@@ -122,6 +126,7 @@ public class InventoryUI : MonoBehaviour
                         (int)Math.Floor(_playerInv.GetCurrentBlockCount(x, y) / 2.0f + 1));
                 _playerInv.RemoveHalfBlocks(x, y, Game.InvSprites[0]);
             }
+
             else if (mouse == "Middle") _movingItem = (_playerInv.GetCurrentBlock(x, y), 64);
 
             _movingItemImage = Instantiate(movingItemImagePrefab, Input.mousePosition, Quaternion.identity,

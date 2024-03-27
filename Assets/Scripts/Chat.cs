@@ -14,9 +14,10 @@ public class Msg
         Obj = obj;
         _endTime = Time.time + lifeTime;
     }
-    public bool IsTimesUp() => Time.time >= _endTime;
 
+    public bool IsTimesUp() => Time.time >= _endTime;
 }
+
 public class Chat : NetworkBehaviour
 {
     // Start is called before the first frame update
@@ -34,6 +35,7 @@ public class Chat : NetworkBehaviour
         {
             SendMessages("A new player joined !");
         }
+
         chatWindow.SetActive(false);
     }
 
@@ -71,6 +73,7 @@ public class Chat : NetworkBehaviour
     {
         RcpClientReceiveMessage(message);
     }
+
     private void SendMessages(string message)
     {
         if (isServer) RcpClientReceiveMessage(message);
@@ -111,6 +114,7 @@ public class Chat : NetworkBehaviour
         {
             if(o.IsTimesUp()) o.Obj.SetActive(chatWindow.activeSelf);
         }
+
         while (_messages.Count > 10) Destroy(_messages.Dequeue().Obj);
 
         if (chatWindow.activeSelf)
