@@ -26,21 +26,17 @@ public class DummyAnimator : IAnimator
         switch (type)
         {
             case AnimationType.Idle:
-                Debug.Log("Idling");
                 Annimate("Idle");
                 break;
             case AnimationType.Walk:
-                Debug.Log("walking");
                 Annimate("Walk");
                 break;
             case AnimationType.Run:
-                Debug.Log("Sprinting");
                 Annimate("Sprint");
                 break;
             case AnimationType.Jump:
                 break;
             default:
-                Debug.Log("Idling from somewhere else");
                 Annimate("Idle");
                 break;
         }
