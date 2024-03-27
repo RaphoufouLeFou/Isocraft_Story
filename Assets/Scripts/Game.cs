@@ -96,10 +96,28 @@ public class Game : MonoBehaviour
         public static GameObject[] GameObjects;
     }
 
+    public struct Mobs
+    {
+        public const int
+            PlayerMob = 0,
+            Zapatos = 1;
+
+        public static readonly Dictionary<int, string> Names = new()
+        {
+            { PlayerMob, "Player" },
+            { Zapatos, "Zapatos" }
+        };
+
+        public static readonly Dictionary<int, int> Health = new()
+        {
+            { PlayerMob, 100 },
+            { Zapatos, 2 }
+        };
+    }
+
     public void InitGameUtils()
     {
-        if (Models.ModelsIndex.Count != models.Length)
-            throw new BlockException("Not all models initialized");
+        if (Models.ModelsIndex.Count != models.Length) throw new BlockException("Not all models initialized");
         Models.GameObjects = models;
         Object = this;
 

@@ -131,7 +131,7 @@ public class NetworkManager : MonoBehaviour
 
     private void Update()
     {
-        if (_manager is null) throw new NullExceptionCrash("Game probably failed to load");
+        if (_manager is null) throw new NullExceptionCrash("Game object probably failed to load");
         if (_manager.isNetworkActive == false) SceneManager.LoadScene(mainMenuSceneName);
     }
 }

@@ -1,27 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+using System;
 using UnityEngine;
 
 public class MobAI : MonoBehaviour
 {
-    private readonly Dictionary<string, float> _mobsHealth = new()
-    {
-        {"Zapatos(Clone)", 2},
-        {"Mob(Clone)",9001}
-    };
-
     private MobBody _body;
 
-    private float _health;
+    private int _name;
+    [NonSerialized] public float Health;
+
+    public MobAI(int name)
+    {
+        _name = name;
+    }
 
     void Start()
     {
         _body = new MobBody(transform, MoveFunction);
 
         // initializing attached mob
-        string gameObjectName = gameObject.name;
-        _health = _mobsHealth[gameObjectName];
+        gameObject.name = Game.Mobs.Names[_name];
+        Health = Game.Mobs.Health[_name];
     }
 
     void Update()

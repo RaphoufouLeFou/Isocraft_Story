@@ -9,8 +9,8 @@ public class Player : NetworkBehaviour
     public PlayerCamera playerCamera;
 
     [NonSerialized] public int Level = 0;
-    [NonSerialized] public int MaxHealth;
     [NonSerialized] public int Health;
+    private int _maxHealth;
     [NonSerialized] public bool IsLoaded;
 
     public PlayerBody Body;
@@ -37,9 +37,11 @@ public class Player : NetworkBehaviour
         GameObject scripts = GameObject.Find("Scripts");
         _inventoryUI = scripts.GetComponent<InventoryUI>();
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
-        MaxHealth = 100;
-        Health = 100;
+
+        _maxHealth = Game.Mobs.Health[Game.Mobs.PlayerMob];
+        Health = _maxHealth;
         DealDamage(0); // update health bar at the start
+
         _networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
 
         Inventory = new Inventory();
@@ -118,8 +120,8 @@ public class Player : NetworkBehaviour
 
     public void DealDamage(int amount)
     {
-        Health = amount < Health ? Health - amount : 0;
-        _healthImage.transform.localScale = new Vector3(Health / MaxHealth, 1, 1);
+        Health =  amount < Health ? Health - amount : 0;
+        _healthImage.transform.localScale = new Vector3((float)Health / _maxHealth, 1, 1);
     }
 
     private int PlaceBreak(int chunkX, int chunkZ, int x, int y, int z, Chunk chunk, int type, bool isPlacing)

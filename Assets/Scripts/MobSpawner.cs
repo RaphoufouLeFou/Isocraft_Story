@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MobSpawner : MonoBehaviour
@@ -14,11 +12,10 @@ public class MobSpawner : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (spawn)
         {
-            // commented out for now
             SpawnMob(new Vector3(0,7,0));
             spawn = false;
         }

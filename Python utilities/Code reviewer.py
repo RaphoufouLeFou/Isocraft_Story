@@ -57,129 +57,133 @@ def clean_file(filename):
              (line and line.lstrip() not in '{}'):
             edited += '\n'
 
-        if add:
-            # add line if needed
-            edited += line+'\n'
+    if add:
+        # add line if needed
+        edited += line+'\n'
 
-            # group empty blocks into "{ }"
-            if line.lstrip() == '}' and Prev.lstrip() == '{':
-                edited = '\n'.join(edited.split('\n')[:-3]) + ' { }\n'
+        # group empty blocks into "{ }"
+        if line.lstrip() == '}' and Prev.lstrip() == '{':
+            edited = '\n'.join(edited.split('\n')[:-3]) + ' { }\n'
 
-            Prev = line
+        Prev = line
 
-            # other warnings
-            if len(line) > length:
-                long.append(Thing(filename, i+1, line))
-            if not py:
-                # get code part of line, check for string additions
-                _line = ''
-                operation = []
-                count = 0
-                in_string = False
-                depth = 0
-                prev = None
-                dollar = False
-                for char in line:
-                    if char == '"' and prev != '\\': # I know about "\\"
-                        in_string = not in_string
-                        count += 1
-                        _line += char
-                        dollar = in_string and prev == '$'
-                        if in_string: depth = 0
-                    elif in_string: # in string: if $"", add code inside
-                        if dollar and prev != '\\':
-                            if char == '{': depth += 1
-                            elif char == '}':
-                                depth -= 1
-                                _line += char
-                            if depth: _line += char
-                    else: # outside of string: add and check for ""+""
-                        _line += char
-                        if char == '+': operation.append(count)
+    elif next is not None: n_changes += 1
 
-                    prev = char
+    for i, line in enumerate(edited.split('\n')):
+        # other warnings
+        if len(line) > length:
+            long.append(Thing(filename, i+1, line))
+        if not py:
+            # get code part of line, check for string additions
+            _line = ''
+            operation = []
+            count = 0
+            in_string = False
+            depth = 0
+            prev = None
+            dollar = False
+            for char in line:
+                if char == '"' and prev != '\\': # I know about "\\"
+                    in_string = not in_string
+                    count += 1
+                    _line += char
+                    dollar = in_string and prev == '$'
+                    if in_string: depth = 0
+                elif in_string: # in string: if $"", add code inside
+                    if dollar and prev != '\\':
+                        if char == '{': depth += 1
+                        elif char == '}':
+                            depth -= 1
+                            _line += char
+                        if depth: _line += char
+                else: # outside of string: add and check for ""+""
+                    _line += char
+                    if char == '+': operation.append(count)
 
-                op = False
-                for o in operation:
-                    if o != 0 and o != count:
-                        op = True
-                        break
+                prev = char
 
-                if op: string.append(Thing(filename, i+1, line))
+            op = False
+            for o in operation:
+                if o != 0 and o != count:
+                    op = True
+                    break
 
-                # check for operators
-                ok = True
-                _line = _line.split('//')[0]+' ' # I know about "// //"
-                j = 1
-                while j < len(_line)-2:
-                    if 'case' in line or 'default' in line: break
-                    if _line[j] in operators:
-                        double = False
-                        a, b = j-1, j+1
-                        # can extend operator if made of multiple characters
-                        if b < len(_line)-1:
-                            if _line[j:j+2] in ('++', '--'):
-                                j += 2
-                                continue
-                            double = _line[j:j+2] in double_operators
-                            if double or _line[b] == '=':
+            if op: string.append(Thing(filename, i+1, line))
+
+            # check for operators
+            ok = True
+            _line = _line.split('//')[0]+' ' # I know about "// //"
+            j = 1
+            while j < len(_line)-2:
+                if 'case' in line or 'default' in line: break
+                if _line[j] in operators:
+                    double = False
+                    a, b = j-1, j+1
+                    # can extend operator if made of multiple characters
+                    if b < len(_line)-1:
+                        if _line[j:j+2] in ('++', '--'):
+                            j += 2
+                            continue
+                        double = _line[j:j+2] in double_operators
+                        if double or _line[b] == '=':
+                            j += 1
+                            b += 1
+                            if b < len(_line)-1 and double \
+                               and _line[j+1] == '=':
+                                # triple characters operators
                                 j += 1
                                 b += 1
-                                if b < len(_line)-1 and double \
-                                   and _line[j+1] == '=':
-                                    # triple characters operators
-                                    j += 1
-                                    b += 1
 
-                        if a and _line[a] == '!': a -= 1
-                        a, b = _line[a], _line[b]
-                        if a == b == "'":
-                            j += 1
-                            continue # char
+                    if a and _line[a] == '!': a -= 1
+                    a, b = _line[a], _line[b]
+                    if a == b == "'":
+                        j += 1
+                        continue # char
 
-                        # avoid things like "List<(int, Vector3)>()"
-                        if (_line[j] in '<>?' and not double
-                            or _line[j] == '-' or _line[j:j+2] == ':F') \
-                            and (a.isalpha() or a in ' 23)(]') \
-                            and (b.isalnum() or b == ' '
-                            or _line[j+1:j+3] == '()' or (
-                            b == '(' and _line[j+2].isalpha())):
-                            j += 1
-                            continue
+                    # avoid things like "List<(int, Vector3)>()"
+                    if (_line[j] in '<>?' and not double
+                        or _line[j] == '-' or _line[j:j+2] == ':F') \
+                        and (a.isalpha() or a in ' 23)(]') \
+                        and (b.isalnum() or b == ' '
+                        or _line[j+1:j+3] == '()' or (
+                        b == '(' and _line[j+2].isalpha())):
+                        j += 1
+                        continue
 
-                        if not (a == 0 or a == ' ') or not (
-                            b == len(_line)-1 or b == ' '):
-                            ok = False
-                            break
-                    j += 1
-
-                for j in range(1, len(_line)):
-                    # check commas "[no space], " except for e.g. "int[,,]"
-                    if j < len(_line)-1 and _line[j] == ',' and (
-                       _line[j-1] == ' ' and _line[j+1] not in ' ,]' or \
-                       j < len(_line)-2 and _line[j+1] == _line[j+2] == ' '):
+                    if not (a == 0 or a == ' ') or not (
+                        b == len(_line)-1 or b == ' '):
                         ok = False
                         break
+                j += 1
 
-                    # check semicolons "[no space];"
-                    if _line[j] == ';' and _line[j-1] == ' ':
-                        ok = False
-                        break
-
-                # check newline before "{", except if "{ whatever"
-                _line = line.replace(' ', '')
-                if len(_line) > 1 and _line[-1] == '{' and _line[0] != '{':
+            for j in range(1, len(_line)):
+                # check commas "[no space], " except for e.g. "int[,,]"
+                if j < len(_line)-1 and _line[j] == ',' and (
+                   _line[j-1] == ' ' and _line[j+1] not in ' ,]' or \
+                   j < len(_line)-2 and _line[j+1] == _line[j+2] == ' '):
                     ok = False
+                    break
 
-                if not ok: visual.append(Thing(filename, i+1, line))
+                # check semicolons "[no space];"
+                if _line[j] == ';' and _line[j-1] == ' ':
+                    ok = False
+                    break
 
-                if 'todo' in line.lower():
-                    todo.append(Thing(filename, i+1, line))
+            # check for double spaces
+            if '  ' in _line.lstrip(): ok = False
 
-                if 'GameObject.Find(' in line or 'GetComponent' in line:
-                        expensive.append(Thing(filename, i+1, line))
+            # check newline before "{", except if "{ whatever"
+            _line = line.replace(' ', '')
+            if len(_line) > 1 and _line[-1] == '{' and _line[0] != '{':
+                ok = False
 
-        elif next is not None: n_changes += 1
+            if not ok: visual.append(Thing(filename, i+1, line))
+
+            if 'todo' in line.lower():
+                todo.append(Thing(filename, i+1, line))
+
+            if 'GameObject.Find(' in line or 'GetComponent' in line:
+                    expensive.append(Thing(filename, i+1, line))
 
     with open(filename, 'w', encoding='utf-8') as f: f.write(edited)
 
@@ -251,7 +255,7 @@ title('VISUAL')
 print('%sSpaces around operators, newline %s{%s (except when inline),' %(
     Fore.LIGHTGREEN_EX, Fore.GREEN, Fore.LIGHTGREEN_EX)
 )
-print('correct comma and semicolon spacing%s\n' %Fore.RESET)
+print('no double spaces, correct comma and semicolon spacing%s\n' %Fore.RESET)
 for thing in visual: print(thing)
 n = len(visual)
 print('Detected %s%d%s issues' %(
@@ -269,7 +273,7 @@ print('Detected %s%d%s issues' %(
 )
 
 title('COMPACTNESS')
-print('Made %s%d%s changes in basic syntax compactness' %(
+print('Made %s%d%s basic syntax improvements' %(
     Fore.LIGHTRED_EX if n_changes else Fore.GREEN, n_changes, Fore.RESET)
 )
 
