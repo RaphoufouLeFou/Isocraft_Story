@@ -20,7 +20,6 @@ public class Player : Mob
     private GameObject _nameTag;
     private GameObject _healthImage;
     private InventoryUI _inventoryUI;
-    private NetworkManagement _networkManagement;
     public Inventory Inventory;
 
     private void Start()
@@ -46,8 +45,6 @@ public class Player : Mob
         GameObject scripts = GameObject.Find("Scripts");
         _inventoryUI = scripts.GetComponent<InventoryUI>();
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
-
-        _networkManagement = GameObject.Find("NetworkManager").GetComponent<NetworkManagement>();
 
         Inventory = new Inventory();
         Inventory.AddBlock(Game.Blocks.Cobblestone, Game.InvSprites[Game.Blocks.Cobblestone], 64);
@@ -284,6 +281,6 @@ public class Player : Mob
             return;
         }
 
-        _networkManagement.LeaveGame();
+        Game.Object.networkManagement.LeaveGame();
     }
 }

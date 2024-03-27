@@ -67,9 +67,9 @@ public class MapManagement : NetworkBehaviour
     }
 
     [Command(requiresAuthority = false)]
-    private void CmdRequestPlayersNameDictionary(int id, uint netId, string playerName)
+    private void CmdRequestPlayersNameDictionary(int id, uint networkId, string playerName)
     {
-        bool res = Game.PlayersNames.TryAdd(netId, playerName);
+        bool res = Game.PlayersNames.TryAdd(networkId, playerName);
         if (res) Debug.LogWarning("A player already exist with this name !");
         List<uint> idList = new List<uint>();
         List<string> nameList = new List<string>();
@@ -83,10 +83,11 @@ public class MapManagement : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void RpcGetPlayersNameDictionary(List<uint> idList, List<string> nameList, bool nameExist, int id)
+    private void RpcGetPlayersNameDictionary(List<uint> idList, List<string> nameList, bool nameExists, int id)
     {
         if (NetworkClient.localPlayer.GetInstanceID() == id)
-            if(!nameExist) GameObject.Find("NetworkManagement").GetComponent<NetworkManagement>().LeaveGame();
+            if (!nameExists)
+                Game.Object.networkManagement.LeaveGame();
         Dictionary<uint, string> dictionary = new Dictionary<uint, string>();
         for (int i = 0; i < idList.Count; i++)
             dictionary.Add(idList[i], nameList[i]);
@@ -98,9 +99,7 @@ public class MapManagement : NetworkBehaviour
     private void UpdateNameTags()
     {
         foreach (KeyValuePair<uint, string> pair in Game.PlayersNames)
-        {
             NetworkServer.spawned[pair.Key].transform.GetChild(3).GetComponent<TMP_Text>().text = pair.Value;
-        }
     }
 
     [Command (requiresAuthority = false)]

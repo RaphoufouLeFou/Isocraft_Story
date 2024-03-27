@@ -13,12 +13,13 @@ public class Game : MonoBehaviour
     [NonSerialized] public static Dictionary<uint, string> PlayersNames = new ();
 
     // static variables, get initialized from their serialized variables
-    [NonSerialized] public static Sprite[] InvSprites;
-    [NonSerialized] public static Player Player;
-    [NonSerialized] public static SaveManagement SaveManager;
+    public static Sprite[] InvSprites;
+    public static Player Player;
+    public static SaveManagement SaveManager;
 
     public Sprite[] sprites;
     public MapManagement mapManagement;
+    public NetworkManagement networkManagement;
 
     public GameObject[] models;
 
