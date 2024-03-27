@@ -34,7 +34,7 @@ public abstract class CustomRigidBody : IBody
 
     private readonly Transform _transform;
     private readonly float _speed, _drag, _jumpForce, _gravity;
-    private bool _sprinting;
+    protected bool sprinting { get; private set; }
 
     private readonly float _width, _height;
 
@@ -136,7 +136,7 @@ public abstract class CustomRigidBody : IBody
                 if (toChange == 0) // x wall collision
                 {
                     if (MathF.Abs(corr.x) > MathF.Abs(correction.x)) correction.x = corr.x;
-                    _sprinting = false; // reset sprint when bonking on wall
+                    sprinting = false; // reset sprint when bonking on wall
                     Animator.ReceiveAnimation(AnimationType.Walk);
                 }
 
@@ -152,7 +152,7 @@ public abstract class CustomRigidBody : IBody
                 else if (toChange == 2) // z wall collision
                 {
                     if (MathF.Abs(corr.z) > MathF.Abs(correction.z)) correction.z = corr.z;
-                    _sprinting = false;
+                    sprinting = false;
                     Animator.ReceiveAnimation(AnimationType.Walk);
                 }
 
@@ -197,11 +197,11 @@ public abstract class CustomRigidBody : IBody
         _moveRelative = new Vector3(x * 0.8f, 0, z).normalized;
         bool immobile = _moveRelative == Vector3.zero;
 
-        if (prevImmobile && !immobile) Animator.ReceiveAnimation(_sprinting ? AnimationType.Run : AnimationType.Walk);
+        if (prevImmobile && !immobile) Animator.ReceiveAnimation(sprinting ? AnimationType.Run : AnimationType.Walk);
         else if (!prevImmobile && immobile) Animator.ReceiveAnimation(AnimationType.Idle);
 
         Vector3 move = MovementType == BodyMovement.Absolute ? _moveRelative : _transform.rotation * _moveRelative;
-        float speed = _sprinting ? 1.7f * _speed : _speed;
+        float speed = sprinting ? 1.7f * _speed : _speed;
         _movement += move * (speed * delta);
 
         // move according to Movement
@@ -219,14 +219,14 @@ public abstract class CustomRigidBody : IBody
 
     protected void StartSprinting()
     {
-        _sprinting = true;
+        sprinting = true;
         Animator.ReceiveAnimation(AnimationType.Run);
     }
 
     protected void StopSprinting()
     {
-        Debug.Log("walking");
-        _sprinting = false;
+        
+        sprinting = false;
         Animator.ReceiveAnimation(AnimationType.Walk);
     }
 
@@ -287,8 +287,8 @@ public class PlayerBody : PlanetBody, IBody
         if (Input.GetKey(Settings.KeyMap["Left"])) x--;
         if (Input.GetKey(Settings.KeyMap["Right"])) x++;
 
-        if (Input.GetKey(Settings.KeyMap["Sprint"])) StartSprinting();
-        if ((!forwards || backwards) && Input.GetKey(Settings.KeyMap["Sprint"])) StopSprinting();
+        if (Input.GetKey(Settings.KeyMap["Sprint"]) && (forwards || backwards)) StartSprinting();
+        if ((!forwards || backwards) && sprinting) StopSprinting();
 
         if (Input.GetKey(Settings.KeyMap["Jump"]) && OnFloor) Jump();
         base.Update(x, z, delta);
