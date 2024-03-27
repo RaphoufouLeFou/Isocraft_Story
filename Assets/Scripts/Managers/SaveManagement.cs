@@ -16,9 +16,9 @@ public class SaveManagement
         // save player data
         Vector3 pos = Game.Player.transform.position;
         Vector3 rot = Game.Player.playerCamera.GoalRot;
-        string usableSaveName =(Game.Player.isServer ? "" : "CLIENT__") +  SuperGlobals.SaveName;
+        string usableSaveName = $"{(Game.Player.isServer ? "" : "CLIENT__")}SuperGlobals.SaveName";
 
-        string path = Application.persistentDataPath + $"/Saves/{usableSaveName}/{usableSaveName}.IsoSave";
+        string path = $"{Application.persistentDataPath}/Saves/{usableSaveName}/{usableSaveName}.IsoSave";
         if (!_isInit) CreateSaveFile(path);
         _isInit = true;
 
@@ -46,7 +46,7 @@ public class SaveManagement
 
     public void LoadSave()
     {
-        string usableSaveName = (Game.Player.isServer ? "" : "CLIENT__") + SuperGlobals.SaveName;
+        string usableSaveName = $"{(Game.Player.isServer ? "" : "CLIENT__")}SuperGlobals.SaveName";
 
         string path = $"{Application.persistentDataPath}/Saves/{usableSaveName}/{usableSaveName}.IsoSave";
         if (!File.Exists(path)) throw new FileNotFoundException("No save file found");

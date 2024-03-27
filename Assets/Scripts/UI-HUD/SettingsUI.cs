@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ public class SettingsUI : MonoBehaviour
 {
     private void Start()
     {
-        _path = Application.persistentDataPath + "/options.txt";
+        _path = $"{Application.persistentDataPath}/options.txt";
         LoadSettings();
         // close all menus
         GoToMenu("None");

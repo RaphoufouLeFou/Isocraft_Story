@@ -25,7 +25,6 @@ public class Player : Mob
 
     private void Start()
     {
-
         // camera
         _camera = GetComponentInChildren<Camera>();
         GetComponentInChildren<AudioListener>().enabled = isLocalPlayer;
@@ -36,13 +35,13 @@ public class Player : Mob
         if (!isLocalPlayer) return;
         Game.Player = this;
         _nameTag.SetActive(false);
-        
+
         Debug.LogWarning("Saving disabled !");
         SuperGlobals.EditorMode = true;
 
         Name = SuperGlobals.PlayerName;
         Debug.Log($"My pseudo is : {Name}");
-        
+
         // set up other objects
         GameObject scripts = GameObject.Find("Scripts");
         _inventoryUI = scripts.GetComponent<InventoryUI>();
@@ -101,8 +100,8 @@ public class Player : Mob
         int chunkX = Utils.Floor(pos.x / Chunk.Size), chunkZ = Utils.Floor(pos.z / Chunk.Size);
         _spawn = new Vector3(Utils.Floor(pos.x) + 0.5f, y, Utils.Floor(pos.z) + 0.5f);
 
-        if (MapManager.Chunks != null &&
-            MapManager.Chunks.TryGetValue(Chunk.GetName(chunkX, Level, chunkZ), out Chunk chunk))
+        if (MapManagement.Chunks != null &&
+            MapManagement.Chunks.TryGetValue(Chunk.GetName(chunkX, Level, chunkZ), out Chunk chunk))
         {
             int modX = (int)(pos.x - chunkX * Chunk.Size),
                 modZ = (int)(pos.z - chunkZ * Chunk.Size);
@@ -160,9 +159,9 @@ public class Player : Mob
     [ClientRpc]
     private void RpcPlaceBreak(List<string> update, int x, int y, int z, int type, bool isPlacing)
     {
-        if (!MapManager.Chunks.ContainsKey(update[0])) return; // map edit isn't visible for this player
+        if (!MapManagement.Chunks.ContainsKey(update[0])) return; // map edit isn't visible for this player
         // this could skip an update when editing a chunk border, but this shouldn't matter most of the time
-        Chunk chunk = MapManager.Chunks[update[0]];
+        Chunk chunk = MapManagement.Chunks[update[0]];
 
         // update block in chunk
         if (isPlacing) chunk.Blocks[x, y, z] = type;
@@ -175,8 +174,8 @@ public class Player : Mob
 
         // update current chunk, and also nearby chunks if placed on a chunk border
         foreach (string chunkName2 in update)
-            if (MapManager.Chunks.ContainsKey(chunkName2))
-                MapManager.Chunks[chunkName2].BuildMesh();
+            if (MapManagement.Chunks.ContainsKey(chunkName2))
+                MapManagement.Chunks[chunkName2].BuildMesh();
     }
 
     [Command (requiresAuthority = false)]
@@ -214,7 +213,7 @@ public class Player : Mob
 
                 int currentBlock = Inventory.GetCurrentBlock(HotBar.SelectedIndex, 3);
                 // check for breaking and interacting
-                if (MapManager.Chunks.TryGetValue(Chunk.GetName(breakCx, Level, breakCz), out Chunk chunk))
+                if (MapManagement.Chunks.TryGetValue(Chunk.GetName(breakCx, Level, breakCz), out Chunk chunk))
                 {
                     if (placing && chunk.InteractBlock(breakX, breakY, breakZ)) return; // check for interactions
                     if (breaking) // break block
@@ -226,7 +225,7 @@ public class Player : Mob
                 }
 
                 // check for block placing
-                if (placing && MapManager.Chunks.TryGetValue(Chunk.GetName(placeCx, Level, placeCz), out chunk))
+                if (placing && MapManagement.Chunks.TryGetValue(Chunk.GetName(placeCx, Level, placeCz), out chunk))
                 {
                     int count = Inventory.GetCurrentBlockCount(HotBar.SelectedIndex, 3);
                     if (count <= 0) return;
@@ -245,18 +244,16 @@ public class Player : Mob
 
     void Update()
     {
-
-
         // if couldn't spawn before, retry
         if (!_spawnSuccess) SetSpawn(_spawn);
-        
-        if (!isLocalPlayer){
+
+        if (!isLocalPlayer)
+        {
             _nameTag.transform.rotation = playerCamera.cam.transform.rotation;
             return; // don't update other players
         }
-        
-        if (Body == null) throw new PlayerException("Player body is null, check game start for errors");
 
+        if (Body == null) throw new PlayerException("Player body is null, check game start for errors");
 
         Body.Update();
         if (Body.OnFloor) GroundedHeight = transform.position.y; // for camera

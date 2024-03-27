@@ -35,12 +35,14 @@ def clean_file(filename):
         Fore.LIGHTYELLOW_EX, basename(filename), Fore.RESET)
     )
 
-    with open(filename, encoding='utf-8') as f: content = f.read().split('\n')
+    with open(filename, encoding='utf-8') as f:
+        content = f.read().split('\n')
 
     edited = ''
     Prev = None
     for i, line in enumerate(content):
         # remove trailing spaces
+        changed = line != line.rstrip()
         line = line.rstrip()
 
         add = True
@@ -48,19 +50,21 @@ def clean_file(filename):
 
         # remove empty lines, except after } and before blocks
         # and also after {, and before } too
-        startprev = Prev is None or Prev == '' or Prev.lstrip() == '{'
+        startprev = Prev is None or Prev in '\ufeff' or Prev.lstrip() == '{'
         endnext = next is None or next == '' or next.lstrip() == '}'
+
         if line == '' and (py and endnext or startprev or endnext): add = False
 
         # add a single empty line after } and before blocks if missing
         elif Prev and Prev.lstrip() == '}' and \
              (line and line.lstrip() not in '{}'):
             edited += '\n'
-            changes += 1
+            n_changes += 1
 
         if add:
             # add line if needed
             edited += line+'\n'
+            if changed: n_changes += 1
 
             # group empty blocks into "{ }"
             if line.lstrip() == '}' and Prev.lstrip() == '{':
@@ -87,13 +91,13 @@ def clean_file(filename):
         if not py:
             # get code part of line, check for string additions
             _line = ''
-            operation = []
+            operation = False
             count = 0
             in_string = False
             depth = 0
             prev = None
             dollar = False
-            for char in line:
+            for j, char in enumerate(line):
                 if char == '"' and prev != '\\': # I know about "\\"
                     in_string = not in_string
                     count += 1
@@ -109,17 +113,15 @@ def clean_file(filename):
                         if depth: _line += char
                 else: # outside of string: add and check for ""+""
                     _line += char
-                    if char == '+': operation.append(count)
+                    if char == '+' and not (
+                       (j < len(line)-1 and line[j+1] in '+=') or
+                       (j and line[j-1] == '+')):
+                        operation = True
 
                 prev = char
 
-            op = False
-            for o in operation:
-                if o != 0 and o != count:
-                    op = True
-                    break
-
-            if op: string.append(Thing(filename, i+1, line))
+            if count > 1 and operation:
+                string.append(Thing(filename, i+1, line))
 
             # check for operators
             ok = True
@@ -198,6 +200,9 @@ def clean_file(filename):
 
         in_comment = next_in_comment
 
+    if edited and edited[0] == '\ufeff':
+        n_changes += 1
+        edited = edited[1:]
     with open(filename, 'w', encoding='utf-8') as f: f.write(edited)
 
 def clean_folder(path):

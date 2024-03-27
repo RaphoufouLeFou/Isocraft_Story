@@ -66,7 +66,7 @@ public static class NoiseGen
                 }
 
                 break;
-                default: throw new GenerationException("Incorrect level: " + Game.Player.Level);
+                default: throw new GenerationException($"Incorrect level: {Game.Player.Level}");
         }
     }
 

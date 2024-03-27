@@ -1,4 +1,4 @@
-﻿public class Region
+public class Region
 {
     // regions have a fixed size of 8x8 chunks, centered at the origin
     // e.g. region r.1.0 contains chunks from c.4.0 to c.11.7

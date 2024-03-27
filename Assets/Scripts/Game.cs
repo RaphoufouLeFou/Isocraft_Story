@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,7 +18,7 @@ public class Game : MonoBehaviour
     [NonSerialized] public static SaveManagement SaveManager;
 
     public Sprite[] sprites;
-    public MapManager mapManager;
+    public MapManagement mapManagement;
 
     public GameObject[] models;
 
@@ -157,7 +157,7 @@ public class Game : MonoBehaviour
 
     private void StartGame()
     {
-        mapManager.StartMapHandle();
+        mapManagement.StartMapHandle();
         // local player hasn't been spawned by map handler
         if (SuperGlobals.IsNewSave) Player.SetSpawn(Player.transform.position);
 

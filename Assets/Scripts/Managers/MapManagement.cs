@@ -5,7 +5,7 @@ using UnityEngine;
 using Mirror;
 using TMPro;
 
-public class MapManager : NetworkBehaviour
+public class MapManagement : NetworkBehaviour
 {
     public GameObject chunkPlane;
     public GameObject chunkParent;
@@ -26,7 +26,6 @@ public class MapManager : NetworkBehaviour
     }
 
     [NonSerialized] public static Dictionary<string, Chunk> Chunks;
-    
 
     public void StartMapHandle()
     {
@@ -37,7 +36,8 @@ public class MapManager : NetworkBehaviour
         for (int x = -4; x < 5; x++)
             for (int z = -4; z < 5; z++)
                 CmdGenChunk(x, z, Id);
-        CmdRequestPlayersNameDictionary(NetworkClient.localPlayer.GetInstanceID(), NetworkClient.localPlayer.assetId, SuperGlobals.PlayerName);
+        CmdRequestPlayersNameDictionary(NetworkClient.localPlayer.GetInstanceID(), NetworkClient.localPlayer.assetId,
+            SuperGlobals.PlayerName);
         if (isServer)
         {
             if (SuperGlobals.IsNewSave) Game.SaveManager.SaveGame(); // initial save
@@ -59,8 +59,8 @@ public class MapManager : NetworkBehaviour
         if (NetworkClient.localPlayer.GetInstanceID() != id) return;
 
         SuperGlobals.SaveName = gameName;
-        string clientName = "CLIENT__" + gameName;
-        string path = Application.persistentDataPath + $"/Saves/{clientName}/{clientName}.IsoSave";
+        string clientName = $"CLIENT__{gameName}";
+        string path = $"{Application.persistentDataPath}/Saves/{clientName}/{clientName}.IsoSave";
 
         if (!File.Exists(path)) Game.SaveManager.SaveGame();
         else Game.SaveManager.LoadSave();
@@ -73,13 +73,15 @@ public class MapManager : NetworkBehaviour
         if (res) Debug.LogWarning("A player already exist with this name !");
         List<uint> idList = new List<uint>();
         List<string> nameList = new List<string>();
-        foreach (KeyValuePair<uint,string> keyValuePair in Game.PlayersNames)
+        foreach (KeyValuePair<uint, string> keyValuePair in Game.PlayersNames)
         {
             idList.Add(keyValuePair.Key);
             nameList.Add(keyValuePair.Value);
         }
+
         RpcGetPlayersNameDictionary(idList, nameList, res, id);
     }
+
     [ClientRpc]
     private void RpcGetPlayersNameDictionary(List<uint> idList, List<string> nameList, bool nameExist, int id)
     {
@@ -88,18 +90,17 @@ public class MapManager : NetworkBehaviour
         Dictionary<uint, string> dictionary = new Dictionary<uint, string>();
         for (int i = 0; i < idList.Count; i++)
             dictionary.Add(idList[i], nameList[i]);
-        
+
         Game.PlayersNames = dictionary;
         //UpdateNameTags(); Not working yet
     }
 
     private void UpdateNameTags()
     {
-        foreach (KeyValuePair<uint,string> pair in Game.PlayersNames)
+        foreach (KeyValuePair<uint, string> pair in Game.PlayersNames)
         {
             NetworkServer.spawned[pair.Key].transform.GetChild(3).GetComponent<TMP_Text>().text = pair.Value;
         }
-        
     }
 
     [Command (requiresAuthority = false)]

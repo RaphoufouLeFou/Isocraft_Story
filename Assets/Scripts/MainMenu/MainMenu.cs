@@ -79,7 +79,7 @@ public class MainMenu : MonoBehaviour
     {
         if (_code != "")
         {
-            (string ip, int err) = NetworkManagement.DecodeIP(_code.ToUpper().Replace("\n", "").Replace(" ",""));
+            (string ip, int err) = NetworkManagement.DecodeIP(_code.ToUpper().Replace("\n", "").Replace(" ", ""));
 
             if (err != 0)
             {
@@ -121,7 +121,7 @@ public class MainMenu : MonoBehaviour
     private void StartGame(string saveName, bool multi, bool newSave)
     {
         saveName = saveName.Replace(' ', '_');
-        string saveFile = Application.persistentDataPath + $"/Saves/{saveName}/{saveName}.IsoSave";
+        string saveFile = $"{Application.persistentDataPath}/Saves/{saveName}/{saveName}.IsoSave";
         if (!IsValidNewSaveName(saveName)) throw new ArgumentException("Save name is not valid");
         if (!File.Exists(saveFile) && !newSave) throw new ArgumentException("Save file not found in folder");
 
@@ -166,7 +166,7 @@ public class MainMenu : MonoBehaviour
     private void DeleteSave(string saveName)
     {
         saveName = saveName.Replace(' ', '_');
-        string path = Application.persistentDataPath + $"/Saves/{saveName}/";
+        string path = $"{Application.persistentDataPath}/Saves/{saveName}/";
         if (Directory.Exists(path)) Directory.Delete(path, true);
     }
 

@@ -97,7 +97,7 @@ public class Chunk : MonoBehaviour
         // get neighboring chunks
         Dictionary<int, Chunk> neighbors = new ();
         for (int i = 0; i < 4; i++)
-            if (MapManager.Chunks.TryGetValue(GetName(
+            if (MapManagement.Chunks.TryGetValue(GetName(
                     _cx + (i < 2 ? i * 2 - 1 : 0),
                     _level,
                     _cz + (i > 1 ? i * 2 - 5 : 0)
@@ -259,7 +259,7 @@ public class Chunk : MonoBehaviour
         // add to mapHandler, and update neighbors (remove side faces if needed) if newly created chunk
         if (newChunk)
         {
-            MapManager.Chunks.TryAdd(name, this);
+            MapManagement.Chunks.TryAdd(name, this);
             foreach (Chunk c in neighbors.Values)
                 c.BuildMesh();
         }

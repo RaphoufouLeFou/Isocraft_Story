@@ -78,7 +78,7 @@ public abstract class CustomRigidBody : IBody
         for (int j = chunkZ - 1; j < chunkZ + 2; j++)
         {
             // no collisions for unloaded chunks
-            if (!MapManager.Chunks.TryGetValue(Chunk.GetName(i, Game.Player.Level, j), out Chunk chunk))
+            if (!MapManagement.Chunks.TryGetValue(Chunk.GetName(i, Game.Player.Level, j), out Chunk chunk))
             {
                 if (i == chunkX && j == chunkZ) return; // sitting in unloaded chunk
                 continue;
