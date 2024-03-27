@@ -55,7 +55,7 @@ public class SaveManagement
 
         Inventory inv = new();
         Vector3 pos = new(), rot = new();
-        float health = 1;
+        int health = 100;
 
         while (file.ReadLine() is { } line)
         {
@@ -78,7 +78,7 @@ public class SaveManagement
 
                 if (count > 0 && type > 0) inv.AddBlockAt(x, y, type, count);
             }
-            else if (key == "Health") health = float.Parse(value);
+            else if (key == "Health") health = int.Parse(value);
         }
 
         Game.Player.SaveLoaded(pos, rot, inv, health);
