@@ -3,17 +3,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : NetworkBehaviour
+public class Player : Mob
 {
     private Camera _camera;
     public PlayerCamera playerCamera;
 
     [NonSerialized] public int Level = 0;
-    [NonSerialized] public int Health;
-    private int _maxHealth;
     [NonSerialized] public bool IsLoaded;
 
-    public PlayerBody Body;
     [NonSerialized] public float GroundedHeight; // height at which the player was last grounded
     private Vector3 _spawn;
     private bool _spawnSuccess = true;
@@ -38,10 +35,6 @@ public class Player : NetworkBehaviour
         _inventoryUI = scripts.GetComponent<InventoryUI>();
         _healthImage = GameObject.Find("Health bar").transform.GetChild(0).gameObject;
 
-        _maxHealth = Game.Mobs.Health[Game.Mobs.PlayerMob];
-        Health = _maxHealth;
-        DealDamage(0); // update health bar at the start
-
         _networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
 
         Inventory = new Inventory();
@@ -50,9 +43,10 @@ public class Player : NetworkBehaviour
         _inventoryUI.SetPlayerInv(Inventory);
         HotBar.UpdateHotBarVisual(Inventory);
 
-        // body settings
+        // body and mob settings
         Transform tr = transform;
-        Body = new PlayerBody(tr);
+        InitMob(Game.Mobs.PlayerMob, new PlayerBody(tr));
+        Damage(0); // update health bar at the start
 
         tr.position = new Vector3(0, Chunk.Size, 0);
 
@@ -74,6 +68,17 @@ public class Player : NetworkBehaviour
         Inventory = inv;
         _inventoryUI.SetPlayerInv(Inventory);
         HotBar.UpdateHotBarVisual(Inventory);
+    }
+
+    public int GetHealth()
+    {
+        return Health;
+    }
+
+    public new void Damage(int amount)
+    {
+        base.Damage(amount);
+        _healthImage.transform.localScale = new Vector3((float)Health / MaxHealth, 1, 1);
     }
 
     public void SetSpawn(Vector3 pos)
@@ -115,13 +120,7 @@ public class Player : NetworkBehaviour
     private void Respawn()
     {
         transform.position = _spawn;
-        Body.Movement = Vector3.zero;
-    }
-
-    public void DealDamage(int amount)
-    {
-        Health =  amount < Health ? Health - amount : 0;
-        _healthImage.transform.localScale = new Vector3((float)Health / _maxHealth, 1, 1);
+        Body.Stop();
     }
 
     private int PlaceBreak(int chunkX, int chunkZ, int x, int y, int z, Chunk chunk, int type, bool isPlacing)

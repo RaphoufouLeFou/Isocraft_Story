@@ -2,11 +2,31 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CustomRigidBody
+public enum BodyMovement
 {
-    public Vector3 Movement = Vector3.zero;
-    public Vector3 MoveRelative;
-    public bool OnFloor;
+    Absolute,
+    Relative
+}
+
+public interface IBody
+{
+    public Vector3 Movement { get; }
+    public Vector3 MoveRelative { get; }
+    public BodyMovement MovementType { get; set; }
+    public bool OnFloor { get; }
+
+    public void Stop();
+    public void Update();
+}
+
+public abstract class CustomRigidBody : IBody
+{
+    private Vector3 _movement = Vector3.zero;
+    private Vector3 _moveRelative;
+    public Vector3 Movement => _movement;
+    public Vector3 MoveRelative => _moveRelative;
+    public bool OnFloor { get; private set; }
+    public BodyMovement MovementType { get; set; } = BodyMovement.Relative;
 
     private readonly Transform _transform;
     private readonly float _speed, _drag, _jumpForce, _gravity;
@@ -14,7 +34,7 @@ public class CustomRigidBody
 
     private readonly float _width, _height;
 
-    public CustomRigidBody(Transform transform, float speed, float drag,
+    protected CustomRigidBody(Transform transform, float speed, float drag,
                            float jumpForce, float gravity, float width, float height)
     {
         _transform = transform;
@@ -136,20 +156,20 @@ public class CustomRigidBody
             // move by final collision
             if (correction.x != 0)
             {
-                Movement.x = 0;
+                _movement.x = 0;
                 pos.x += correction.x;
             }
 
             if (correction.y != 0)
             {
                 if (movement.y <= 0) OnFloor = true; // floor collision
-                Movement.y = 0;
+                _movement.y = 0;
                 pos.y += correction.y;
             }
 
             if (correction.z != 0)
             {
-                Movement.z = 0;
+                _movement.z = 0;
                 pos.z += correction.z;
             }
         }
@@ -167,20 +187,23 @@ public class CustomRigidBody
     protected void Update(float x, float z, float delta)
     {
         // not gonna check, but x and z must be <= 1 in absolute value
-        MoveRelative = new Vector3(x * 0.8f, 0, z).normalized;
-        Vector3 move = _transform.rotation * MoveRelative;
+        _moveRelative = new Vector3(x * 0.8f, 0, z).normalized;
+        Vector3 move = _transform.rotation * _moveRelative;
         float speed = _sprinting ? 1.7f * _speed : _speed;
-        Movement += move * (speed * delta);
+        _movement += move * (speed * delta);
 
         // move according to Movement
         float drag = MathF.Pow(_drag, 100 * delta);
-        Movement.x *= drag;
-        Movement.y += _gravity * delta;
-        Movement.z *= drag;
+        _movement.x *= drag;
+        _movement.y += _gravity * delta;
+        _movement.z *= drag;
 
-        Vector3 newPos = _transform.position + Movement * (delta * _speed);
+        Vector3 newPos = _transform.position + _movement * (delta * _speed);
         CheckCollisions(newPos);
     }
+
+    // overriden by children, this is the method called from the mob's Update
+    public abstract void Update();
 
     protected void StartSprinting()
     {
@@ -194,18 +217,23 @@ public class CustomRigidBody
 
     protected void Jump()
     {
-        Movement.y = _jumpForce;
+        _movement.y = _jumpForce;
+    }
+
+    public void Stop()
+    {
+        _movement = Vector3.zero;
     }
 }
 
 // body set up with the planet's constants
-public class PlanetBody : CustomRigidBody
+public abstract class PlanetBody : CustomRigidBody
 {
     protected PlanetBody(Transform transform) : base(transform, 8, 0.9f, 1.3f, -5, 0.95f, 1.85f) { }
 }
 
 // body with AI controller
-public class MobBody : PlanetBody
+public class MobBody : PlanetBody, IBody
 {
     private readonly Func<(float side, float forwards)> _moveFunc;
 
@@ -214,7 +242,7 @@ public class MobBody : PlanetBody
         _moveFunc = moveFunc;
     }
 
-    public void Update()
+    public override void Update()
     {
         float delta = GetDelta();
         (float x, float z) = _moveFunc();
@@ -222,30 +250,29 @@ public class MobBody : PlanetBody
     }
 }
 
-public class PlayerBody : PlanetBody
+public class PlayerBody : PlanetBody, IBody
 {
     public PlayerBody(Transform transform) : base(transform) { }
 
-    public void Update()
+    public override void Update()
     {
         float delta = GetDelta();
 
-        if (!Settings.IsPaused) // keys movement
-        {
-            float x = 0;
-            float z = 0;
-            bool forwards = Input.GetKey(Settings.KeyMap["Forwards"]);
-            bool backwards = Input.GetKey(Settings.KeyMap["Backwards"]);
-            if (forwards) z++;
-            if (backwards) z--;
-            if (Input.GetKey(Settings.KeyMap["Left"])) x--;
-            if (Input.GetKey(Settings.KeyMap["Right"])) x++;
+        if (Settings.IsPaused) return; // keys movement
 
-            if (Input.GetKey(Settings.KeyMap["Sprint"])) StartSprinting();
-            if (!forwards || backwards) StopSprinting();
+        float x = 0;
+        float z = 0;
+        bool forwards = Input.GetKey(Settings.KeyMap["Forwards"]);
+        bool backwards = Input.GetKey(Settings.KeyMap["Backwards"]);
+        if (forwards) z++;
+        if (backwards) z--;
+        if (Input.GetKey(Settings.KeyMap["Left"])) x--;
+        if (Input.GetKey(Settings.KeyMap["Right"])) x++;
 
-            if (Input.GetKey(Settings.KeyMap["Jump"]) && OnFloor) Jump();
-            base.Update(x, z, delta);
-        }
+        if (Input.GetKey(Settings.KeyMap["Sprint"])) StartSprinting();
+        if (!forwards || backwards) StopSprinting();
+
+        if (Input.GetKey(Settings.KeyMap["Jump"]) && OnFloor) Jump();
+        base.Update(x, z, delta);
     }
 }

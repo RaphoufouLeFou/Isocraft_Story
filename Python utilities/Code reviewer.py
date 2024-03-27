@@ -57,20 +57,30 @@ def clean_file(filename):
              (line and line.lstrip() not in '{}'):
             edited += '\n'
 
-    if add:
-        # add line if needed
-        edited += line+'\n'
+        if add:
+            # add line if needed
+            edited += line+'\n'
 
-        # group empty blocks into "{ }"
-        if line.lstrip() == '}' and Prev.lstrip() == '{':
-            edited = '\n'.join(edited.split('\n')[:-3]) + ' { }\n'
+            # group empty blocks into "{ }"
+            if line.lstrip() == '}' and Prev.lstrip() == '{':
+                edited = '\n'.join(edited.split('\n')[:-3]) + ' { }\n'
+                n_changes += 3
 
-        Prev = line
+            Prev = line
 
-    elif next is not None: n_changes += 1
+        elif next is not None: n_changes += 1
 
+    # other warnings
+    in_comment = False
     for i, line in enumerate(edited.split('\n')):
-        # other warnings
+        next_in_comment = in_comment
+        if '/*' in line:
+            next_in_comment = True
+            line = line.split('/*')[0]
+        elif '*/' in line:
+            next_in_comment = False
+            line = line.split('*/')[-1]
+
         if len(line) > length:
             long.append(Thing(filename, i+1, line))
         if not py:
@@ -170,7 +180,7 @@ def clean_file(filename):
                     break
 
             # check for double spaces
-            if '  ' in _line.lstrip(): ok = False
+            if not in_comment and '  ' in _line.lstrip()[:-1]: ok = False
 
             # check newline before "{", except if "{ whatever"
             _line = line.replace(' ', '')
@@ -184,6 +194,8 @@ def clean_file(filename):
 
             if 'GameObject.Find(' in line or 'GetComponent' in line:
                     expensive.append(Thing(filename, i+1, line))
+
+        in_comment = next_in_comment
 
     with open(filename, 'w', encoding='utf-8') as f: f.write(edited)
 
@@ -208,7 +220,7 @@ ignore_filenames = ('FastNoiseLite', 'Mirror')
 ignore_folders = ('TextMesh',)
 types = ('.cs', '.py', '.pyw')
 operators = '+-*/<>=&|^:?'
-double_operators = ('&&', '||', '^^', '<<', '>>', '=>', '??', '/*', '*/')
+double_operators = ('&&', '||', '^^', '<<', '>>', '=>', '??')
 opening, closing = '([{', ')]}'
 
 n_changes = 0

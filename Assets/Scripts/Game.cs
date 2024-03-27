@@ -8,6 +8,7 @@ public class Game : MonoBehaviour
     [NonSerialized] public static int Tick;
     [NonSerialized] public static int Seed;
     [NonSerialized] public static bool Started;
+    [NonSerialized] public static float InvincibilityTime = 0.5f;
 
     // static variables, get initialized from their serialized variables
     [NonSerialized] public static Sprite[] InvSprites;

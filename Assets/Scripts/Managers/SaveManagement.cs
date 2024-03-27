@@ -27,7 +27,7 @@ public class SaveManagement
         for (int j = 0; j < 4; j++)
         for (int i = 0; i < 9; i++)
             text += $"Inv{i}{j}:{inv.GetCurrentBlock(i, j)}.{inv.GetCurrentBlockCount(i, j)}\n";
-        text += $"Health:{Game.Player.Health}";
+        text += $"Health:{Game.Player.GetHealth()}";
         if (File.Exists(path)) File.Delete(path);
         File.WriteAllText(path, text);
 

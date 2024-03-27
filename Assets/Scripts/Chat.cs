@@ -91,7 +91,7 @@ public class Chat : NetworkBehaviour
         _pastMessages.Add(msg);
         inputField.Select();
         inputField.ActivateInputField();
-        if (msg[0] == '/') Commands.ExecuteCommand(msg.Substring(1));  // command
+        if (msg[0] == '/') Commands.ExecuteCommand(msg.Substring(1)); // command
         else SendMessagesFromUser(msg);
         chatWindow.SetActive(false);
     }

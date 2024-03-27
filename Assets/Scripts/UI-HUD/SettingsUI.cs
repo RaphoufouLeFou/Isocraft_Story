@@ -239,7 +239,7 @@ public class SettingsUI : MonoBehaviour
                     if(key == KeyCode.Escape) return; // cancel if escape key is pressed
 
                     Settings.KeyMap[_key] = key; // map the key in the dictionary
-                    _keyText.text = key.ToString();  // update the button text of the parameter
+                    _keyText.text = key.ToString(); // update the button text of the parameter
                 }
     }
 }

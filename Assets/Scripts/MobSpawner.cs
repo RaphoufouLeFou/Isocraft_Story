@@ -6,11 +6,11 @@ public class MobSpawner : MonoBehaviour
 
     public bool spawn;
 
-    public void SpawnMob(Vector3 position, int Mob)
+    public void SpawnMob(Vector3 position, int mobName)
     {
         GameObject mob = Instantiate(mobPrefab, position, Quaternion.identity);
         MobAI ai = mob.GetComponent<MobAI>();
-        ai.SetName(Mob);
+        ai.Init(mobName);
     }
 
     // Update is called once per frame
