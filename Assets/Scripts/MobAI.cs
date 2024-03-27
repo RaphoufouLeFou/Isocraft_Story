@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MobAI : MonoBehaviour
 {
-    private Dictionary<string, float> dico = new()
+    private readonly Dictionary<string, float> _dico = new()
     {
         {"Zapatos(Clone)", 2},
         {"Mob(Clone)",9001}
@@ -13,19 +13,17 @@ public class MobAI : MonoBehaviour
 
     private MobBody _body;
 
-    private float Health;
+    private float _health;
 
-    // Start is called before the first frame update
     void Start()
     {
         _body = new MobBody(transform, MoveFunction);
 
-        // Accède au Mob attaché et initialisation des différentes caractéristiques du mob.
+        // initializing attached mob
         string gameObjectName = gameObject.name;
-        Health = dico[gameObjectName];
+        _health = _dico[gameObjectName];
     }
 
-    // Update is called once per frame
     void Update()
     {
         _body.Update();

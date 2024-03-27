@@ -1,8 +1,12 @@
 from os import listdir
 from os.path import basename, join, isfile, isdir, splitext
-from colorama import init, Fore
 
-init()
+try:
+    from colorama import init, Fore
+    init()
+except:
+    class Fore: GREEN = RESET = RED = YELLOW = LIGHTGREEN_EX = \
+                LIGHTYELLOW_EX = LIGHTRED_EX = ''
 
 class Thing:
     def __init__(self, *args):
@@ -54,7 +58,6 @@ def clean_file(filename):
                 count = 0
                 in_string = False
                 depth = 0
-                _depth = 0
                 prev = None
                 dollar = False
                 for char in line:
@@ -63,21 +66,17 @@ def clean_file(filename):
                         count += 1
                         _line += char
                         dollar = in_string and prev == '$'
-                        if in_string: _depth = 0
+                        if in_string: depth = 0
                     elif in_string: # in string: if $"", add code inside
                         if dollar and prev != '\\':
-                            if char in opening: _depth += 1
-                            elif char in closing:
-                                _depth -= 1
+                            if char == '{': depth += 1
+                            elif char == '}':
+                                depth -= 1
                                 _line += char
-                            if _depth: _line += char
+                            if depth: _line += char
                     else: # outside of string: add and check for ""+""
                         _line += char
-
-                        if char in opening: depth += 1
-                        elif char in closing: depth -= 1
-                        elif not depth and char == '+':
-                            operation.append(count)
+                        if char == '+': operation.append(count)
 
                     prev = char
 
@@ -94,8 +93,9 @@ def clean_file(filename):
                 _line = _line.split('//')[0]+' ' # I know about // //
                 j = 1
                 while j < len(_line)-2:
-                    if 'case' in line: break
+                    if 'case' in line or 'default' in line: break
                     if _line[j] in operators:
+                        double = False
                         a, b = j-1, j+1
                         # can extend operator if made of multiple characters
                         if b < len(_line)-1:
@@ -119,8 +119,10 @@ def clean_file(filename):
                             continue # char
 
                         # avoid things like List<(int, Vector3)>()
-                        if (a.isalpha() or a in ' 23)(]') \
-                           and (b.isalnum() or b == ' '
+                        if (_line[j] in '<>?' and not double
+                            or _line[j] == '-' or _line[j:j+2] == ':F') \
+                            and (a.isalpha() or a in ' 23)(]') \
+                            and (b.isalnum() or b == ' '
                             or _line[j+1:j+3] == '()' or (
                             b == '(' and _line[j+2].isalpha())):
                             j += 1
@@ -138,7 +140,8 @@ def clean_file(filename):
 
                 if not ok: visual.append(Thing(filename, i+1, line))
 
-                if 'TODO' in line: todo.append(Thing(filename, i+1, line))
+                if 'todo' in line.lower():
+                    todo.append(Thing(filename, i+1, line))
 
                 if 'GameObject.Find(' in line or 'GetComponent' in line:
                         expensive.append(Thing(filename, i+1, line))

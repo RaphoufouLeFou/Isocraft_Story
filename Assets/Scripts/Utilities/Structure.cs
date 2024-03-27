@@ -25,7 +25,7 @@ public class Structure
         _type = type;
         try
         {
-            StreamReader file = new StreamReader("Assets/Structures/" + type + ".txt");
+            StreamReader file = new StreamReader($"Assets/Structures/{type}.txt");
             // first line: size (x.y.z)
             string[] coords = GetDataLine(file);
             X = int.Parse(coords[0]);
@@ -48,7 +48,7 @@ public class Structure
         }
         catch
         {
-            throw new ArgumentException("Error loading structure \"" + type + "\"");
+            throw new ArgumentException($"Error loading structure \"{type}\"");
         }
     }
 
