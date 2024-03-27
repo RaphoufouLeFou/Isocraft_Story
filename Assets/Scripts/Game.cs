@@ -13,10 +13,12 @@ public class Game : MonoBehaviour
 
     // static variables, get initialized from their serialized variables
     public static Sprite[] InvSprites;
+    public static GameObject[] MobPrefabs;
     public static Player Player;
     public static SaveManagement SaveManager;
 
     public Sprite[] sprites;
+    public GameObject[] mobPrefabs;
     public MapManagement mapManagement;
     public NetworkManagement networkManagement;
 
@@ -103,29 +105,29 @@ public class Game : MonoBehaviour
     {
         public const int
             PlayerMob = 0,
-            Zapatos = 1;
-
-        public static readonly Dictionary<int, string> Prefab = new()
-        {
-            { PlayerMob, "Player" },
-            { Zapatos, "Zapatos" }
-        };
+            Mob = 1,
+            Zapatos = 2;
+        
 
         public static readonly Dictionary<int, string> Names = new()
         {
             { PlayerMob, "Player" },
+            { Mob, "🦃🦃🦃" },
             { Zapatos, "Zapatos" }
         };
 
         public static readonly Dictionary<int, int> Health = new()
         {
             { PlayerMob, 100 },
+            { Mob, 9000 },
             { Zapatos, 50 }
         };
     }
 
     public void InitGameUtils()
     {
+        MobPrefabs = mobPrefabs;
+        
         if (Models.ModelsIndex.Count != models.Length) throw new BlockException("Not all models initialized");
         Models.GameObjects = models;
         Object = this;

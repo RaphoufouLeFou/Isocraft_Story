@@ -42,9 +42,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8190461397343952044}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0579eecfee59e9847af1cf36b41b2435, type: 3}
+  m_Script: {fileID: 11500000, guid: 412c842cffaa42c0a82d2bf031d840c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
 --- !u!1 &9222544463477158957
 GameObject:
   m_ObjectHideFlags: 0
