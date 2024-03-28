@@ -34,7 +34,6 @@ public class PlayerAnimator : IAnimator
                 AnimateLoop("Sprint");
                 break;
             case AnimationType.Attack:
-                Debug.Log("attack !");
                 AnimateSingle("Attack");
                 break;
             case AnimationType.Jump:
@@ -54,7 +53,6 @@ public class PlayerAnimator : IAnimator
     
     private void AnimateSingle(string animName)
     {
-        Debug.Log("Playing attack !");
         _animator.Play(animName);
     }
     
