@@ -15,7 +15,7 @@ public interface IBody
     public BodyMovement MovementType { set; }
     public bool OnFloor { get; }
 
-    public IAnimator Animator { get; }
+    public IAnimator Animator { get; set; }
 
     public void Stop();
     public void Update();
@@ -30,7 +30,7 @@ public abstract class CustomRigidBody : IBody
     public bool OnFloor { get; private set; }
     public BodyMovement MovementType { get; set; } = BodyMovement.Relative;
 
-    public IAnimator Animator { get; } = new DummyAnimator();
+    public IAnimator Animator { get; set; } = new PlayerAnimator();
 
     private readonly Transform _transform;
     private readonly float _speed, _drag, _jumpForce, _gravity;
@@ -197,9 +197,10 @@ public abstract class CustomRigidBody : IBody
         _moveRelative = new Vector3(x * 0.8f, 0, z).normalized;
         bool immobile = _moveRelative == Vector3.zero;
 
+        
         if (prevImmobile && !immobile) Animator.ReceiveAnimation(sprinting ? AnimationType.Run : AnimationType.Walk);
         else if (!prevImmobile && immobile) Animator.ReceiveAnimation(AnimationType.Idle);
-
+       
         Vector3 move = MovementType == BodyMovement.Absolute ? _moveRelative : _transform.rotation * _moveRelative;
         float speed = sprinting ? 1.7f * _speed : _speed;
         _movement += move * (speed * delta);
@@ -253,12 +254,15 @@ public abstract class PlanetBody : CustomRigidBody
 public class AiBody : PlanetBody, IBody
 {
     private readonly Func<Vector2> _moveFunc;
+    private readonly IAnimator _animator = new MobAnimator();
 
     public AiBody(Transform transform, Func<Vector2> moveFunc) : base(transform)
     {
         _moveFunc = moveFunc;
         MovementType = BodyMovement.Absolute;
+        Animator = _animator;
     }
+    
 
     public override void Update()
     {
@@ -270,8 +274,11 @@ public class AiBody : PlanetBody, IBody
 
 public class PlayerBody : PlanetBody, IBody
 {
-    public PlayerBody(Transform transform) : base(transform) { }
-
+    private readonly IAnimator _animator = new PlayerAnimator();
+    public PlayerBody(Transform transform) : base(transform)
+    {
+        Animator = _animator;
+    }
     public override void Update()
     {
         float delta = GetDelta();

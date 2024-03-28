@@ -76,7 +76,7 @@ public class MobPokabo : Mob, IAiControlled
 
     public Vector2 MoveFunction()
     {
-        return Vector2.zero;
+        return Vector2.one;
     }
 }
 

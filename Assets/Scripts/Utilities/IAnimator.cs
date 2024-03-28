@@ -14,37 +14,74 @@ public enum AnimationType
 public interface IAnimator
 {
     public void ReceiveAnimation(AnimationType type);
+    public void Animate(string animName);
 }
 
-public class DummyAnimator : IAnimator
+public class PlayerAnimator : IAnimator
 {
     private string _currentState;
-    private Animator _animator = Game.Player.transform.GetChild(1).GetComponent<Animator>();
+    private readonly Animator _animator = Game.Player.transform.GetChild(1).GetComponent<Animator>();
     public void ReceiveAnimation(AnimationType type)
     {
         switch (type)
         {
             case AnimationType.Idle:
-                Annimate("Idle");
+                Animate("Idle");
                 break;
             case AnimationType.Walk:
-                Annimate("Walk");
+                Animate("Walk");
                 break;
             case AnimationType.Run:
-                Annimate("Sprint");
+                Animate("Sprint");
                 break;
             case AnimationType.Jump:
                 break;
             default:
-                Annimate("Idle");
+                Animate("Idle");
                 break;
         }
     }
 
-    private void Annimate(string animName)
+    public void Animate(string animName)
     {
         if(_currentState == animName) return;
         _animator.Play(animName);
         _currentState = animName;
     }
 }
+
+public class MobAnimator : IAnimator
+{
+    private string _currentState;
+    //private Animator _animator = Game.Player.transform.GetChild(1).GetComponent<Animator>();
+    public void ReceiveAnimation(AnimationType type)
+    {
+        switch (type)
+        {
+            case AnimationType.Idle:
+                Animate("Idle");
+                break;
+            case AnimationType.Walk:
+                Animate("Walk");
+                break;
+            case AnimationType.Run:
+                Animate("Sprint");
+                break;
+            case AnimationType.Jump:
+                break;
+            default:
+                Animate("Idle");
+                break;
+        }
+    }
+
+    public void Animate(string animName)
+    {
+        /*
+        if(_currentState == animName) return;
+        _animator.Play(animName);
+        _currentState = animName;
+        */
+    }
+}
+
