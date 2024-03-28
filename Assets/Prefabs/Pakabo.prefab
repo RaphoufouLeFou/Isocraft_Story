@@ -118,7 +118,7 @@ GameObject:
   - component: {fileID: 5935594368436389024}
   - component: {fileID: -3043121796944779416}
   m_Layer: 0
-  m_Name: Mob
+  m_Name: Pakabo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

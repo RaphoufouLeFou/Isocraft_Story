@@ -105,21 +105,36 @@ public class Game : MonoBehaviour
     {
         public const int
             PlayerMob = 0,
-            Mob = 1,
-            Zapatos = 2;
+            Pakabo = 1,
+            Bopako = 2,
+            OakBoka = 3, 
+            ChefBoka = 4;
 
         public static readonly Dictionary<int, string> Names = new()
         {
             { PlayerMob, "Player" },
-            { Mob, "🦃🦃🦃" },
-            { Zapatos, "Zapatos" }
+            { Pakabo, "Pakabo" },
+            { Bopako, "Bopaka" },
+            { OakBoka, "Oakboka" },
+            { ChefBoka, "Chefboka" }
         };
 
         public static readonly Dictionary<int, int> Health = new()
         {
             { PlayerMob, 100 },
-            { Mob, 9000 },
-            { Zapatos, 50 }
+            { Pakabo, 150 },
+            { Bopako, 50 },
+            { OakBoka, 75 },
+            { ChefBoka, 250 }
+        };
+        
+        public static readonly Dictionary<int, int> BasedDamage = new()
+        {
+            { PlayerMob, 20 },
+            { Pakabo, 50 },
+            { Bopako, 10 },
+            { OakBoka, 40 },
+            { ChefBoka, 30 }
         };
     }
 

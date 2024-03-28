@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5935594368436389024}
   - component: {fileID: 7830170923587087091}
   m_Layer: 0
-  m_Name: Zapatos
+  m_Name: OakBoka
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
