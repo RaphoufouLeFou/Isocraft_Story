@@ -14,7 +14,6 @@ public enum AnimationType
 public interface IAnimator
 {
     public void ReceiveAnimation(AnimationType type);
-    public void Animate(string animName);
 }
 
 public class PlayerAnimator : IAnimator
@@ -26,28 +25,39 @@ public class PlayerAnimator : IAnimator
         switch (type)
         {
             case AnimationType.Idle:
-                Animate("Idle");
+                AnimateLoop("Idle");
                 break;
             case AnimationType.Walk:
-                Animate("Walk");
+                AnimateLoop("Walk");
                 break;
             case AnimationType.Run:
-                Animate("Sprint");
+                AnimateLoop("Sprint");
+                break;
+            case AnimationType.Attack:
+                Debug.Log("attack !");
+                AnimateSingle("Attack");
                 break;
             case AnimationType.Jump:
                 break;
             default:
-                Animate("Idle");
+                AnimateLoop("Idle");
                 break;
         }
     }
 
-    public void Animate(string animName)
+    private void AnimateLoop(string animName)
     {
         if(_currentState == animName) return;
         _animator.Play(animName);
         _currentState = animName;
     }
+    
+    private void AnimateSingle(string animName)
+    {
+        Debug.Log("Playing attack !");
+        _animator.Play(animName);
+    }
+    
 }
 
 public class MobAnimator : IAnimator

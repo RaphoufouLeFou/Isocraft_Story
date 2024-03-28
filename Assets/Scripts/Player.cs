@@ -146,7 +146,9 @@ public class Player : Mob
         else if (x == Chunk.Size1) update.Add(Chunk.GetName(chunkX + 1, Level, chunkZ));
         if (z == 0) update.Add(Chunk.GetName(chunkX, Level, chunkZ - 1));
         else if (z == Chunk.Size1) update.Add(Chunk.GetName(chunkX, Level, chunkZ + 1));
-
+        
+        Body.Animator.ReceiveAnimation(AnimationType.Attack);
+        
         if (isServer) RpcPlaceBreak(update, x, y, z, type, isPlacing);
         else CmdPlaceBreak(update, x, y, z, type, isPlacing);
 
