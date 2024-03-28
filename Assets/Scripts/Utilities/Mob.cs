@@ -52,3 +52,22 @@ public class MobZapatos : Mob, IAiControlled
         return Vector2.zero;
     }
 }
+
+public class MobClassic : Mob, IAiControlled
+{
+    public void Init(int mobName)
+    {
+        // Body is a MobBody, meaning it will need a function to get the movement from
+        InitMob(mobName, new AiBody(transform, MoveFunction));
+    }
+
+    void Update()
+    {
+        Body.Update();
+    }
+
+    public Vector2 MoveFunction()
+    {
+        return Vector2.zero;
+    }
+}

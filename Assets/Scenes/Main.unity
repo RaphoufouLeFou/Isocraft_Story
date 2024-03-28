@@ -2098,6 +2098,7 @@ GameObject:
   - component: {fileID: 124641310}
   - component: {fileID: 124641312}
   - component: {fileID: 124641311}
+  - component: {fileID: 124641313}
   m_Layer: 0
   m_Name: Scripts
   m_TagString: Untagged
@@ -2236,6 +2237,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5a5624e58518c8847a936630219aeb40, type: 3}
   - {fileID: 21300000, guid: 5a5624e58518c8847a936630219aeb40, type: 3}
   - {fileID: 21300000, guid: 9c57b1e3bc5a73d418e564a5e46e4e8b, type: 3}
+  mobPrefabs:
+  - {fileID: 6898874048799245517, guid: bd62b9d82520a9641a08bb763a969a8c, type: 3}
+  - {fileID: 8190461397343952044, guid: b5b9f995f936e1643a8b56441aff62af, type: 3}
+  - {fileID: 8190461397343952044, guid: 8dbf0b791cd787a468476bf89134c9a2, type: 3}
   mapManagement: {fileID: 124641312}
   networkManagement: {fileID: 520568134}
   models:
@@ -2257,6 +2262,19 @@ MonoBehaviour:
   syncInterval: 0.1
   chunkPlane: {fileID: 9217093936871528207, guid: 591103caefeb4be45b8ccc5a163c3fea, type: 3}
   chunkParent: {fileID: 851175655}
+--- !u!114 &124641313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124641301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90edc54ea4ef35b4f8ddc9a6977af906, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawn: 0
 --- !u!1 &144715727
 GameObject:
   m_ObjectHideFlags: 0

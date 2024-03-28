@@ -8,7 +8,20 @@ public class MobSpawner : MonoBehaviour
     public void SpawnMob(Vector3 position, int mobID)
     {
         GameObject mob = Instantiate(Game.MobPrefabs[mobID], position, Quaternion.identity);
-        IAiControlled ai = mob.GetComponent<IAiControlled>();
+        IAiControlled ai;
+        switch (mobID)
+        {
+            case 1:
+                ai = mob.AddComponent<MobClassic>();
+                break;
+            case 2:
+                ai = mob.AddComponent<MobZapatos>();
+                break; 
+            default: 
+                ai = mob.AddComponent<MobZapatos>();
+                break;
+        }
+        
         ai.Init(mobID);
     }
 
@@ -17,8 +30,8 @@ public class MobSpawner : MonoBehaviour
     {
         if (spawn)
         {
-            SpawnMob(new Vector3(0, 7, 0), 2);
             spawn = false;
+            SpawnMob(new Vector3(0, 7, 0), 2);
         }
     }
 }
